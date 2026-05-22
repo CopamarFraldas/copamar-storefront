@@ -27,30 +27,30 @@ type CountrySelectProps = {
 }
 
 const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
-  const [current, setCurrent] = useState<
-    | { country: string | undefined; region: string; label: string | undefined }
-    | undefined
-  >(undefined)
+  const [current, setCurrent] = useState<CountryOption | undefined>(undefined)
 
   const { countryCode } = useParams()
   const currentPath = usePathname().split(`/${countryCode}`)[1]
 
   const { state, close } = toggleState
 
-  const options = useMemo(() => {
+  const options = useMemo<CountryOption[]>(() => {
     const ptNames: Record<string, string> = {
       br: "Brasil",
     }
     return regions
-      ?.map((r) => {
-        return r.countries?.map((c) => ({
-          country: c.iso_2,
-          region: r.id,
-          label: ptNames[c.iso_2 ?? ""] ?? c.display_name,
-        }))
-      })
-      .flat()
-      .sort((a, b) => (a?.label ?? "").localeCompare(b?.label ?? ""))
+      .flatMap((r) =>
+        (r.countries ?? [])
+          .filter((c): c is HttpTypes.StoreRegionCountry & { iso_2: string } =>
+            !!c.iso_2
+          )
+          .map((c) => ({
+            country: c.iso_2,
+            region: r.id,
+            label: ptNames[c.iso_2] ?? c.display_name ?? c.iso_2,
+          }))
+      )
+      .sort((a, b) => a.label.localeCompare(b.label))
   }, [regions])
 
   useEffect(() => {
