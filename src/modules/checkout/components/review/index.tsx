@@ -30,7 +30,7 @@ const Review = ({ cart }: { cart: any }) => {
             }
           )}
         >
-          Review
+          Revisar pedido
         </Heading>
       </div>
       {isOpen && previousStepsCompleted && (

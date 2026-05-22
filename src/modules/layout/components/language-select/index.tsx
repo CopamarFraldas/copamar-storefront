@@ -49,7 +49,7 @@ type LanguageSelectProps = {
 const getLocalizedLanguageName = (
   code: string,
   fallbackName: string,
-  displayLocale: string = "en-US"
+  displayLocale: string = "pt-BR"
 ): string => {
   try {
     const displayNames = new Intl.DisplayNames([displayLocale], {
@@ -63,8 +63,8 @@ const getLocalizedLanguageName = (
 
 const DEFAULT_OPTION: LanguageOption = {
   code: "",
-  name: "Default",
-  localizedName: "Default",
+  name: "Padrão",
+  localizedName: "Padrão",
   countryCode: "",
 }
 
@@ -86,7 +86,7 @@ const LanguageSelect = ({
       localizedName: getLocalizedLanguageName(
         locale.code,
         locale.name,
-        currentLocale ?? "en-US"
+        currentLocale ?? "pt-BR"
       ),
       countryCode: getCountryCodeFromLocale(locale.code),
     }))
@@ -128,7 +128,7 @@ const LanguageSelect = ({
       >
         <ListboxButton className="py-1 w-full">
           <div className="txt-compact-small flex items-start gap-x-2">
-            <span>Language:</span>
+            <span>Idioma:</span>
             {current && (
               <span className="txt-compact-small flex items-center gap-x-2">
                 {current.countryCode && (

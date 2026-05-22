@@ -117,7 +117,7 @@ const Payment = ({
             }
           )}
         >
-          Payment
+          Pagamento
           {!isOpen && paymentReady && <CheckCircleSolid />}
         </Heading>
         {!isOpen && paymentReady && (
@@ -127,7 +127,7 @@ const Payment = ({
               className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
               data-testid="edit-payment-button"
             >
-              Edit
+              Editar
             </button>
           </Text>
         )}
@@ -196,7 +196,7 @@ const Payment = ({
           >
             {!activeSession && isStripeLike(selectedPaymentMethod)
               ? " Enter card details"
-              : "Continue to review"}
+              : "Continuar para revisão"}
           </Button>
         </div>
 
@@ -231,7 +231,7 @@ const Payment = ({
                   <Text>
                     {isStripeLike(selectedPaymentMethod) && cardBrand
                       ? cardBrand
-                      : "Another step will appear"}
+                      : "Outra etapa aparecerá"}
                   </Text>
                 </div>
               </div>

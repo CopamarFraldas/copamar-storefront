@@ -6,9 +6,9 @@ import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
-  title: "Medusa Next.js Starter Template",
+  title: "Copamar Fraldas — Cuidado e dignidade pra quem você ama",
   description:
-    "A performant frontend ecommerce starter template with Next.js 15 and Medusa.",
+    "Fraldas geriátricas, fraldas infantis e produtos de higiene pra cuidadores. Entrega para todo o Brasil. Atendimento especializado.",
 }
 
 export default async function Home(props: {

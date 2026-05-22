@@ -161,7 +161,7 @@ const Shipping: React.FC<ShippingProps> = ({
             }
           )}
         >
-          Delivery
+          Entrega
           {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
             <CheckCircleSolid />
           )}
@@ -176,7 +176,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
                 data-testid="edit-delivery-button"
               >
-                Edit
+                Editar
               </button>
             </Text>
           )}
@@ -186,10 +186,10 @@ const Shipping: React.FC<ShippingProps> = ({
           <div className="grid">
             <div className="flex flex-col">
               <span className="font-medium txt-medium text-ui-fg-base">
-                Shipping method
+                Forma de envio
               </span>
               <span className="mb-4 text-ui-fg-muted txt-medium">
-                How would you like you order delivered
+                Como você prefere receber
               </span>
             </div>
             <div data-testid="delivery-options-container">
@@ -223,11 +223,18 @@ const Shipping: React.FC<ShippingProps> = ({
                           checked={showPickupOptions === PICKUP_OPTION_ON}
                         />
                         <span className="text-base-regular">
-                          Pick up your order
+                          Retirar na loja
                         </span>
                       </div>
                       <span className="justify-self-end text-ui-fg-base">
-                        -
+                        {_pickupMethods.length > 0 &&
+                        _pickupMethods.every((o) => o.amount === 0) ? (
+                          <span className="text-emerald-600 font-medium">
+                            Grátis
+                          </span>
+                        ) : (
+                          "-"
+                        )}
                       </span>
                     </Radio>
                   </RadioGroup>
@@ -272,15 +279,27 @@ const Shipping: React.FC<ShippingProps> = ({
                         </div>
                         <span className="justify-self-end text-ui-fg-base">
                           {option.price_type === "flat" ? (
-                            convertToLocale({
-                              amount: option.amount!,
-                              currency_code: cart?.currency_code,
-                            })
-                          ) : calculatedPricesMap[option.id] ? (
-                            convertToLocale({
-                              amount: calculatedPricesMap[option.id],
-                              currency_code: cart?.currency_code,
-                            })
+                            option.amount === 0 ? (
+                              <span className="text-emerald-600 font-medium">
+                                Grátis
+                              </span>
+                            ) : (
+                              convertToLocale({
+                                amount: option.amount!,
+                                currency_code: cart?.currency_code,
+                              })
+                            )
+                          ) : calculatedPricesMap[option.id] !== undefined ? (
+                            calculatedPricesMap[option.id] === 0 ? (
+                              <span className="text-emerald-600 font-medium">
+                                Grátis
+                              </span>
+                            ) : (
+                              convertToLocale({
+                                amount: calculatedPricesMap[option.id],
+                                currency_code: cart?.currency_code,
+                              })
+                            )
                           ) : isLoadingPrices ? (
                             <Loader />
                           ) : (
@@ -299,7 +318,7 @@ const Shipping: React.FC<ShippingProps> = ({
             <div className="grid">
               <div className="flex flex-col">
                 <span className="font-medium txt-medium text-ui-fg-base">
-                  Store
+                  Loja
                 </span>
                 <span className="mb-4 text-ui-fg-muted txt-medium">
                   Choose a store near you
@@ -349,10 +368,16 @@ const Shipping: React.FC<ShippingProps> = ({
                             </div>
                           </div>
                           <span className="justify-self-end text-ui-fg-base">
-                            {convertToLocale({
-                              amount: option.amount!,
-                              currency_code: cart?.currency_code,
-                            })}
+                            {option.amount === 0 ? (
+                              <span className="text-emerald-600 font-medium">
+                                Grátis
+                              </span>
+                            ) : (
+                              convertToLocale({
+                                amount: option.amount!,
+                                currency_code: cart?.currency_code,
+                              })
+                            )}
                           </span>
                         </Radio>
                       )
@@ -376,7 +401,7 @@ const Shipping: React.FC<ShippingProps> = ({
               disabled={!cart.shipping_methods?.[0]}
               data-testid="submit-delivery-option-button"
             >
-              Continue to payment
+              Continuar para pagamento
             </Button>
           </div>
         </>
@@ -386,14 +411,18 @@ const Shipping: React.FC<ShippingProps> = ({
             {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
               <div className="flex flex-col w-1/3">
                 <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  Method
+                  Forma
                 </Text>
                 <Text className="txt-medium text-ui-fg-subtle">
                   {cart.shipping_methods!.at(-1)!.name}{" "}
-                  {convertToLocale({
-                    amount: cart.shipping_methods!.at(-1)!.amount!,
-                    currency_code: cart?.currency_code,
-                  })}
+                  {cart.shipping_methods!.at(-1)!.amount === 0 ? (
+                    <span className="text-emerald-600 font-medium">Grátis</span>
+                  ) : (
+                    convertToLocale({
+                      amount: cart.shipping_methods!.at(-1)!.amount!,
+                      currency_code: cart?.currency_code,
+                    })
+                  )}
                 </Text>
               </div>
             )}

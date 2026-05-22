@@ -21,7 +21,7 @@ export default async function TransferPage({
               Order transfered!
             </Heading>
             <Text className="text-zinc-600">
-              Order {id} has been successfully transfered to the new owner.
+              Pedido {id} has been successfully transfered to the new owner.
             </Text>
           </>
         )}

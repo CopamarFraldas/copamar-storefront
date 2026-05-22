@@ -38,12 +38,15 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
   const { state, close } = toggleState
 
   const options = useMemo(() => {
+    const ptNames: Record<string, string> = {
+      br: "Brasil",
+    }
     return regions
       ?.map((r) => {
         return r.countries?.map((c) => ({
           country: c.iso_2,
           region: r.id,
-          label: c.display_name,
+          label: ptNames[c.iso_2 ?? ""] ?? c.display_name,
         }))
       })
       .flat()
@@ -75,7 +78,7 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
       >
         <ListboxButton className="py-1 w-full">
           <div className="txt-compact-small flex items-start gap-x-2">
-            <span>Shipping to:</span>
+            <span>Entrega em:</span>
             {current && (
               <span className="txt-compact-small flex items-center gap-x-2">
                 {/* @ts-ignore */}

@@ -11,12 +11,12 @@ import LanguageSelect from "../language-select"
 import { HttpTypes } from "@medusajs/types"
 import { Locale } from "@lib/data/locales"
 
-const SideMenuItems = {
-  Home: "/",
-  Store: "/store",
-  Account: "/account",
-  Cart: "/cart",
-}
+const SideMenuItems: { label: string; href: string; testId: string }[] = [
+  { label: "Início", href: "/", testId: "home-link" },
+  { label: "Loja", href: "/store", testId: "store-link" },
+  { label: "Minha conta", href: "/account", testId: "account-link" },
+  { label: "Carrinho", href: "/cart", testId: "cart-link" },
+]
 
 type SideMenuProps = {
   regions: HttpTypes.StoreRegion[] | null
@@ -72,16 +72,16 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                       </button>
                     </div>
                     <ul className="flex flex-col gap-6 items-start justify-start">
-                      {Object.entries(SideMenuItems).map(([name, href]) => {
+                      {SideMenuItems.map(({ label, href, testId }) => {
                         return (
-                          <li key={name}>
+                          <li key={href}>
                             <LocalizedClientLink
                               href={href}
                               className="text-3xl leading-10 hover:text-ui-fg-disabled"
                               onClick={close}
-                              data-testid={`${name.toLowerCase()}-link`}
+                              data-testid={testId}
                             >
-                              {name}
+                              {label}
                             </LocalizedClientLink>
                           </li>
                         )
@@ -126,8 +126,8 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                         />
                       </div>
                       <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} Medusa Store. All rights
-                        reserved.
+                        © {new Date().getFullYear()} Copamar Fraldas. Todos os direitos
+                        reservados.
                       </Text>
                     </div>
                   </div>
