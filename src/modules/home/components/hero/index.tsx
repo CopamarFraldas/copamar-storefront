@@ -18,6 +18,11 @@ const Hero = () => {
             Cuidado e dignidade pra quem você ama
           </Heading>
         </span>
+        <p className="text-base-regular text-ui-fg-subtle max-w-2xl">
+          Distribuidora especializada em fraldas geriátricas há 20 anos.
+          Atacadista familiar de Santo André, atendendo cuidadores e
+          profissionais de saúde em todo o Brasil.
+        </p>
       </div>
     </div>
   )

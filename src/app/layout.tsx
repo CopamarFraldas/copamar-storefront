@@ -2,20 +2,33 @@ import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import Script from "next/script"
 import CookieConsent from "@modules/common/components/cookie-consent"
+import StructuredData from "@modules/common/components/structured-data"
 import "styles/globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
   title: {
-    default: "Copamar Fraldas — Cuidado e dignidade pra quem você ama",
-    template: "%s | Copamar Fraldas",
+    default:
+      "Copamar Fraldas — Especialista em Fraldas Geriátricas desde 2006",
+    template: "%s | Copamar Fraldas - Especialista em Fraldas Geriátricas desde 2006",
   },
   description:
-    "Fraldas geriátricas, fraldas infantis e produtos de higiene pra cuidadores. Entrega para todo o Brasil. Atendimento especializado.",
+    "Distribuidora atacadista especializada em fraldas geriátricas. 20 anos de tradição. Parcelamento 6x sem juros, 10% desconto PIX. Entregas para todo o Brasil.",
+  keywords: [
+    "fralda geriátrica",
+    "fralda para idoso",
+    "fralda acamado",
+    "loja fralda geriátrica",
+    "atacado fralda geriátrica",
+  ],
+  alternates: {
+    // expõe o llms.txt como <link rel="alternate" type="text/plain" href="/llms.txt">
+    types: { "text/plain": "/llms.txt" },
+  },
   openGraph: {
-    title: "Copamar Fraldas — Cuidado e dignidade pra quem você ama",
+    title: "Copamar Fraldas — Especialista em Fraldas Geriátricas desde 2006",
     description:
-      "Fraldas geriátricas, fraldas infantis e produtos de higiene pra cuidadores. Entrega para todo o Brasil.",
+      "Distribuidora atacadista especializada em fraldas geriátricas. 20 anos de tradição. Parcelamento 6x sem juros, 10% desconto PIX. Entregas para todo o Brasil.",
     locale: "pt_BR",
     type: "website",
     siteName: "Copamar Fraldas",
@@ -26,6 +39,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" data-mode="light">
       <body>
+        <StructuredData />
         <main className="relative">{props.children}</main>
         <CookieConsent />
         {/* tracking on-site (LGPD): só roda com consentimento; carrega após interativo */}
