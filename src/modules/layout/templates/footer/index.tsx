@@ -3,7 +3,7 @@ import { listCollections } from "@lib/data/collections"
 import { Text, clx } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import MedusaCTA from "@modules/layout/components/medusa-cta"
+import ConfigurarCookiesButton from "@modules/common/components/cookie-consent/configure-button"
 
 export default async function Footer() {
   const { collections } = await listCollections({
@@ -142,6 +142,7 @@ export default async function Footer() {
           <Text className="txt-compact-small">
             © {new Date().getFullYear()} Copamar Fraldas. Todos os direitos reservados.
           </Text>
+          <ConfigurarCookiesButton />
         </div>
       </div>
     </footer>
