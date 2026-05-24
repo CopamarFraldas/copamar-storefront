@@ -16,10 +16,10 @@ const Overview = ({ customer, orders }: OverviewProps) => {
       <div className="hidden small:block">
         <div className="text-xl-semi flex justify-between items-center mb-4">
           <span data-testid="welcome-message" data-value={customer?.first_name}>
-            Hello {customer?.first_name}
+            Olá, {customer?.first_name}
           </span>
           <span className="text-small-regular text-ui-fg-base">
-            Signed in as:{" "}
+            Conectado como:{" "}
             <span
               className="font-semibold"
               data-testid="customer-email"
@@ -43,7 +43,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                     {getProfileCompletion(customer)}%
                   </span>
                   <span className="uppercase text-base-regular text-ui-fg-subtle">
-                    Completed
+                    Concluído
                   </span>
                 </div>
               </div>
@@ -59,7 +59,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                     {customer?.addresses?.length || 0}
                   </span>
                   <span className="uppercase text-base-regular text-ui-fg-subtle">
-                    Saved
+                    Salvos
                   </span>
                 </div>
               </div>
@@ -88,13 +88,13 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                             <div className="grid grid-cols-3 grid-rows-2 text-small-regular gap-x-4 flex-1">
                               <span className="font-semibold">Data do pedido</span>
                               <span className="font-semibold">
-                                Order number
+                                Número do pedido
                               </span>
                               <span className="font-semibold">
-                                Total amount
+                                Valor total
                               </span>
                               <span data-testid="order-created-date">
-                                {new Date(order.created_at).toDateString()}
+                                {new Date(order.created_at).toLocaleDateString("pt-BR")}
                               </span>
                               <span
                                 data-testid="order-id"
@@ -114,7 +114,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                               data-testid="open-order-button"
                             >
                               <span className="sr-only">
-                                Go to order #{order.display_id}
+                                Ver pedido #{order.display_id}
                               </span>
                               <ChevronDown className="-rotate-90" />
                             </button>

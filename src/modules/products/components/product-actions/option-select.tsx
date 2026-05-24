@@ -21,9 +21,18 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
 }) => {
   const filteredOptions = (option.values ?? []).map((v) => v.value)
 
+  // Tradução leve dos títulos comuns do seed inglês (Size/Color). Produtos
+  // reais Copamar já virão com title em PT — o fallback usa o título original.
+  const titlePt: Record<string, string> = {
+    Size: "Tamanho",
+    Color: "Cor",
+    Material: "Material",
+  }
+  const titleLabel = titlePt[title] ?? title
+
   return (
     <div className="flex flex-col gap-y-3">
-      <span className="text-sm">Select {title}</span>
+      <span className="text-sm">Escolher {titleLabel.toLowerCase()}</span>
       <div
         className="flex flex-wrap justify-between gap-2"
         data-testid={dataTestId}

@@ -223,7 +223,7 @@ export const updateCustomerAddress = async (
     (currentState.addressId as string) || (formData.get("addressId") as string)
 
   if (!addressId) {
-    return { success: false, error: "Address ID is required" }
+    return { success: false, error: "ID do endereço é obrigatório" }
   }
 
   const address = {

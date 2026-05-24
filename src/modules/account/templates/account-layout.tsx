@@ -1,6 +1,7 @@
 import React from "react"
 
-import UnderlineLink from "@modules/common/components/interactive-link"
+import { ArrowUpRightMini } from "@medusajs/icons"
+import { Text } from "@medusajs/ui"
 
 import AccountNav from "../components/account-nav"
 import { HttpTypes } from "@medusajs/types"
@@ -25,14 +26,23 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
           <div>
             <h3 className="text-xl-semi mb-4">Tem dúvidas?</h3>
             <span className="txt-medium">
-              You can find frequently asked questions and answers on our
-              customer service page.
+              Nossa equipe está pronta pra te ajudar de segunda a sexta, das
+              8h às 17h. Chama no WhatsApp ou manda um e-mail.
             </span>
           </div>
           <div>
-            <UnderlineLink href="/customer-service">
-              Customer Service
-            </UnderlineLink>
+            <a
+              className="flex gap-x-1 items-center group"
+              href="https://wa.me/5511952050000"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Text className="text-ui-fg-interactive">Falar no WhatsApp</Text>
+              <ArrowUpRightMini
+                className="group-hover:rotate-45 ease-in-out duration-150"
+                color="var(--fg-interactive)"
+              />
+            </a>
           </div>
         </div>
       </div>
