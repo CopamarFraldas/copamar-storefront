@@ -7,7 +7,7 @@ import { listOrders } from "@lib/data/orders"
 
 export const metadata: Metadata = {
   title: "Minha conta",
-  description: "Overview of your account activity.",
+  description: "Visão geral da sua conta Copamar.",
 }
 
 export default async function OverviewTemplate() {

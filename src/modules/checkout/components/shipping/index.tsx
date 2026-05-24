@@ -332,7 +332,7 @@ const Shipping: React.FC<ShippingProps> = ({
                   Loja
                 </span>
                 <span className="mb-4 text-ui-fg-muted txt-medium">
-                  Choose a store near you
+                  Escolha um ponto de retirada
                 </span>
               </div>
               <div data-testid="delivery-options-container">

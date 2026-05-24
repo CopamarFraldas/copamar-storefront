@@ -77,7 +77,7 @@ const Addresses = ({
                   level="h2"
                   className="text-3xl-regular gap-x-4 pb-6 pt-8"
                 >
-                  Billing address
+                  Endereço de cobrança
                 </Heading>
 
                 <BillingAddress cart={cart} />

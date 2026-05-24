@@ -5,7 +5,7 @@ import StoreTemplate from "@modules/store/templates"
 
 export const metadata: Metadata = {
   title: "Loja",
-  description: "Explore all of our products.",
+  description: "Explore todos os produtos da Copamar Fraldas.",
 }
 
 type Params = {

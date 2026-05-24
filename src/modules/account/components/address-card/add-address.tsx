@@ -116,7 +116,7 @@ const AddAddress = ({
                 />
               </div>
               <Input
-                label="Province / State"
+                label="Estado"
                 name="province"
                 autoComplete="address-level1"
                 data-testid="state-input"
