@@ -41,10 +41,19 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`,
     foundingDate: "2006-05-16",
-    foundingLocation: "Santo André, SP, Brasil",
+    foundingLocation: {
+      "@type": "Place",
+      name: "Tucuruvi, São Paulo",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "São Paulo",
+        addressRegion: "SP",
+        addressCountry: "BR",
+      },
+    },
     slogan: "Cuidado e dignidade pra quem você ama",
     description:
-      "Distribuidora atacadista especializada em fraldas geriátricas e produtos de higiene para idosos. Empresa familiar fundada em 2006 em Santo André/SP. 20 anos de tradição no atendimento a cuidadores e profissionais de saúde, com parcelamento em até 6x sem juros e 10% de desconto no PIX/boleto.",
+      "Distribuidora atacadista especializada em fraldas geriátricas e produtos de higiene para idosos. Empresa familiar com 20 anos de tradição (fundada em 2006), com sede atual em Santo André/SP. Atendemos cuidadores familiares e profissionais de saúde (asilos, casas de repouso, home care) com parcelamento em até 6x sem juros, 10% de desconto no PIX e boleto, e entregas para todo o Brasil.",
     knowsAbout: [
       "fralda geriátrica",
       "fralda para idoso",
@@ -53,9 +62,34 @@ export function organizationSchema() {
       "incontinência urinária",
       "cuidado de idosos",
     ],
-    founder: [
-      { "@type": "Person", name: "Marco Aurellio Berco Nascimento" },
-      { "@type": "Person", name: "Paulo Henrique Berco Nascimento" },
+    founder: {
+      "@type": "Person",
+      name: "Francisco Antônio Nascimento Junior",
+      alternateName: "Seu Francisco",
+      jobTitle: "Fundador e Consultor Honorário",
+      description:
+        "Fundou a Copamar em 2006 no bairro do Tucuruvi, zona norte de São Paulo. Pivotou a loja generalista para especialização em fraldas geriátricas. Hoje atua como consultor honorário.",
+    },
+    employee: [
+      {
+        "@type": "Person",
+        name: "Marco Aurellio Berco Nascimento",
+        jobTitle:
+          "Sócio-Administrador, Diretor de Estratégia e Operações Digitais",
+        alumniOf: {
+          "@type": "EducationalOrganization",
+          name: "Fundação Getulio Vargas (FGV)",
+        },
+        description:
+          "Filho do fundador, assumiu a direção da Copamar em 2021 junto ao irmão Paulo. Formado em Administração pela FGV. Responsável por estratégia, operação digital (e-commerce, sistemas, automações) e atendimento na loja física.",
+      },
+      {
+        "@type": "Person",
+        name: "Paulo Henrique Berco Nascimento",
+        jobTitle: "Sócio-Administrador, Gestão de Atendimento e Varejo",
+        description:
+          "Filho do fundador, assumiu a direção da Copamar em 2021 junto ao irmão Marco. Em aperfeiçoamento constante via G4 Educação. Responsável por modernização do atendimento, gestão de varejo e relacionamento direto com cuidadores na loja física.",
+      },
     ],
     address: ENDERECO,
     contactPoint: {
