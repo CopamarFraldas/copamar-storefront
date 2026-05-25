@@ -23,8 +23,8 @@ export default async function Footer() {
               Copamar Fraldas
             </LocalizedClientLink>
             <p className="txt-small text-ui-fg-muted">
-              Especialista em fraldas geriátricas desde 2006. Distribuidora
-              atacadista familiar de Santo André/SP. CNPJ 08.140.992/0001-64.
+              Especialista em fraldas geriátricas desde 2006. Empresa familiar
+              de Santo André/SP. CNPJ 08.140.992/0001-64.
             </p>
             <LocalizedClientLink
               href="/sobre"
@@ -43,7 +43,12 @@ export default async function Footer() {
                   className="grid grid-cols-1 gap-2"
                   data-testid="footer-categories"
                 >
-                  {productCategories?.slice(0, 6).map((c) => {
+                  {productCategories
+                    ?.filter(
+                      (c) => !c.parent_category && c.handle !== "atacado"
+                    )
+                    .slice(0, 6)
+                    .map((c) => {
                     if (c.parent_category) {
                       return
                     }
