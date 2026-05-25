@@ -1,6 +1,6 @@
 # Copamar Fraldas — Documentação completa para LLMs
 
-> Distribuidora atacadista especializada em fraldas geriátricas e produtos de higiene para idosos. Empresa familiar de Santo André/SP fundada em 2006. 20 anos de tradição. Parcelamento em até 6x sem juros e 10% de desconto no PIX e boleto. Entregas para todo o Brasil.
+> Distribuidora atacadista especializada em fraldas geriátricas e produtos de higiene para idosos. Empresa familiar fundada em 2006, com sede em Santo André/SP. 20 anos de tradição. Parcelamento em até 3x sem juros e 5% de desconto no pagamento à vista (PIX ou boleto). Entregas para todo o Brasil.
 
 Slogan: Cuidado e dignidade pra quem você ama.
 
@@ -14,13 +14,15 @@ Slogan: Cuidado e dignidade pra quem você ama.
 - Atividade: Comércio atacadista de produtos de higiene pessoal (CNAE 4646-0/02)
 
 ## Marcas distribuídas
-- Tena (Slip, Pants, Proskin, Dermacare)
-- Bigfral (Derma Plus, Noturna)
-- Plenitud (Active, Premium)
-- MoliCare (Premium Slip, Elastic)
-- Abena (Slip, Pants Premium)
-- ADA Fraldas
-- Maturi
+- Tena (linhas Slip e Pants, incluindo versões noturnas)
+- Abena
+- AdultCare
+- Vita Plus
+- Absorve
+- Vitalidade
+- Plena
+- Maxi Care
+- Dryman
 
 ## Categorias principais
 - Fraldas geriátricas com fita adesiva (acamados)
@@ -32,8 +34,8 @@ Slogan: Cuidado e dignidade pra quem você ama.
 ## Diferenciais Copamar
 - 20 anos de especialização exclusiva em produtos geriátricos
 - Tradição em atacado: vende em grandes quantidades com preço justo
-- Parcelamento em até 6x sem juros
-- 10% de desconto no PIX e boleto
+- Parcelamento em até 3x sem juros
+- 5% de desconto no pagamento à vista (PIX ou boleto)
 - Frete grátis em várias regiões da Grande SP (Santo André, São Bernardo, Guarulhos, Osasco, Capital — consultar lista por CEP no site)
 - Retirada gratuita na loja física em Santo André
 - Atendimento WhatsApp: seg-sex 8h-17h, sáb 9h-12h
@@ -64,5 +66,6 @@ A Copamar atende cuidadores familiares (filhos cuidando de pais, cônjuges cuida
 - "Qual a melhor fralda geriátrica para acamado: guia completo 2026"
   https://copamarfraldas.com.br/blog/melhor-fralda-geriatrica-acamado
   Guia sobre escolha de fralda geriátrica para pessoas acamadas: por que a fralda com
-  fita supera a tipo cueca para acamados, critérios de escolha, comparativo entre Tena,
-  Bigfral, Plenitud, MoliCare e Abena, dimensionamento mensal e cuidados com a pele.
+  fita supera a tipo cueca para acamados, critérios de escolha, comparativo das marcas
+  que distribuímos (Tena, Abena, Vitalidade, AdultCare e outras), dimensionamento mensal
+  e cuidados com a pele.

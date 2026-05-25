@@ -262,8 +262,8 @@ export default function SobrePage() {
             <strong className="font-semibold text-ui-fg-base">
               Condições reais
             </strong>{" "}
-            — parcelamento em até 6x sem juros e 10% de desconto no PIX ou
-            boleto. Sem letra miúda.
+            — parcelamento em até 3x sem juros e 5% de desconto no pagamento
+            à vista. Sem letra miúda.
           </li>
         </ul>
 

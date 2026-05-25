@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: "%s | Copamar Fraldas - Especialista em Fraldas Geriátricas desde 2006",
   },
   description:
-    "Distribuidora atacadista especializada em fraldas geriátricas. 20 anos de tradição. Parcelamento 6x sem juros, 10% desconto PIX. Entregas para todo o Brasil.",
+    "Distribuidora atacadista especializada em fraldas geriátricas. 20 anos de tradição. Parcelamento 3x sem juros, 5% desconto à vista. Entregas para todo o Brasil.",
   keywords: [
     "fralda geriátrica",
     "fralda para idoso",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Copamar Fraldas — Especialista em Fraldas Geriátricas desde 2006",
     description:
-      "Distribuidora atacadista especializada em fraldas geriátricas. 20 anos de tradição. Parcelamento 6x sem juros, 10% desconto PIX. Entregas para todo o Brasil.",
+      "Distribuidora atacadista especializada em fraldas geriátricas. 20 anos de tradição. Parcelamento 3x sem juros, 5% desconto à vista. Entregas para todo o Brasil.",
     locale: "pt_BR",
     type: "website",
     siteName: "Copamar Fraldas",

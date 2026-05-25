@@ -53,7 +53,7 @@ export function organizationSchema() {
     },
     slogan: "Cuidado e dignidade pra quem você ama",
     description:
-      "Distribuidora atacadista especializada em fraldas geriátricas e produtos de higiene para idosos. Empresa familiar com 20 anos de tradição (fundada em 2006), com sede atual em Santo André/SP. Atendemos cuidadores familiares e profissionais de saúde (asilos, casas de repouso, home care) com parcelamento em até 6x sem juros, 10% de desconto no PIX e boleto, e entregas para todo o Brasil.",
+      "Distribuidora atacadista especializada em fraldas geriátricas e produtos de higiene para idosos. Empresa familiar com 20 anos de tradição (fundada em 2006), com sede atual em Santo André/SP. Atendemos cuidadores familiares e profissionais de saúde (asilos, casas de repouso, home care) com parcelamento em até 3x sem juros, 5% de desconto no pagamento à vista, e entregas para todo o Brasil.",
     knowsAbout: [
       "fralda geriátrica",
       "fralda para idoso",
