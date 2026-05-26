@@ -39,7 +39,8 @@ export function organizationSchema() {
     legalName:
       "Copamar Distribuidora e Atacadista de Fraldas e Produtos de Higiene LTDA",
     url: SITE_URL,
-    logo: `${SITE_URL}/logo.png`,
+    logo: `${SITE_URL}/logo-512.png`,
+    image: `${SITE_URL}/og-image.png`,
     foundingDate: "2006-05-16",
     foundingLocation: {
       "@type": "Place",

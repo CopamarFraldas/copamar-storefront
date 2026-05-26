@@ -21,6 +21,13 @@ export const metadata: Metadata = {
     "loja fralda geriátrica",
     "atacado fralda geriátrica",
   ],
+  icons: {
+    icon: [
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   alternates: {
     // expõe o llms.txt como <link rel="alternate" type="text/plain" href="/llms.txt">
     types: { "text/plain": "/llms.txt" },
@@ -32,6 +39,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     type: "website",
     siteName: "Copamar Fraldas",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
 }
 

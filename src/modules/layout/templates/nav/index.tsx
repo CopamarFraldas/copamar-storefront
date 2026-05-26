@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import Image from "next/image"
 
 import { listRegions } from "@lib/data/regions"
 import { listLocales } from "@lib/data/locales"
@@ -28,10 +29,17 @@ export default async function Nav() {
           <div className="flex items-center h-full">
             <LocalizedClientLink
               href="/"
-              className="txt-compact-xlarge-plus hover:text-ui-fg-base uppercase"
+              className="flex items-center"
               data-testid="nav-store-link"
             >
-              Copamar Fraldas
+              <Image
+                src="/logo.png"
+                alt="Copamar Fraldas - Especialista em fraldas geriátricas"
+                width={140}
+                height={48}
+                priority
+                style={{ width: "auto", height: "44px" }}
+              />
             </LocalizedClientLink>
           </div>
 

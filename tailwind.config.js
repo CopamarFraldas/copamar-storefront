@@ -34,6 +34,16 @@ module.exports = {
           80: "#1F2937",
           90: "#111827",
         },
+        copamar: {
+          primary: "#1251b8",
+          "primary-dark": "#0d3d8a",
+          "primary-light": "#4a7bc8",
+          cta: "#ef7e1a",
+          "cta-dark": "#c9651a",
+          success: "#10b981",
+          text: "#525252",
+          "bg-light": "#f4f4f5",
+        },
       },
       borderRadius: {
         none: "0px",
