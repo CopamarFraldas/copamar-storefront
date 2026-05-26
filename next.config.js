@@ -13,6 +13,9 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
  */
 const nextConfig = {
   reactStrictMode: true,
+  // Esconde o Dev Indicator ("N") no canto — mantém dev mode + hot reload.
+  // Erros de compile/runtime ainda aparecem. (Next 15.3: buildActivity foi deprecado; usar `false`.)
+  devIndicators: false,
   logging: {
     fetches: {
       fullUrl: true,
