@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import {
   aboutPageSchema,
@@ -14,6 +15,14 @@ export const metadata: Metadata = {
   description:
     "A história da Copamar Fraldas: empresa familiar de Santo André/SP fundada em 2006, especializada em fraldas geriátricas e produtos de higiene para idosos há 20 anos.",
   alternates: { canonical: `${SITE_URL}/sobre` },
+  openGraph: {
+    title: "Quem somos — Copamar Fraldas, 20 anos em fraldas geriátricas",
+    description:
+      "Empresa familiar de Santo André/SP fundada em 2006, especializada em fraldas geriátricas e produtos de higiene para idosos.",
+    url: `${SITE_URL}/sobre`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/loja-fachada.jpg`, width: 1600, height: 900, alt: "Interior da loja Copamar Fraldas em Santo André/SP" }],
+  },
 }
 
 export default function SobrePage() {
@@ -38,6 +47,22 @@ export default function SobrePage() {
           loja de bairro na zona norte de São Paulo e atravessou três endereços
           até encontrar o seu lugar.
         </p>
+
+        <figure className="my-2">
+          <div className="relative w-full aspect-[16/9] overflow-hidden rounded-lg bg-ui-bg-subtle">
+            <Image
+              src="/loja-fachada.jpg"
+              alt="Interior da Copamar Fraldas em Santo André/SP: balcão de atendimento e estoque de fraldas geriátricas (Tena, Adultcare) ao fundo"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 672px"
+              className="object-cover"
+            />
+          </div>
+          <figcaption className="text-xsmall-regular text-ui-fg-muted mt-2 text-center">
+            Nossa loja em Santo André/SP — estoque próprio e atendimento especializado.
+          </figcaption>
+        </figure>
 
         <h2 className="text-xl font-semibold text-ui-fg-base mt-4">
           A loja que começou no Tucuruvi

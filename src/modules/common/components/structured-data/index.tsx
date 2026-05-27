@@ -116,7 +116,7 @@ export function localBusinessSchema() {
     "@type": "LocalBusiness",
     "@id": `${SITE_URL}/#localbusiness`,
     name: "Copamar Fraldas - Loja Física",
-    image: `${SITE_URL}/loja-fachada.jpg`,
+    image: `${SITE_URL}/loja-fachada-square.jpg`,
     telephone: "+5511952050000",
     url: SITE_URL,
     priceRange: "$$",
