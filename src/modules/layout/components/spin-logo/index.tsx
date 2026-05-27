@@ -4,36 +4,43 @@ import Image from "next/image"
 import { useEffect, useRef } from "react"
 
 /**
- * Logo que rotaciona conforme o scroll da página.
- * Desce → gira num sentido; sobe → gira no sentido inverso (a rotação acompanha
- * a posição do scroll, então voltar pro topo desfaz o giro). Usa rAF p/ suavidade.
+ * Logo do header com DUAS rotações combinadas:
+ *  1. Rotação contínua de fundo — "respiração" da marca, 180° a cada 7s.
+ *     Como o símbolo Copamar é simétrico a 180° (dois "C" espelhados),
+ *     a cada meia-volta ele parece voltar à mesma posição.
+ *  2. Rotação por scroll — somada à contínua; ao rolar, o termo do scroll
+ *     muda rápido e domina o movimento. Ao parar, sobra só a contínua (suave).
+ *
+ * Um único requestAnimationFrame lê o scrollY a cada frame e acumula o tempo,
+ * então não há "judder" na transição scroll→parado. Respeita prefers-reduced-motion
+ * e pausa quando a aba não está visível.
  */
 const SpinLogo = () => {
   const ref = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    const SCROLL_FATOR = 0.4 // graus por pixel de scroll
+    const CONT_SPEED = reduce ? 0 : 180 / 7000 // graus por ms (180° em 7s; 0 = sem rotação contínua)
+
     let raf = 0
-    const FATOR = 0.4 // graus por pixel de scroll (~900px = 1 volta completa)
+    let last = performance.now()
+    let continua = 0
 
-    const update = () => {
-      raf = 0
-      const el = ref.current
-      if (el) {
-        const deg = window.scrollY * FATOR
-        el.style.transform = `rotate(${deg}deg)`
-      }
+    const tick = (now: number) => {
+      const dt = now - last
+      last = now
+      if (!document.hidden) continua += dt * CONT_SPEED
+      const deg = continua + window.scrollY * SCROLL_FATOR
+      el.style.transform = `rotate(${deg}deg)`
+      raf = window.requestAnimationFrame(tick)
     }
-    const onScroll = () => {
-      // agenda 1 update por frame (evita thrashing de layout)
-      if (!raf) raf = window.requestAnimationFrame(update)
-    }
+    raf = window.requestAnimationFrame(tick)
 
-    update() // estado inicial (caso a página abra já rolada)
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      if (raf) window.cancelAnimationFrame(raf)
-    }
+    return () => { if (raf) window.cancelAnimationFrame(raf) }
   }, [])
 
   return (
@@ -45,7 +52,7 @@ const SpinLogo = () => {
       height={48}
       priority
       className="will-change-transform"
-      style={{ width: "auto", height: "44px", transition: "transform 80ms linear" }}
+      style={{ width: "auto", height: "44px" }}
     />
   )
 }
