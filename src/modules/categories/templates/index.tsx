@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import InteractiveLink from "@modules/common/components/interactive-link"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -64,17 +63,20 @@ export default function CategoryTemplate({
             <p>{category.description}</p>
           </div>
         )}
-        {category.category_children && (
-          <div className="mb-8 text-base-large">
-            <ul className="grid grid-cols-1 gap-2">
-              {category.category_children?.map((c) => (
-                <li key={c.id}>
-                  <InteractiveLink href={`/categories/${c.handle}`}>
-                    {c.name}
-                  </InteractiveLink>
-                </li>
+        {category.category_children && category.category_children.length > 0 && (
+          <div className="mb-8">
+            <p className="mb-3 text-sm text-ui-fg-muted">Refine sua busca</p>
+            <div className="flex flex-wrap gap-2">
+              {category.category_children.map((c) => (
+                <LocalizedClientLink
+                  key={c.id}
+                  href={`/categories/${c.handle}`}
+                  className="inline-flex items-center rounded-full border border-ui-border-base bg-ui-bg-subtle px-4 py-1.5 text-sm text-ui-fg-subtle transition-colors hover:border-[#1251b8] hover:bg-[#1251b8]/5 hover:text-[#1251b8]"
+                >
+                  {c.name}
+                </LocalizedClientLink>
               ))}
-            </ul>
+            </div>
           </div>
         )}
         <Suspense
