@@ -1,5 +1,4 @@
 import { Suspense } from "react"
-import Image from "next/image"
 
 import { listRegions } from "@lib/data/regions"
 import { listLocales } from "@lib/data/locales"
@@ -8,6 +7,7 @@ import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
+import SpinLogo from "@modules/layout/components/spin-logo"
 
 export default async function Nav() {
   const [regions, locales, currentLocale] = await Promise.all([
@@ -32,14 +32,7 @@ export default async function Nav() {
               className="flex items-center"
               data-testid="nav-store-link"
             >
-              <Image
-                src="/logo.png"
-                alt="Copamar Fraldas - Especialista em fraldas geriátricas"
-                width={140}
-                height={48}
-                priority
-                style={{ width: "auto", height: "44px" }}
-              />
+              <SpinLogo />
             </LocalizedClientLink>
           </div>
 
