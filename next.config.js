@@ -33,6 +33,13 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
+      // Fotos dos produtos migrados (Bling→Medusa): referência direta às origens
+      // externas até o cutover (~22/06), quando migram p/ R2. Ver imagens-magento-urls.log.
+      { protocol: "https", hostname: "copamarfraldas.com.br" },
+      { protocol: "https", hostname: "http2.mlstatic.com" },
+      { protocol: "https", hostname: "www.fraldasgeriatrica.com.br" },
+      // Fotos migradas pro Cloudflare R2 (Fase S1.5) — destino definitivo das imagens
+      { protocol: "https", hostname: "pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev" },
       {
         protocol: "https",
         hostname: "medusa-public-images.s3.eu-west-1.amazonaws.com",
