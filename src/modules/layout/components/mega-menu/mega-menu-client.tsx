@@ -73,9 +73,18 @@ const MegaMenuClient = ({ categories }: Props) => {
           aria-expanded={open}
           aria-controls="mega-menu-panel"
           onClick={() => { clearTimers(); setOpen((o) => !o) }}
-          className="flex items-center gap-1 hover:text-ui-fg-base focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1251b8] rounded px-1 py-0.5"
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 font-medium text-white shadow-md transition-all duration-200
+            ${open ? "bg-blue-800 dark:bg-blue-700 shadow-lg" : "bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 hover:shadow-lg"}
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2`}
           data-testid="nav-categorias-trigger"
         >
+          {/* ícone grade (4 quadradinhos) */}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
           Categorias
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden className={`transition-transform ${open ? "rotate-180" : ""}`}>
             <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
