@@ -1,159 +1,50 @@
-import { listCategories } from "@lib/data/categories"
-import { listCollections } from "@lib/data/collections"
-import { Text, clx } from "@medusajs/ui"
+import { Text } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ConfigurarCookiesButton from "@modules/common/components/cookie-consent/configure-button"
+import FooterCategories from "@modules/layout/components/footer-categories"
+import { getNavCategories } from "@lib/data/nav-categories"
 
 export default async function Footer() {
-  const { collections } = await listCollections({
-    fields: "*products",
-  })
-  const productCategories = await listCategories()
+  const categories = await getNavCategories()
 
   return (
     <footer className="border-t border-ui-border-base w-full">
       <div className="content-container flex flex-col w-full">
-        <div className="flex flex-col gap-y-6 xsmall:flex-row items-start justify-between py-40">
-          <div className="flex flex-col gap-y-3 max-w-xs">
-            <LocalizedClientLink
-              href="/"
-              className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
-            >
-              Copamar Fraldas
-            </LocalizedClientLink>
-            <p className="txt-small text-ui-fg-muted">
-              Especialista em fraldas geriátricas desde 2006. Empresa familiar
-              de Santo André/SP. CNPJ 08.140.992/0001-64.
-            </p>
-            <LocalizedClientLink
-              href="/sobre"
-              className="txt-small text-ui-fg-subtle hover:text-ui-fg-base"
-            >
-              Conheça nossa história →
-            </LocalizedClientLink>
+        {/*
+          DESKTOP (lg+): 5 colunas — identidade | 3 colunas de categorias (FooterCategories) | atendimento
+          TABLET (md): 2 linhas — identidade+atendimento em cima, 3 colunas de categorias embaixo
+          MOBILE (sm): tudo empilhado, categorias viram acordion
+        */}
+        <div className="py-16 lg:py-20">
+          {/* desktop lg+: layout 5 colunas com identidade e atendimento nas pontas */}
+          <div className="hidden lg:grid lg:grid-cols-[1.2fr_2.4fr_0.9fr] gap-x-12">
+            <Identidade />
+            <FooterCategories categories={categories} />
+            <Atendimento />
           </div>
-          <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3">
-            {productCategories && productCategories?.length > 0 && (
-              <div className="flex flex-col gap-y-2">
-                <span className="txt-small-plus txt-ui-fg-base">
-                  Categorias
-                </span>
-                <ul
-                  className="grid grid-cols-1 gap-2"
-                  data-testid="footer-categories"
-                >
-                  {productCategories
-                    ?.filter(
-                      (c) => !c.parent_category && c.handle !== "atacado"
-                    )
-                    .slice(0, 6)
-                    .map((c) => {
-                    if (c.parent_category) {
-                      return
-                    }
 
-                    const children =
-                      c.category_children?.map((child) => ({
-                        name: child.name,
-                        handle: child.handle,
-                        id: child.id,
-                      })) || null
-
-                    return (
-                      <li
-                        className="flex flex-col gap-2 text-ui-fg-subtle txt-small"
-                        key={c.id}
-                      >
-                        <LocalizedClientLink
-                          className={clx(
-                            "hover:text-ui-fg-base",
-                            children && "txt-small-plus"
-                          )}
-                          href={`/categories/${c.handle}`}
-                          data-testid="category-link"
-                        >
-                          {c.name}
-                        </LocalizedClientLink>
-                        {children && (
-                          <ul className="grid grid-cols-1 ml-3 gap-2">
-                            {children &&
-                              children.map((child) => (
-                                <li key={child.id}>
-                                  <LocalizedClientLink
-                                    className="hover:text-ui-fg-base"
-                                    href={`/categories/${child.handle}`}
-                                    data-testid="category-link"
-                                  >
-                                    {child.name}
-                                  </LocalizedClientLink>
-                                </li>
-                              ))}
-                          </ul>
-                        )}
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )}
-            {collections && collections.length > 0 && (
-              <div className="flex flex-col gap-y-2">
-                <span className="txt-small-plus txt-ui-fg-base">
-                  Coleções
-                </span>
-                <ul
-                  className={clx(
-                    "grid grid-cols-1 gap-2 text-ui-fg-subtle txt-small",
-                    {
-                      "grid-cols-2": (collections?.length || 0) > 3,
-                    }
-                  )}
-                >
-                  {collections?.slice(0, 6).map((c) => (
-                    <li key={c.id}>
-                      <LocalizedClientLink
-                        className="hover:text-ui-fg-base"
-                        href={`/collections/${c.handle}`}
-                      >
-                        {c.title}
-                      </LocalizedClientLink>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <div className="flex flex-col gap-y-2">
-              <span className="txt-small-plus txt-ui-fg-base">Atendimento</span>
-              <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
-                <li>
-                  <a
-                    href="https://wa.me/5511952050000"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-ui-fg-base"
-                  >
-                    WhatsApp
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="mailto:vendas@copamarfraldas.com.br"
-                    className="hover:text-ui-fg-base"
-                  >
-                    E-mail
-                  </a>
-                </li>
-                <li>
-                  <span className="text-ui-fg-subtle">
-                    Seg a Sex: 8h às 17h
-                  </span>
-                </li>
-              </ul>
+          {/* tablet md: identidade+atendimento em cima, categorias embaixo */}
+          <div className="hidden md:block lg:hidden">
+            <div className="flex flex-row gap-x-12 mb-10">
+              <Identidade />
+              <Atendimento />
             </div>
+            <FooterCategories categories={categories} />
+          </div>
+
+          {/* mobile sm: empilhado com acordion */}
+          <div className="md:hidden flex flex-col gap-y-8">
+            <Identidade />
+            <div>
+              <h2 className="text-sm font-semibold text-ui-fg-base mb-2">Categorias</h2>
+              <FooterCategories categories={categories} />
+            </div>
+            <Atendimento />
           </div>
         </div>
-        <div className="flex w-full mb-16 justify-between text-ui-fg-muted">
+
+        <div className="flex flex-col xsmall:flex-row w-full pb-10 gap-y-2 justify-between text-ui-fg-muted">
           <Text className="txt-compact-small">
             © {new Date().getFullYear()} Copamar Fraldas. Todos os direitos reservados.
           </Text>
@@ -163,3 +54,53 @@ export default async function Footer() {
     </footer>
   )
 }
+
+const Identidade = () => (
+  <div className="flex flex-col gap-y-3 max-w-xs">
+    <LocalizedClientLink
+      href="/"
+      className="txt-compact-xlarge-plus text-ui-fg-base hover:text-[#1251b8] uppercase font-semibold"
+    >
+      Copamar Fraldas
+    </LocalizedClientLink>
+    <p className="txt-small text-ui-fg-muted leading-relaxed">
+      Especialista em fraldas geriátricas desde 2006. Empresa familiar de
+      Santo André/SP. CNPJ 08.140.992/0001-64.
+    </p>
+    <LocalizedClientLink
+      href="/sobre"
+      className="txt-small text-[#1251b8] hover:underline"
+    >
+      Conheça nossa história →
+    </LocalizedClientLink>
+  </div>
+)
+
+const Atendimento = () => (
+  <div className="flex flex-col gap-y-2">
+    <h3 className="text-sm font-semibold text-ui-fg-base">Atendimento</h3>
+    <ul className="flex flex-col gap-y-2 text-sm text-ui-fg-subtle">
+      <li>
+        <a
+          href="https://wa.me/5511952050000"
+          target="_blank"
+          rel="noreferrer"
+          className="hover:text-[#1251b8] transition-colors"
+        >
+          WhatsApp
+        </a>
+      </li>
+      <li>
+        <a
+          href="mailto:vendas@copamarfraldas.com.br"
+          className="hover:text-[#1251b8] transition-colors"
+        >
+          E-mail
+        </a>
+      </li>
+      <li>
+        <span className="text-ui-fg-muted">Seg a Sex: 8h às 17h</span>
+      </li>
+    </ul>
+  </div>
+)
