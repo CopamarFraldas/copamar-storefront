@@ -15,7 +15,9 @@ const ThemeToggle = () => {
   return (
     <button
       type="button"
-      aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
+      // label neutro no SSR (mounted=false) — evita hydration mismatch porque o tema
+      // só é conhecido no cliente. Após montar, label reflete o tema real.
+      aria-label={!mounted ? "Alternar tema" : isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="flex h-8 w-8 items-center justify-center rounded-full text-ui-fg-subtle transition-colors hover:bg-ui-bg-subtle hover:text-ui-fg-base"
     >
