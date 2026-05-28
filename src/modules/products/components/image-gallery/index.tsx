@@ -49,7 +49,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
         {valid.map((image, index) => (
           <div
             key={image.id}
-            className="relative h-full w-full shrink-0 snap-center bg-ui-bg-subtle"
+            className="relative h-full w-full shrink-0 snap-center bg-white"
             id={image.id}
           >
             <Image
@@ -80,7 +80,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
             aria-label="Foto anterior"
             onClick={() => goTo(active - 1)}
             disabled={active === 0}
-            className="absolute left-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-md backdrop-blur transition hover:bg-white disabled:opacity-0"
+            className="absolute left-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-md backdrop-blur transition hover:bg-ui-bg-base disabled:opacity-0"
           >
             <span className="text-xl leading-none">‹</span>
           </button>
@@ -89,7 +89,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
             aria-label="Próxima foto"
             onClick={() => goTo(active + 1)}
             disabled={active === count - 1}
-            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-md backdrop-blur transition hover:bg-white disabled:opacity-0"
+            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-md backdrop-blur transition hover:bg-ui-bg-base disabled:opacity-0"
           >
             <span className="text-xl leading-none">›</span>
           </button>

@@ -74,7 +74,7 @@ const Toggle = ({
   >
     <span
       className={clx(
-        "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+        "inline-block h-4 w-4 transform rounded-full bg-ui-bg-base transition-transform",
         ativo ? "translate-x-6" : "translate-x-1"
       )}
     />
@@ -156,7 +156,7 @@ const CookieConsent = () => {
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-[60] border-t border-gray-200 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+      className="fixed inset-x-0 bottom-0 z-[60] border-t border-gray-200 bg-ui-bg-base shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
       role="dialog"
       aria-live="polite"
       aria-label="Aviso de cookies e privacidade"

@@ -8,6 +8,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
 import SpinLogo from "@modules/layout/components/spin-logo"
+import ThemeToggle from "@modules/layout/components/theme-toggle"
 
 export default async function Nav() {
   const [regions, locales, currentLocale] = await Promise.all([
@@ -18,7 +19,7 @@ export default async function Nav() {
 
   return (
     <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-white border-ui-border-base">
+      <header className="relative h-16 mx-auto border-b duration-200 bg-ui-bg-base border-ui-border-base">
         <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
           <div className="flex-1 basis-0 h-full flex items-center">
             <div className="h-full small:hidden">
@@ -67,6 +68,7 @@ export default async function Nav() {
                 Minha conta
               </LocalizedClientLink>
             </div>
+            <ThemeToggle />
             <Suspense
               fallback={
                 <LocalizedClientLink
