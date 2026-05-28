@@ -1,0 +1,267 @@
+"use client"
+
+import { useEffect, useRef, useState, useCallback } from "react"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import type { NavCat } from "@lib/data/nav-categories"
+
+type Props = { categories: NavCat[] }
+
+/**
+ * Navegação principal com mega-menu (desktop) e drawer hamburger (mobile).
+ * Contagens vêm das props (sem hardcode). Mantém o que já existe ao redor
+ * (Blog, Quem somos, Minha conta, Tema, Carrinho) — esse componente substitui
+ * só o link antigo de "Fraldas Geriátricas".
+ */
+const MegaMenuClient = ({ categories }: Props) => {
+  // ── DESKTOP: painel com hover-intent + clique + ESC ──
+  const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const openTimer = useRef<number | null>(null)
+  const closeTimer = useRef<number | null>(null)
+
+  const clearTimers = () => {
+    if (openTimer.current) { window.clearTimeout(openTimer.current); openTimer.current = null }
+    if (closeTimer.current) { window.clearTimeout(closeTimer.current); closeTimer.current = null }
+  }
+  const scheduleOpen = useCallback(() => { clearTimers(); openTimer.current = window.setTimeout(() => setOpen(true), 100) }, [])
+  const scheduleClose = useCallback(() => { clearTimers(); closeTimer.current = window.setTimeout(() => setOpen(false), 200) }, [])
+
+  // fecha com ESC + foca o trigger
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setOpen(false); triggerRef.current?.focus() }
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [open])
+
+  // ── MOBILE: drawer ──
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const toggleExpand = (handle: string) =>
+    setExpanded((s) => { const n = new Set(s); n.has(handle) ? n.delete(handle) : n.add(handle); return n })
+
+  // bloqueia scroll do body + ESC fecha
+  useEffect(() => {
+    if (!mobileOpen) return
+    const orig = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileOpen(false) }
+    document.addEventListener("keydown", onKey)
+    return () => { document.body.style.overflow = orig; document.removeEventListener("keydown", onKey) }
+  }, [mobileOpen])
+
+  // Fallback: sem categorias, ainda mostra um link pra /store
+  if (!categories.length) {
+    return (
+      <LocalizedClientLink className="hover:text-ui-fg-base" href="/store" data-testid="nav-categorias-link">
+        Categorias
+      </LocalizedClientLink>
+    )
+  }
+
+  return (
+    <>
+      {/* ===== DESKTOP (≥ small) ===== */}
+      <div className="hidden small:block relative" onMouseEnter={scheduleOpen} onMouseLeave={scheduleClose}>
+        <button
+          ref={triggerRef}
+          type="button"
+          aria-haspopup="true"
+          aria-expanded={open}
+          aria-controls="mega-menu-panel"
+          onClick={() => { clearTimers(); setOpen((o) => !o) }}
+          className="flex items-center gap-1 hover:text-ui-fg-base focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1251b8] rounded px-1 py-0.5"
+          data-testid="nav-categorias-trigger"
+        >
+          Categorias
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden className={`transition-transform ${open ? "rotate-180" : ""}`}>
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {open && (
+          <div
+            ref={panelRef}
+            id="mega-menu-panel"
+            role="menu"
+            aria-label="Categorias da loja"
+            className="fixed left-0 right-0 top-16 z-40 border-b border-ui-border-base bg-ui-bg-base shadow-xl"
+            onMouseEnter={clearTimers}
+            onMouseLeave={scheduleClose}
+          >
+            <div className="content-container py-8">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-8">
+                {categories.map((cat) => (
+                  <div key={cat.handle} className="min-w-0">
+                    <h3 className="mb-3 text-sm font-semibold text-ui-fg-base">
+                      {cat.name}{" "}
+                      <span className="font-normal text-ui-fg-muted">({cat.count})</span>
+                    </h3>
+                    {cat.subs.length > 0 ? (
+                      <>
+                        <ul className="flex flex-col gap-2">
+                          {cat.subs.map((s) => (
+                            <li key={s.handle}>
+                              <LocalizedClientLink
+                                href={`/categories/${s.handle}`}
+                                onClick={() => setOpen(false)}
+                                className="text-sm text-ui-fg-subtle transition-colors hover:text-[#1251b8] focus:outline-none focus-visible:text-[#1251b8] focus-visible:underline"
+                                role="menuitem"
+                              >
+                                {s.name}{" "}
+                                <span className="text-ui-fg-muted">({s.count})</span>
+                              </LocalizedClientLink>
+                            </li>
+                          ))}
+                        </ul>
+                        <LocalizedClientLink
+                          href={`/categories/${cat.handle}`}
+                          onClick={() => setOpen(false)}
+                          className="mt-3 inline-block text-sm font-medium text-[#1251b8] hover:underline"
+                          role="menuitem"
+                        >
+                          Ver tudo →
+                        </LocalizedClientLink>
+                      </>
+                    ) : (
+                      <LocalizedClientLink
+                        href={`/categories/${cat.handle}`}
+                        onClick={() => setOpen(false)}
+                        className="text-sm font-medium text-[#1251b8] hover:underline"
+                        role="menuitem"
+                      >
+                        Ver produtos →
+                      </LocalizedClientLink>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ===== MOBILE (< small) — hamburger + drawer ===== */}
+      <button
+        type="button"
+        aria-label="Abrir menu de categorias"
+        aria-expanded={mobileOpen}
+        onClick={() => setMobileOpen(true)}
+        className="small:hidden flex h-10 w-10 items-center justify-center rounded-md text-ui-fg-base hover:bg-ui-bg-subtle focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1251b8]"
+        data-testid="nav-hamburger"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+          <path d="M3 6h18M3 12h18M3 18h18" />
+        </svg>
+      </button>
+
+      {mobileOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/50 small:hidden"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Categorias da loja"
+            className="fixed left-0 top-0 z-50 h-full w-[85%] max-w-[360px] bg-ui-bg-base shadow-2xl small:hidden flex flex-col animate-in slide-in-from-left duration-300"
+          >
+            <div className="flex items-center justify-between border-b border-ui-border-base px-4 py-3">
+              <h2 className="text-base font-semibold text-ui-fg-base">Categorias</h2>
+              <button
+                type="button"
+                aria-label="Fechar menu"
+                onClick={() => setMobileOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-md text-ui-fg-subtle hover:bg-ui-bg-subtle"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <nav className="flex-1 overflow-y-auto">
+              <ul className="px-2 py-2">
+                {categories.map((cat) => {
+                  const hasSubs = cat.subs.length > 0
+                  const isOpen = expanded.has(cat.handle)
+                  return (
+                    <li key={cat.handle} className="border-b border-ui-border-base last:border-b-0">
+                      {hasSubs ? (
+                        <button
+                          type="button"
+                          aria-expanded={isOpen}
+                          onClick={() => toggleExpand(cat.handle)}
+                          className="flex w-full items-center justify-between px-3 py-3 text-left text-ui-fg-base"
+                        >
+                          <span>
+                            {cat.name}{" "}
+                            <span className="text-ui-fg-muted">({cat.count})</span>
+                          </span>
+                          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden className={`transition-transform ${isOpen ? "rotate-90" : ""}`}>
+                            <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      ) : (
+                        <LocalizedClientLink
+                          href={`/categories/${cat.handle}`}
+                          onClick={() => setMobileOpen(false)}
+                          className="flex items-center justify-between px-3 py-3 text-ui-fg-base"
+                        >
+                          <span>
+                            {cat.name}{" "}
+                            <span className="text-ui-fg-muted">({cat.count})</span>
+                          </span>
+                        </LocalizedClientLink>
+                      )}
+                      {hasSubs && isOpen && (
+                        <ul className="pb-2 pl-6 pr-3">
+                          {cat.subs.map((s) => (
+                            <li key={s.handle}>
+                              <LocalizedClientLink
+                                href={`/categories/${s.handle}`}
+                                onClick={() => setMobileOpen(false)}
+                                className="block py-2 text-sm text-ui-fg-subtle hover:text-[#1251b8]"
+                              >
+                                {s.name}{" "}
+                                <span className="text-ui-fg-muted">({s.count})</span>
+                              </LocalizedClientLink>
+                            </li>
+                          ))}
+                          <li>
+                            <LocalizedClientLink
+                              href={`/categories/${cat.handle}`}
+                              onClick={() => setMobileOpen(false)}
+                              className="block py-2 text-sm font-medium text-[#1251b8]"
+                            >
+                              Ver tudo →
+                            </LocalizedClientLink>
+                          </li>
+                        </ul>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+
+              <div className="border-t border-ui-border-base px-3 py-3">
+                <ul className="flex flex-col gap-1">
+                  <li><LocalizedClientLink href="/blog" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Blog</LocalizedClientLink></li>
+                  <li><LocalizedClientLink href="/sobre" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Quem somos</LocalizedClientLink></li>
+                  <li><LocalizedClientLink href="/account" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Minha conta</LocalizedClientLink></li>
+                </ul>
+              </div>
+            </nav>
+          </div>
+        </>
+      )}
+    </>
+  )
+}
+
+export default MegaMenuClient
