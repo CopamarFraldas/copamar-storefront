@@ -13,6 +13,7 @@ import { Locale } from "@lib/data/locales"
 
 const SideMenuItems: { label: string; href: string; testId: string }[] = [
   { label: "Início", href: "/", testId: "home-link" },
+  { label: "Fraldas Geriátricas", href: "/categories/fraldas-geriatricas", testId: "geriatricas-link" },
   { label: "Loja", href: "/store", testId: "store-link" },
   { label: "Minha conta", href: "/account", testId: "account-link" },
   { label: "Carrinho", href: "/cart", testId: "cart-link" },
