@@ -40,7 +40,9 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
   return (
     // a ALTURA vem daqui (aspect-ratio em bloco). Os slides são h-full —
     // evita o colapso de altura que o aspect-ratio sofre dentro de flex-row.
-    <div className="relative w-full aspect-[29/34]">
+    // aspect-[1/1] + max-w/max-h 600px: galeria proporcional (padrão Amazon/ML).
+    // Antes era aspect-[29/34] em w-full → ~930px de altura em telas grandes (colossal).
+    <div className="relative w-full mx-auto aspect-[1/1] max-w-[600px] max-h-[600px]">
       {/* trilho com scroll-snap: 1 foto por vez */}
       <div
         ref={trackRef}
