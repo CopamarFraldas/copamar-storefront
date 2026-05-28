@@ -1,5 +1,4 @@
 import Image from "next/image"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const Hero = () => {
   return (
@@ -17,13 +16,13 @@ const Hero = () => {
               Empresa familiar de Santo André, atendendo cuidadores e
               profissionais de saúde em todo o Brasil.
             </p>
-            <LocalizedClientLink
-              href="/categories/fraldas-geriatricas"
+            <a
+              href="#nossos-produtos"
               className="inline-block mt-6 px-6 py-3 bg-copamar-cta hover:bg-copamar-cta-dark text-white font-semibold rounded-large transition-colors"
-              data-testid="hero-cta-geriatricas"
+              data-testid="hero-cta-explorar"
             >
-              Ver fraldas geriátricas
-            </LocalizedClientLink>
+              Explorar nossos produtos
+            </a>
           </div>
           <div>
             <Image
