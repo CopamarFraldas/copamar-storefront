@@ -34,9 +34,9 @@ export const paymentInfoMap: Record<
     title: "Pagamento manual",
     icon: <CreditCard />,
   },
-  // PagBank (provider custom — MVP PIX; cartão/boleto depois)
+  // PagBank (provider custom — PIX ou Cartão de crédito; escolha no painel)
   pp_pagbank_pagbank: {
-    title: "PIX (PagBank)",
+    title: "PIX ou Cartão (PagBank)",
     icon: <CreditCard />,
   },
   // Add more payment providers here

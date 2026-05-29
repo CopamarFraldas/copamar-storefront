@@ -10,6 +10,7 @@ import PaymentContainer, {
   StripeCardContainer,
 } from "@modules/checkout/components/payment-container"
 import PagBankPix from "@modules/checkout/components/pagbank-pix"
+import PagBankCard from "@modules/checkout/components/pagbank-card"
 import Divider from "@modules/common/components/divider"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
@@ -32,6 +33,8 @@ const Payment = ({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
     activeSession?.provider_id ?? ""
   )
+  // dentro do PagBank o cliente escolhe PIX ou Cartão (mesmo provider, data diferente)
+  const [pagbankMethod, setPagbankMethod] = useState<"pix" | "card">("pix")
 
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -184,10 +187,36 @@ const Payment = ({
             data-testid="payment-method-error-message"
           />
 
-          {/* PIX PagBank: painel próprio (CPF → QR → polling → finaliza). Não usa o botão de revisão. */}
+          {/* PagBank: painel próprio com seletor PIX | Cartão. Conduz até a
+              confirmação sozinho — não usa o botão de revisão. */}
           {isPagBank(selectedPaymentMethod) && !paidByGiftcard ? (
             <div className="mt-6">
-              <PagBankPix cartId={cart.id} />
+              <div className="mb-5 inline-flex rounded-lg border border-ui-border-base bg-ui-bg-subtle p-1">
+                {(["pix", "card"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setPagbankMethod(m)}
+                    className={clx(
+                      "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+                      {
+                        "bg-ui-bg-base text-ui-fg-base shadow-sm":
+                          pagbankMethod === m,
+                        "text-ui-fg-subtle hover:text-ui-fg-base":
+                          pagbankMethod !== m,
+                      }
+                    )}
+                    data-testid={`pagbank-tab-${m}`}
+                  >
+                    {m === "pix" ? "PIX" : "Cartão de crédito"}
+                  </button>
+                ))}
+              </div>
+              {pagbankMethod === "pix" ? (
+                <PagBankPix cartId={cart.id} />
+              ) : (
+                <PagBankCard cartId={cart.id} />
+              )}
             </div>
           ) : (
             <Button
