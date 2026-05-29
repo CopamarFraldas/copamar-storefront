@@ -1,7 +1,7 @@
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { HttpTypes } from "@medusajs/types"
-import Product from "../product-preview"
+import RelatedProductsCarousel from "./carousel"
 
 type RelatedProductsProps = {
   product: HttpTypes.StoreProduct
@@ -18,29 +18,23 @@ export default async function RelatedProducts({
     return null
   }
 
-  // edit this function to define your related products logic
-  const queryParams: HttpTypes.StoreProductListParams = {}
-  if (region?.id) {
-    queryParams.region_id = region.id
-  }
-  if (product.collection_id) {
-    queryParams.collection_id = [product.collection_id]
-  }
-  if (product.tags) {
-    queryParams.tag_id = product.tags
-      .map((t) => t.id)
-      .filter(Boolean) as string[]
-  }
-  queryParams.is_giftcard = false
+  // Relacionados por CATEGORIA — nossos produtos Bling não têm collection/tag
+  // setados, mas todos têm categoria (Fraldas Geriátricas, Pants, etc) e
+  // subcategoria (Tena, Adultcare, ...). Prioridade: pega da subcategoria
+  // (mais relevante); se não tiver subcategoria, pega da categoria pai.
+  const categoryIds = ((product as any).categories || [])
+    .map((c: any) => c.id)
+    .filter(Boolean) as string[]
 
-  const products = await listProducts({
-    queryParams,
-    countryCode,
-  }).then(({ response }) => {
-    return response.products.filter(
-      (responseProduct) => responseProduct.id !== product.id
+  const queryParams: HttpTypes.StoreProductListParams = { is_giftcard: false }
+  if (region?.id) queryParams.region_id = region.id
+  if (categoryIds.length) (queryParams as any).category_id = categoryIds
+
+  const products = await listProducts({ queryParams, countryCode })
+    .then(({ response }) =>
+      response.products.filter((rp) => rp.id !== product.id)
     )
-  })
+    .catch(() => [])
 
   if (!products.length) {
     return null
@@ -57,13 +51,7 @@ export default async function RelatedProducts({
         </p>
       </div>
 
-      <ul className="grid grid-cols-2 small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8">
-        {products.map((product) => (
-          <li key={product.id}>
-            <Product region={region} product={product} />
-          </li>
-        ))}
-      </ul>
+      <RelatedProductsCarousel products={products} region={region} />
     </div>
   )
 }
