@@ -34,6 +34,11 @@ export const paymentInfoMap: Record<
     title: "Pagamento manual",
     icon: <CreditCard />,
   },
+  // PagBank (provider custom — MVP PIX; cartão/boleto depois)
+  pp_pagbank_pagbank: {
+    title: "PIX (PagBank)",
+    icon: <CreditCard />,
+  },
   // Add more payment providers here
 }
 
@@ -49,6 +54,10 @@ export const isPaypal = (providerId?: string) => {
 }
 export const isManual = (providerId?: string) => {
   return providerId?.startsWith("pp_system_default")
+}
+// PagBank — PIX assíncrono (mostra QR no checkout, confirma via status/webhook)
+export const isPagBank = (providerId?: string) => {
+  return providerId?.startsWith("pp_pagbank")
 }
 
 // Add currencies that don't need to be divided by 100
