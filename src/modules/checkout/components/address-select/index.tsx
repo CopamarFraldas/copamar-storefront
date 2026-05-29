@@ -33,8 +33,6 @@ const AddressSelect = ({
   }, [addresses, addressInput])
 
   return (
-    {/* value sempre definido ("" quando nenhum endereço salvo casa) — evita o
-        warning do Headless UI de uncontrolled→controlled */}
     <Listbox onChange={handleSelect} value={selectedAddress?.id ?? ""}>
       <div className="relative">
         <Listbox.Button
