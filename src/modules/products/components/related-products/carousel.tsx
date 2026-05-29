@@ -1,21 +1,23 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import Product from "../product-preview"
-import { HttpTypes } from "@medusajs/types"
+import { Children, useEffect, useRef, useState } from "react"
 
 type Props = {
-  products: HttpTypes.StoreProduct[]
-  region: HttpTypes.StoreRegion
+  children: React.ReactNode
 }
 
 /**
  * Carrossel horizontal de produtos relacionados. 1 fileira que rola pro lado.
- * Estilo das setas reaproveita o image-gallery (consistência visual).
+ * IMPORTANTE: recebe os cards via children (não renderiza ProductPreview
+ * internamente). ProductPreview é Server Component async — Client Component
+ * (este carrossel) não pode renderizar Server Components diretamente. O
+ * server pai (RelatedProducts) renderiza os Products e passa como children;
+ * este só envolve em <li> + faz scroll/setas.
+ *
  * Mobile: swipe puro (scroll-snap), sem setas.
- * Setas só aparecem quando há overflow (mais cards do que caberia na tela).
+ * Desktop: setas circulares ‹ › (mesmo estilo do image-gallery).
  */
-const RelatedProductsCarousel = ({ products, region }: Props) => {
+const RelatedProductsCarousel = ({ children }: Props) => {
   const trackRef = useRef<HTMLUListElement>(null)
   const [canPrev, setCanPrev] = useState(false)
   const [canNext, setCanNext] = useState(false)
@@ -38,7 +40,7 @@ const RelatedProductsCarousel = ({ products, region }: Props) => {
       el.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onScroll)
     }
-  }, [products.length])
+  }, [])
 
   const scrollBy = (dir: 1 | -1) => {
     const el = trackRef.current
@@ -53,14 +55,14 @@ const RelatedProductsCarousel = ({ products, region }: Props) => {
         ref={trackRef}
         className="flex gap-x-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {products.map((p) => (
+        {Children.map(children, (child, i) => (
           <li
-            key={p.id}
+            key={i}
             // larguras escolhidas pra DEIXAR O PRÓXIMO ESPIANDO na borda direita:
             // mobile: 70% (1 card e meio espiando), tablet 42% (~2.3 cards), desktop 30% (~3.3 cards)
             className="snap-start shrink-0 w-[70%] xsmall:w-[55%] small:w-[42%] medium:w-[30%] large:w-[24%]"
           >
-            <Product region={region} product={p} />
+            {child}
           </li>
         ))}
       </ul>

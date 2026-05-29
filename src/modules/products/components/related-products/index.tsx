@@ -1,6 +1,7 @@
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { HttpTypes } from "@medusajs/types"
+import Product from "../product-preview"
 import RelatedProductsCarousel from "./carousel"
 
 type RelatedProductsProps = {
@@ -51,7 +52,14 @@ export default async function RelatedProducts({
         </p>
       </div>
 
-      <RelatedProductsCarousel products={products} region={region} />
+      {/* Renderiza Product (Server Component async) AQUI e passa como children.
+          Client Component (Carousel) não pode renderizar Server Components,
+          mas pode recebê-los como children. */}
+      <RelatedProductsCarousel>
+        {products.map((p) => (
+          <Product key={p.id} region={region} product={p} />
+        ))}
+      </RelatedProductsCarousel>
     </div>
   )
 }
