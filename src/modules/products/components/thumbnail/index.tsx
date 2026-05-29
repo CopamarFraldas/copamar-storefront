@@ -3,6 +3,7 @@ import Image from "next/image"
 import React from "react"
 
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
+import HoverImage from "./hover-image"
 
 type ThumbnailProps = {
   thumbnail?: string | null
@@ -23,6 +24,8 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   "data-testid": dataTestid,
 }) => {
   const initialImage = thumbnail || images?.[0]?.url
+  // 2ª imagem p/ o hover = primeira que difere da exibida (robusto a thumbnail==images[0])
+  const hoverImage = images?.find((i) => i?.url && i.url !== initialImage)?.url
 
   return (
     <Container
@@ -41,6 +44,8 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       data-testid={dataTestid}
     >
       <ImageOrPlaceholder image={initialImage} size={size} />
+      {/* só há efeito se existir 2ª imagem (graceful p/ produto de 1 foto) */}
+      {hoverImage && <HoverImage src={hoverImage} />}
     </Container>
   )
 }
