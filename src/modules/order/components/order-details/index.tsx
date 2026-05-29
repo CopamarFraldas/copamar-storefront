@@ -6,10 +6,37 @@ type OrderDetailsProps = {
   showStatus?: boolean
 }
 
-const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
-  const formatStatus = (str: string) => {
-    const formatted = str.split("_").join(" ")
+// Status do Medusa → rótulos em PT-BR (loja brasileira)
+const FULFILLMENT_PT: Record<string, string> = {
+  not_fulfilled: "Em preparação",
+  partially_fulfilled: "Preparação parcial",
+  fulfilled: "Preparado",
+  partially_shipped: "Envio parcial",
+  shipped: "Enviado",
+  partially_delivered: "Entrega parcial",
+  delivered: "Entregue",
+  canceled: "Cancelado",
+}
 
+const PAYMENT_PT: Record<string, string> = {
+  not_paid: "Não pago",
+  awaiting: "Aguardando pagamento",
+  authorized: "Autorizado",
+  partially_authorized: "Autorizado parcialmente",
+  captured: "Pagamento confirmado",
+  partially_captured: "Pagamento parcial",
+  partially_refunded: "Reembolso parcial",
+  refunded: "Reembolsado",
+  canceled: "Cancelado",
+  requires_action: "Ação necessária",
+}
+
+const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
+  // fallback: troca _ por espaço e capitaliza, caso surja um status não mapeado
+  const formatStatus = (map: Record<string, string>, str?: string) => {
+    if (!str) return "—"
+    if (map[str]) return map[str]
+    const formatted = str.split("_").join(" ")
     return formatted.slice(0, 1).toUpperCase() + formatted.slice(1)
   }
 
@@ -41,16 +68,16 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
             <Text>
               Status do pedido:{" "}
               <span className="text-ui-fg-subtle " data-testid="order-status">
-                {formatStatus(order.fulfillment_status)}
+                {formatStatus(FULFILLMENT_PT, order.fulfillment_status)}
               </span>
             </Text>
             <Text>
               Status do pagamento:{" "}
               <span
                 className="text-ui-fg-subtle "
-                sata-testid="order-payment-status"
+                data-testid="order-payment-status"
               >
-                {formatStatus(order.payment_status)}
+                {formatStatus(PAYMENT_PT, order.payment_status)}
               </span>
             </Text>
           </>
