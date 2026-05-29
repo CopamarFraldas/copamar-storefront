@@ -20,6 +20,19 @@ export type NavSub = { handle: string; name: string; count: number }
 export type NavCat = { handle: string; name: string; count: number; subs: NavSub[] }
 
 /**
+ * Ordem das subcategorias: alfabético, MAS "Outras Marcas" sempre por último.
+ * Marco 28/05 — manter as marcas no topo, jogar genéricos pro fim.
+ * Usado pelo mega menu, footer e chips da página da categoria pai.
+ */
+export function ordenaSubs<T extends { name: string }>(a: T, b: T): number {
+  const aOutras = /outras\s+marcas?/i.test(a.name)
+  const bOutras = /outras\s+marcas?/i.test(b.name)
+  if (aOutras && !bOutras) return 1
+  if (!aOutras && bOutras) return -1
+  return a.name.localeCompare(b.name, "pt-BR")
+}
+
+/**
  * Retorna as 8 categorias do menu com nome, handle, contagem de produtos
  * e subcategorias (também com contagem). Tudo lido do banco em runtime —
  * sem hardcode. Se a query falhar, retorna [] (header não quebra).
@@ -45,7 +58,7 @@ export async function getNavCategories(): Promise<NavCat[]> {
           name: s.name,
           count: (s.products || []).length,
         }))
-        .sort((a: NavSub, b: NavSub) => a.name.localeCompare(b.name, "pt-BR"))
+        .sort(ordenaSubs)
       result.push({
         handle: c.handle,
         name: c.name,

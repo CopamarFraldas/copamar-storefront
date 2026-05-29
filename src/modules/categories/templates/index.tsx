@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
+import { ordenaSubs } from "@lib/data/nav-categories"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
@@ -67,7 +68,7 @@ export default function CategoryTemplate({
           <div className="mb-8">
             <p className="mb-3 text-sm text-ui-fg-muted">Refine sua busca</p>
             <div className="flex flex-wrap gap-2">
-              {category.category_children.map((c) => (
+              {[...category.category_children].sort(ordenaSubs).map((c) => (
                 <LocalizedClientLink
                   key={c.id}
                   href={`/categories/${c.handle}`}
