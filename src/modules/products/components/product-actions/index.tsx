@@ -162,6 +162,36 @@ export default function ProductActions({
 
         <ProductPrice product={product} variant={selectedVariant} />
 
+        {/* selo ESGOTADO + aviso (metadata.aviso_estoque editável na ADM).
+            Só aparece quando o produto está REALMENTE esgotado:
+            - todas as variants sem estoque (esgotado de verdade), OU
+            - variant escolhida e essa específica está sem estoque.
+            Evita o falso positivo de mostrar "Esgotado" antes do cliente
+            escolher uma variação (estado em que selectedVariant é undefined). */}
+        {(() => {
+          const variants = (product?.variants || []) as any[]
+          const todasEsgotadas = variants.length > 0 && variants.every((v) => {
+            if (!v.manage_inventory) return false
+            if (v.allow_backorder) return false
+            return (v.inventory_quantity || 0) === 0
+          })
+          const variantEscolhidaEsgotada = !!selectedVariant && !inStock
+          const mostrar = todasEsgotadas || variantEscolhidaEsgotada
+          if (!mostrar) return null
+          const meta = (product?.metadata || {}) as Record<string, any>
+          const aviso = typeof meta.aviso_estoque === "string" ? meta.aviso_estoque.trim() : ""
+          return (
+            <div className="flex flex-col gap-y-1 mb-2">
+              <span className="inline-flex w-fit items-center rounded-full bg-red-600 text-white text-xs font-semibold uppercase tracking-wide px-3 py-1">
+                Esgotado
+              </span>
+              {aviso && (
+                <p className="text-sm text-ui-fg-subtle leading-snug">{aviso}</p>
+              )}
+            </div>
+          )
+        })()}
+
         <Button
           onClick={handleAddToCart}
           disabled={
