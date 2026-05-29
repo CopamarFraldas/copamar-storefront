@@ -78,8 +78,21 @@ const MegaMenuClient = ({ categories }: Props) => {
             focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2`}
           data-testid="nav-categorias-trigger"
         >
-          {/* ícone grade (4 quadradinhos) */}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          {/* ícone grade (4 quadradinhos). Quando o menu abre, o SVG inteiro gira
+              90° (os 4 quadradinhos parecem se reorganizar). Marco 28/05. */}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+            className={`transition-transform duration-300 ease-out ${open ? "rotate-90" : ""}`}
+            style={{ transformOrigin: "center" }}
+          >
             <rect x="3" y="3" width="7" height="7" rx="1" />
             <rect x="14" y="3" width="7" height="7" rx="1" />
             <rect x="3" y="14" width="7" height="7" rx="1" />
