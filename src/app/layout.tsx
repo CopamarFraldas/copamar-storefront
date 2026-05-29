@@ -4,6 +4,7 @@ import Script from "next/script"
 import CookieConsent from "@modules/common/components/cookie-consent"
 import StructuredData from "@modules/common/components/structured-data"
 import ThemeProvider from "@modules/common/components/theme-provider"
+import WhatsAppFloat from "@modules/layout/components/whatsapp-float"
 import "styles/globals.css"
 
 export const metadata: Metadata = {
@@ -51,6 +52,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <ThemeProvider>
           <StructuredData />
           <main className="relative">{props.children}</main>
+          <WhatsAppFloat />
           <CookieConsent />
           {/* tracking on-site (LGPD): só roda com consentimento; carrega após interativo */}
           <Script src="/copamar-track.js" strategy="afterInteractive" />
