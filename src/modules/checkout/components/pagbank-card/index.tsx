@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Button } from "@medusajs/ui"
 import { createPagbankCard, checkPagbankStatus } from "@lib/data/pagbank"
 import { placeOrder } from "@lib/data/cart"
-import { isValidCpf } from "@lib/util/cpf"
+import { isValidCpfOrCnpj, maskCpfCnpj } from "@lib/util/cpf"
 import ErrorMessage from "../error-message"
 
 type Stage = "form" | "processing" | "pending" | "paid"
@@ -21,12 +21,7 @@ const MAX_PARCELAS = 3
 
 const onlyDigits = (v: string) => v.replace(/\D/g, "")
 
-const formatCpf = (v: string) =>
-  onlyDigits(v)
-    .slice(0, 11)
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+const formatCpf = maskCpfCnpj // CPF (11) ou CNPJ (14) — máscara dinâmica
 
 const formatCard = (v: string) =>
   onlyDigits(v)
@@ -130,7 +125,7 @@ const PagBankCard = ({ cartId }: { cartId: string }) => {
     if (!holder.trim()) return setError("Informe o nome impresso no cartão.")
     if (!expiryOk(mm, yy)) return setError("Validade inválida ou vencida (use MM/AA).")
     if (onlyDigits(cvv).length < 3) return setError("CVV inválido.")
-    if (!isValidCpf(cpf)) return setError("Informe um CPF válido.")
+    if (!isValidCpfOrCnpj(cpf)) return setError("Informe um CPF ou CNPJ válido.")
 
     const PagSeguro = (window as any).PagSeguro
     if (!sdkReady || !PagSeguro?.encryptCard) {
@@ -273,12 +268,12 @@ const PagBankCard = ({ cartId }: { cartId: string }) => {
         </div>
       </div>
 
-      <label className="text-sm font-medium text-ui-fg-base">CPF do titular</label>
+      <label className="text-sm font-medium text-ui-fg-base">CPF ou CNPJ do titular</label>
       <input
         inputMode="numeric"
         value={cpf}
         onChange={(e) => setCpf(formatCpf(e.target.value))}
-        placeholder="000.000.000-00"
+        placeholder="CPF ou CNPJ"
         disabled={processing}
         className="rounded-lg border border-ui-border-base bg-ui-bg-field px-3 py-2 text-ui-fg-base outline-none focus:border-[#1251b8] focus:ring-1 focus:ring-[#1251b8] disabled:opacity-60"
       />

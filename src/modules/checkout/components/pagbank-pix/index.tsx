@@ -4,18 +4,12 @@ import { useEffect, useRef, useState } from "react"
 import { Button } from "@medusajs/ui"
 import { createPagbankPix, checkPagbankStatus } from "@lib/data/pagbank"
 import { placeOrder } from "@lib/data/cart"
-import { isValidCpf } from "@lib/util/cpf"
+import { isValidCpfOrCnpj, maskCpfCnpj } from "@lib/util/cpf"
 import ErrorMessage from "../error-message"
 
 type Stage = "form" | "qr" | "paid" | "expired"
 
-const formatCpf = (v: string) =>
-  v
-    .replace(/\D/g, "")
-    .slice(0, 11)
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+const formatCpf = maskCpfCnpj // CPF (11) ou CNPJ (14) — máscara dinâmica
 
 // ~15 min de validade do QR (polling a cada 4s → 225 ticks)
 const MAX_TICKS = 225
@@ -62,8 +56,8 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
   async function gerarPix() {
     if (loading) return // guard anti double-submit
     setError(null)
-    if (!isValidCpf(cpf)) {
-      setError("Informe um CPF válido.")
+    if (!isValidCpfOrCnpj(cpf)) {
+      setError("Informe um CPF ou CNPJ válido.")
       return
     }
     setLoading(true)
@@ -230,14 +224,14 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
   return (
     <div className="flex flex-col gap-3 py-2 max-w-md">
       <p className="text-sm text-ui-fg-subtle">
-        Pagamento via <strong>PIX</strong> — aprovação na hora. Informe seu CPF pra gerar o código.
+        Pagamento via <strong>PIX</strong> — aprovação na hora. Informe seu CPF ou CNPJ pra gerar o código.
       </p>
-      <label className="text-sm font-medium text-ui-fg-base">CPF do pagador</label>
+      <label className="text-sm font-medium text-ui-fg-base">CPF ou CNPJ do pagador</label>
       <input
         inputMode="numeric"
         value={cpf}
         onChange={(e) => setCpf(formatCpf(e.target.value))}
-        placeholder="000.000.000-00"
+        placeholder="CPF ou CNPJ"
         className="rounded-lg border border-ui-border-base bg-ui-bg-field px-3 py-2 text-ui-fg-base outline-none focus:border-[#1251b8] focus:ring-1 focus:ring-[#1251b8]"
       />
       <ErrorMessage error={error} />
