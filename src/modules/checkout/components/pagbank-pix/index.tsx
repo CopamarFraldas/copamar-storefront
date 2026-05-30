@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Button } from "@medusajs/ui"
 import { createPagbankPix, checkPagbankStatus } from "@lib/data/pagbank"
 import { placeOrder } from "@lib/data/cart"
+import { isValidCpf } from "@lib/util/cpf"
 import ErrorMessage from "../error-message"
 
 type Stage = "form" | "qr" | "paid" | "expired"
@@ -59,9 +60,10 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
   }
 
   async function gerarPix() {
+    if (loading) return // guard anti double-submit
     setError(null)
-    if (cpfDigits.length !== 11) {
-      setError("Informe um CPF válido (11 dígitos).")
+    if (!isValidCpf(cpf)) {
+      setError("Informe um CPF válido.")
       return
     }
     setLoading(true)
@@ -92,7 +94,7 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
         return
       }
       try {
-        const { paid } = await checkPagbankStatus(orderId)
+        const { paid } = await checkPagbankStatus(cartId)
         failsRef.current = 0
         setWarn(null)
         if (paid) {
