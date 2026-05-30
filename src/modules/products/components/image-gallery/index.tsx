@@ -67,13 +67,6 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
         ))}
       </div>
 
-      {/* cantoneiras decorativas (estilo moldura de álbum) — azul Copamar sutil,
-          não-interativas, sobre a imagem mas sob as setas/dots. Menores no mobile. */}
-      <span aria-hidden className="pointer-events-none absolute top-0 left-0 h-0 w-0 opacity-[0.13] border-t-[48px] border-r-[48px] border-t-[#1251b8] border-r-transparent max-sm:border-t-[26px] max-sm:border-r-[26px]" />
-      <span aria-hidden className="pointer-events-none absolute top-0 right-0 h-0 w-0 opacity-[0.13] border-t-[48px] border-l-[48px] border-t-[#1251b8] border-l-transparent max-sm:border-t-[26px] max-sm:border-l-[26px]" />
-      <span aria-hidden className="pointer-events-none absolute bottom-0 left-0 h-0 w-0 opacity-[0.13] border-b-[48px] border-r-[48px] border-b-[#1251b8] border-r-transparent max-sm:border-b-[26px] max-sm:border-r-[26px]" />
-      <span aria-hidden className="pointer-events-none absolute bottom-0 right-0 h-0 w-0 opacity-[0.13] border-b-[48px] border-l-[48px] border-b-[#1251b8] border-l-transparent max-sm:border-b-[26px] max-sm:border-l-[26px]" />
-
       {count > 1 && (
         <>
           {/* setas ← → */}
