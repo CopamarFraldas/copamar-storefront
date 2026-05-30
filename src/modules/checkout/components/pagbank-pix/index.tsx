@@ -24,7 +24,20 @@ const MAX_TICKS = 225
  * DEPOIS de pago, o cliente vê o erro + botão pra concluir de novo (nunca trava
  * em "Finalizando…" tendo já pago).
  */
-const PagBankPix = ({ cartId }: { cartId: string }) => {
+const PagBankPix = ({
+  cartId,
+  fiscalDoc,
+}: {
+  cartId: string
+  fiscalDoc?: string
+}) => {
+  // Documento do FATURAMENTO (CPF/CNPJ informado na identificação). O PIX é pago
+  // por quem escaneia o QR, mas o pedido PagBank precisa de um documento — usamos
+  // o de faturamento (não reperguntamos). Fallback: se não veio (carrinho antigo
+  // ou acesso direto), volta a pedir o documento.
+  const fiscalDigits = (fiscalDoc || "").replace(/\D/g, "")
+  const hasFiscal = isValidCpfOrCnpj(fiscalDigits)
+
   const [stage, setStage] = useState<Stage>("form")
   const [cpf, setCpf] = useState("")
   const [qrText, setQrText] = useState<string | null>(null)
@@ -56,13 +69,14 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
   async function gerarPix() {
     if (loading) return // guard anti double-submit
     setError(null)
-    if (!isValidCpfOrCnpj(cpf)) {
+    const docToUse = hasFiscal ? fiscalDigits : cpfDigits
+    if (!isValidCpfOrCnpj(docToUse)) {
       setError("Informe um CPF ou CNPJ válido.")
       return
     }
     setLoading(true)
     try {
-      const r = await createPagbankPix(cartId, cpfDigits)
+      const r = await createPagbankPix(cartId, docToUse)
       if (!r.qr_text || !r.order_id) throw new Error("Não foi possível gerar o PIX. Tente novamente.")
       setQrText(r.qr_text)
       setQrImage(r.qr_image)
@@ -220,7 +234,29 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
     )
   }
 
-  // ── estágio: CPF ──
+  // ── estágio inicial ──
+  // Caminho normal: já temos o documento de faturamento → só gerar o QR.
+  if (hasFiscal) {
+    return (
+      <div className="flex flex-col gap-3 py-2 max-w-md">
+        <p className="text-sm text-ui-fg-subtle">
+          Pagamento via <strong>PIX</strong> — aprovação na hora. É só gerar o
+          código e pagar pelo app do seu banco.
+        </p>
+        <p className="text-xs text-ui-fg-muted">
+          Identificação:{" "}
+          <strong className="text-ui-fg-subtle">{formatCpf(fiscalDigits)}</strong>{" "}
+          (documento do faturamento)
+        </p>
+        <ErrorMessage error={error} />
+        <Button onClick={gerarPix} isLoading={loading} className="mt-1 w-fit">
+          Gerar PIX
+        </Button>
+      </div>
+    )
+  }
+
+  // Fallback: documento de faturamento ausente → pede aqui.
   return (
     <div className="flex flex-col gap-3 py-2 max-w-md">
       <p className="text-sm text-ui-fg-subtle">

@@ -60,14 +60,35 @@ const expiryOk = (mm: string, yy: string) => {
  * só o token cifrado vai pro servidor (PCI — o número nunca trafega pra gente).
  * Parcelamento até 3x. Cobrança síncrona → confirma e finaliza o pedido.
  */
-const PagBankCard = ({ cartId }: { cartId: string }) => {
+const PagBankCard = ({
+  cartId,
+  fiscalDoc,
+  defaultHolder,
+}: {
+  cartId: string
+  fiscalDoc?: string
+  defaultHolder?: string
+}) => {
+  // Documento do FATURAMENTO (quem está na nota). Por padrão é o MESMO de quem
+  // paga (a maioria dos casos). Mas o cartão pode ser de outra pessoa (irmão,
+  // pai, mãe) — aí o cliente marca a opção e informa o CPF/CNPJ do titular do
+  // cartão, que é o documento que vai pro PagBank na cobrança.
+  const fiscalDigits = (fiscalDoc || "").replace(/\D/g, "")
+  const hasFiscal = isValidCpfOrCnpj(fiscalDigits)
+
   const [stage, setStage] = useState<Stage>("form")
   const [number, setNumber] = useState("")
-  const [holder, setHolder] = useState("")
+  const [holder, setHolder] = useState((defaultHolder || "").toUpperCase())
   const [expiry, setExpiry] = useState("")
   const [cvv, setCvv] = useState("")
   const [cpf, setCpf] = useState("")
+  const [outraPessoa, setOutraPessoa] = useState(false)
   const [parcelas, setParcelas] = useState(1)
+
+  // documento de cobrança que vai pro PagBank: do titular (outra pessoa) ou,
+  // por padrão, o do faturamento.
+  const usarOutro = outraPessoa || !hasFiscal
+  const docCobranca = usarOutro ? onlyDigits(cpf) : fiscalDigits
   const [error, setError] = useState<string | null>(null)
   const [sdkReady, setSdkReady] = useState(false)
   const sdkRef = useRef(false)
@@ -125,7 +146,12 @@ const PagBankCard = ({ cartId }: { cartId: string }) => {
     if (!holder.trim()) return setError("Informe o nome impresso no cartão.")
     if (!expiryOk(mm, yy)) return setError("Validade inválida ou vencida (use MM/AA).")
     if (onlyDigits(cvv).length < 3) return setError("CVV inválido.")
-    if (!isValidCpfOrCnpj(cpf)) return setError("Informe um CPF ou CNPJ válido.")
+    if (!isValidCpfOrCnpj(docCobranca))
+      return setError(
+        usarOutro
+          ? "Informe um CPF ou CNPJ válido do titular do cartão."
+          : "Documento de faturamento inválido — volte e revise a identificação."
+      )
 
     const PagSeguro = (window as any).PagSeguro
     if (!sdkReady || !PagSeguro?.encryptCard) {
@@ -151,7 +177,7 @@ const PagBankCard = ({ cartId }: { cartId: string }) => {
 
       const { status } = await createPagbankCard(
         cartId,
-        onlyDigits(cpf),
+        docCobranca,
         enc.encryptedCard,
         holder.trim(),
         parcelas
@@ -268,15 +294,43 @@ const PagBankCard = ({ cartId }: { cartId: string }) => {
         </div>
       </div>
 
-      <label className="text-sm font-medium text-ui-fg-base">CPF ou CNPJ do titular</label>
-      <input
-        inputMode="numeric"
-        value={cpf}
-        onChange={(e) => setCpf(formatCpf(e.target.value))}
-        placeholder="CPF ou CNPJ"
-        disabled={processing}
-        className="rounded-lg border border-ui-border-base bg-ui-bg-field px-3 py-2 text-ui-fg-base outline-none focus:border-[#1251b8] focus:ring-1 focus:ring-[#1251b8] disabled:opacity-60"
-      />
+      {/* Por padrão, quem paga é a mesma pessoa do faturamento — nada a digitar.
+          Só pede o documento do titular se o cartão for de outra pessoa (ou se
+          não houver documento de faturamento, no fallback). */}
+      {hasFiscal && (
+        <label className="flex items-center gap-2 mt-1 text-sm text-ui-fg-subtle select-none">
+          <input
+            type="checkbox"
+            checked={outraPessoa}
+            onChange={(e) => setOutraPessoa(e.target.checked)}
+            disabled={processing}
+            data-testid="cartao-outra-pessoa"
+          />
+          O cartão é de outra pessoa
+        </label>
+      )}
+
+      {usarOutro ? (
+        <>
+          <label className="text-sm font-medium text-ui-fg-base">
+            CPF ou CNPJ do titular do cartão
+          </label>
+          <input
+            inputMode="numeric"
+            value={cpf}
+            onChange={(e) => setCpf(formatCpf(e.target.value))}
+            placeholder="CPF ou CNPJ de quem é o cartão"
+            disabled={processing}
+            data-testid="cartao-doc-titular"
+            className="rounded-lg border border-ui-border-base bg-ui-bg-field px-3 py-2 text-ui-fg-base outline-none focus:border-[#1251b8] focus:ring-1 focus:ring-[#1251b8] disabled:opacity-60"
+          />
+        </>
+      ) : (
+        <p className="text-xs text-ui-fg-muted">
+          Cobrança no documento do faturamento:{" "}
+          <strong className="text-ui-fg-subtle">{formatCpf(fiscalDigits)}</strong>
+        </p>
+      )}
 
       <label className="text-sm font-medium text-ui-fg-base">Parcelamento</label>
       <select

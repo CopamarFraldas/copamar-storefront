@@ -11,6 +11,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useActionState } from "react"
 import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
+import IdentificacaoFiscal from "../identificacao-fiscal"
 import ShippingAddress from "../shipping-address"
 import { SubmitButton } from "../submit-button"
 
@@ -83,6 +84,9 @@ const Addresses = ({
                 <BillingAddress cart={cart} />
               </div>
             )}
+
+            <IdentificacaoFiscal cart={cart} />
+
             <SubmitButton className="mt-6" data-testid="submit-address-button">
               Continuar para entrega
             </SubmitButton>

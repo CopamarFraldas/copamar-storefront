@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
+import { isValidCpf, isValidCnpj } from "@lib/util/cpf"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -125,6 +126,33 @@ export async function signupAndSetAddress(
   currentState: unknown,
   formData: FormData
 ) {
+  // Pré-valida o documento fiscal ANTES de criar a conta. Se o doc estiver
+  // errado, abortamos aqui — assim não criamos uma conta órfã que faria o
+  // reenvio (com o doc corrigido) cair em "e-mail já existe". setAddresses
+  // revalida como backstop.
+  const fiscalTipo =
+    (formData.get("fiscal_tipo") as string) === "J" ? "J" : "F"
+  const fiscalDocDigits = (
+    (formData.get("fiscal_documento") as string) || ""
+  ).replace(/\D/g, "")
+  if (fiscalDocDigits) {
+    const docOk =
+      fiscalTipo === "J"
+        ? isValidCnpj(fiscalDocDigits)
+        : isValidCpf(fiscalDocDigits)
+    if (!docOk) {
+      return fiscalTipo === "J"
+        ? "CNPJ inválido — confira os números para emitir a nota fiscal."
+        : "CPF inválido — confira os números para emitir a nota fiscal."
+    }
+    if (
+      fiscalTipo === "J" &&
+      !((formData.get("fiscal_razao_social") as string) || "").trim()
+    ) {
+      return "Informe a razão social da empresa para a nota fiscal."
+    }
+  }
+
   const accountPassword = ((formData.get("account_password") as string) || "").trim()
   if (accountPassword) {
     const signupForm = new FormData()

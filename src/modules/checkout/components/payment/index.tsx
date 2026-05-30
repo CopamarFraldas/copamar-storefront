@@ -213,9 +213,21 @@ const Payment = ({
                 ))}
               </div>
               {pagbankMethod === "pix" ? (
-                <PagBankPix cartId={cart.id} />
+                <PagBankPix
+                  cartId={cart.id}
+                  fiscalDoc={cart?.metadata?.fiscal_documento as string}
+                />
               ) : (
-                <PagBankCard cartId={cart.id} />
+                <PagBankCard
+                  cartId={cart.id}
+                  fiscalDoc={cart?.metadata?.fiscal_documento as string}
+                  defaultHolder={[
+                    cart?.billing_address?.first_name,
+                    cart?.billing_address?.last_name,
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                />
               )}
             </div>
           ) : (

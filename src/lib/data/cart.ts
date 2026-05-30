@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
+import { isValidCpf, isValidCnpj } from "@lib/util/cpf"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -339,7 +340,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
     }
-    const cartId = getCartId()
+    const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
@@ -376,6 +377,55 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         province: formData.get("billing_address.province"),
         phone: formData.get("billing_address.phone"),
       }
+
+    // IDENTIFICAÇÃO FISCAL (faturamento) — documento que vai pro contato Bling
+    // (tipo F/J) + NF-e. É independente do documento do PAGADOR (titular do
+    // cartão), que é capturado no passo de pagamento. PF = CPF; PJ = CNPJ +
+    // razão social + IE (ou isento). Guardamos no metadata do carrinho; o
+    // backend (bling-push) prioriza fiscal_documento.
+    const onlyDigits = (v: any) =>
+      typeof v === "string" ? v.replace(/\D/g, "") : ""
+    const fiscalTipo =
+      (formData.get("fiscal_tipo") as string) === "J" ? "J" : "F"
+    const fiscalMeta: Record<string, any> = {
+      fiscal_tipo: fiscalTipo,
+      fiscal_documento: onlyDigits(formData.get("fiscal_documento")),
+    }
+    if (fiscalTipo === "J") {
+      const isento =
+        formData.get("fiscal_isento_ie") === "on" ||
+        formData.get("fiscal_isento_ie") === "true"
+      fiscalMeta.razao_social =
+        (formData.get("fiscal_razao_social") as string) || ""
+      fiscalMeta.isento_ie = isento ? "true" : "false"
+      fiscalMeta.inscricao_estadual = isento
+        ? ""
+        : onlyDigits(formData.get("fiscal_ie"))
+    } else {
+      // PF — limpa campos de PJ pra não vazar de uma tentativa anterior
+      fiscalMeta.razao_social = ""
+      fiscalMeta.inscricao_estadual = ""
+      fiscalMeta.isento_ie = "false"
+    }
+    // só grava se o cliente informou o documento (não sobrescreve com vazio)
+    if (fiscalMeta.fiscal_documento) {
+      // GATE FISCAL: documento inválido NÃO avança (NF-e exige CPF/CNPJ válido).
+      const docOk =
+        fiscalTipo === "J"
+          ? isValidCnpj(fiscalMeta.fiscal_documento)
+          : isValidCpf(fiscalMeta.fiscal_documento)
+      if (!docOk) {
+        return fiscalTipo === "J"
+          ? "CNPJ inválido — confira os números para emitir a nota fiscal."
+          : "CPF inválido — confira os números para emitir a nota fiscal."
+      }
+      if (fiscalTipo === "J" && !fiscalMeta.razao_social) {
+        return "Informe a razão social da empresa para a nota fiscal."
+      }
+      const existing = await retrieveCart(cartId, "id,metadata")
+      data.metadata = { ...(existing?.metadata || {}), ...fiscalMeta }
+    }
+
     await updateCart(data)
   } catch (e: any) {
     return e.message
