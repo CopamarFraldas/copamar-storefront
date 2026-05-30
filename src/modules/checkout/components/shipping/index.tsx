@@ -70,6 +70,10 @@ const Shipping: React.FC<ShippingProps> = ({
   const [calculatedPricesMap, setCalculatedPricesMap] = useState<
     Record<string, number>
   >({})
+  // prazo (dias úteis) por opção calculada — vem do provider via calculated_price
+  const [calculatedPrazoMap, setCalculatedPrazoMap] = useState<
+    Record<string, number>
+  >({})
   const [error, setError] = useState<string | null>(null)
   const [shippingMethodId, setShippingMethodId] = useState<string | null>(
     cart.shipping_methods?.at(-1)?.shipping_option_id || null
@@ -91,6 +95,19 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const hasPickupOptions = !!_pickupMethods?.length
 
+  // Esconde opções de preço CALCULADO que o provider não cobre para o CEP
+  // (ex.: Frete Próprio fora da frota → "não responde" → cai pro Frenet).
+  // Enquanto os preços carregam, mantém visível (mostra o loader).
+  const _visibleShippingMethods = _shippingMethods?.filter((sm) => {
+    if (sm.price_type !== "calculated") {
+      return true
+    }
+    if (isLoadingPrices) {
+      return true
+    }
+    return typeof calculatedPricesMap[sm.id] === "number"
+  })
+
   useEffect(() => {
     setIsLoadingPrices(true)
 
@@ -102,11 +119,25 @@ const Shipping: React.FC<ShippingProps> = ({
       if (promises.length) {
         Promise.allSettled(promises).then((res) => {
           const pricesMap: Record<string, number> = {}
+          const prazoMap: Record<string, number> = {}
           res
             .filter((r) => r.status === "fulfilled")
-            .forEach((p) => (pricesMap[p.value?.id || ""] = p.value?.amount!))
+            .forEach((p) => {
+              // calculatePriceForShippingOption devolve null quando o provider
+              // "não responde" (CEP fora de cobertura) → não entra no mapa.
+              const opt = (p as PromiseFulfilledResult<any>).value
+              if (!opt || typeof opt.amount !== "number") {
+                return
+              }
+              pricesMap[opt.id] = opt.amount
+              const prazo = opt?.calculated_price?.prazo_dias
+              if (typeof prazo === "number") {
+                prazoMap[opt.id] = prazo
+              }
+            })
 
           setCalculatedPricesMap(pricesMap)
+          setCalculatedPrazoMap(prazoMap)
           setIsLoadingPrices(false)
         })
       }
@@ -258,11 +289,13 @@ const Shipping: React.FC<ShippingProps> = ({
                     }
                   }}
                 >
-                  {_shippingMethods?.map((option) => {
+                  {_visibleShippingMethods?.map((option) => {
                     const isDisabled =
                       option.price_type === "calculated" &&
                       !isLoadingPrices &&
                       typeof calculatedPricesMap[option.id] !== "number"
+
+                    const prazo = calculatedPrazoMap[option.id]
 
                     return (
                       <Radio
@@ -284,9 +317,17 @@ const Shipping: React.FC<ShippingProps> = ({
                           <MedusaRadio
                             checked={option.id === shippingMethodId}
                           />
-                          <span className="text-base-regular">
-                            {option.name}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-base-regular">
+                              {option.name}
+                            </span>
+                            {typeof prazo === "number" && (
+                              <span className="text-ui-fg-muted text-small-regular">
+                                Chega em até {prazo}{" "}
+                                {prazo === 1 ? "dia útil" : "dias úteis"}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <span className="justify-self-end text-ui-fg-base">
                           {option.price_type === "flat" ? (
