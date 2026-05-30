@@ -12,8 +12,7 @@ const EmptyCartMessage = () => {
         Carrinho
       </Heading>
       <Text className="text-base-regular mt-4 mb-6 max-w-[32rem]">
-        Você não tem itens no carrinho. Use o link abaixo para começar
-        the link below to start browsing our products.
+        Você ainda não tem itens no carrinho. Use o link abaixo para começar a explorar nossos produtos.
       </Text>
       <div>
         <InteractiveLink href="/store">Explorar produtos</InteractiveLink>

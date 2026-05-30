@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
+import AddToCartButton from "./add-to-cart-button"
 
 export default async function ProductPreview({
   product,
@@ -33,8 +34,11 @@ export default async function ProductPreview({
   const aviso = avisoEstoque(product)
 
   return (
-    <LocalizedClientLink href={`/products/${product.handle}`} className="group">
-      <div data-testid="product-wrapper">
+    // O botão "Adicionar" precisa ficar FORA do <a> (botão dentro de link é HTML
+    // inválido + warning de hidratação). Então o link envolve só a área
+    // navegável (foto/título/preço) e o AddToCartButton vira irmão dele.
+    <div className="group" data-testid="product-wrapper">
+      <LocalizedClientLink href={`/products/${product.handle}`} className="block">
         {/* wrapper relative pra posicionar o selo "ESGOTADO" sobre a thumbnail */}
         <div className="relative">
           <Thumbnail
@@ -62,10 +66,11 @@ export default async function ProductPreview({
             {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
           </div>
         </div>
-        {esgotado && aviso && (
-          <p className="mt-1 text-[11px] text-ui-fg-muted leading-snug">{aviso}</p>
-        )}
-      </div>
-    </LocalizedClientLink>
+      </LocalizedClientLink>
+      {esgotado && aviso && (
+        <p className="mt-1 text-[11px] text-ui-fg-muted leading-snug">{aviso}</p>
+      )}
+      {!esgotado && <AddToCartButton product={product} />}
+    </div>
   )
 }

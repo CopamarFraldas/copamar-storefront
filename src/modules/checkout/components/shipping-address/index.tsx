@@ -6,6 +6,7 @@ import { mapKeys } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
+import { fetchCep, isValidCep } from "@lib/util/viacep"
 
 const ShippingAddress = ({
   customer,
@@ -92,12 +93,33 @@ const ShippingAddress = ({
     })
   }
 
+  // Auto-preenche o endereço pelo CEP (ViaCEP). Só dispara com 8 dígitos; em
+  // CEP inexistente/falha, não mexe nos campos (cliente preenche manual).
+  const [cepLoading, setCepLoading] = useState(false)
+  const handleCepLookup = async (raw: string) => {
+    if (!isValidCep(raw)) return
+    setCepLoading(true)
+    const r = await fetchCep(raw)
+    setCepLoading(false)
+    if (!r) return
+    setFormData((prev: Record<string, any>) => ({
+      ...prev,
+      "shipping_address.address_1": r.logradouro || prev["shipping_address.address_1"],
+      "shipping_address.city": r.localidade || prev["shipping_address.city"],
+      "shipping_address.province": r.uf || prev["shipping_address.province"],
+      "shipping_address.country_code": prev["shipping_address.country_code"] || "br",
+    }))
+  }
+
+  // opção de criar conta (define senha) durante o checkout — só p/ não logado
+  const [createAccount, setCreateAccount] = useState(false)
+
   return (
     <>
       {customer && (addressesInRegion?.length || 0) > 0 && (
         <Container className="mb-6 flex flex-col gap-y-4 p-5">
           <p className="text-small-regular">
-            {`Hi ${customer.first_name}, do you want to use one of your saved addresses?`}
+            {`Olá ${customer.first_name}, quer usar um dos seus endereços salvos?`}
           </p>
           <AddressSelect
             addresses={customer.addresses}
@@ -110,6 +132,25 @@ const ShippingAddress = ({
           />
         </Container>
       )}
+      <div className="mb-4">
+        <Input
+          label="CEP"
+          name="shipping_address.postal_code"
+          autoComplete="postal-code"
+          value={formData["shipping_address.postal_code"]}
+          onChange={(e) => {
+            handleChange(e)
+            handleCepLookup(e.target.value)
+          }}
+          required
+          data-testid="shipping-postal-code-input"
+        />
+        <span className="text-xs text-ui-fg-muted mt-1 block">
+          {cepLoading
+            ? "Buscando endereço…"
+            : "Digite o CEP que preenchemos o endereço pra você."}
+        </span>
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <Input
           label="Nome"
@@ -145,15 +186,6 @@ const ShippingAddress = ({
           onChange={handleChange}
           autoComplete="organization"
           data-testid="shipping-company-input"
-        />
-        <Input
-          label="CEP"
-          name="shipping_address.postal_code"
-          autoComplete="postal-code"
-          value={formData["shipping_address.postal_code"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-postal-code-input"
         />
         <Input
           label="Cidade"
@@ -212,6 +244,33 @@ const ShippingAddress = ({
           data-testid="shipping-phone-input"
         />
       </div>
+      {!customer && (
+        <div className="mb-6">
+          <Checkbox
+            label="Quero criar uma conta para acompanhar meus pedidos"
+            name="create_account"
+            checked={createAccount}
+            onChange={() => setCreateAccount(!createAccount)}
+            data-testid="create-account-checkbox"
+          />
+          {createAccount && (
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <Input
+                label="Senha"
+                name="account_password"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                data-testid="account-password-input"
+              />
+              <span className="text-xs text-ui-fg-muted self-center">
+                Mínimo 8 caracteres. Usaremos o e-mail e o nome informados acima.
+              </span>
+            </div>
+          )}
+        </div>
+      )}
     </>
   )
 }

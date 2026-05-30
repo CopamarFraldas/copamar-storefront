@@ -2,6 +2,7 @@ import { HttpTypes } from "@medusajs/types"
 import Input from "@modules/common/components/input"
 import React, { useState } from "react"
 import CountrySelect from "../country-select"
+import { fetchCep, isValidCep } from "@lib/util/viacep"
 
 const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   const [formData, setFormData] = useState<any>({
@@ -27,8 +28,43 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     })
   }
 
+  const [cepLoading, setCepLoading] = useState(false)
+  const handleCepLookup = async (raw: string) => {
+    if (!isValidCep(raw)) return
+    setCepLoading(true)
+    const r = await fetchCep(raw)
+    setCepLoading(false)
+    if (!r) return
+    setFormData((prev: any) => ({
+      ...prev,
+      "billing_address.address_1": r.logradouro || prev["billing_address.address_1"],
+      "billing_address.city": r.localidade || prev["billing_address.city"],
+      "billing_address.province": r.uf || prev["billing_address.province"],
+      "billing_address.country_code": prev["billing_address.country_code"] || "br",
+    }))
+  }
+
   return (
     <>
+      <div className="mb-4">
+        <Input
+          label="CEP"
+          name="billing_address.postal_code"
+          autoComplete="postal-code"
+          value={formData["billing_address.postal_code"]}
+          onChange={(e) => {
+            handleChange(e)
+            handleCepLookup(e.target.value)
+          }}
+          required
+          data-testid="billing-postal-input"
+        />
+        <span className="text-xs text-ui-fg-muted mt-1 block">
+          {cepLoading
+            ? "Buscando endereço…"
+            : "Digite o CEP que preenchemos o endereço pra você."}
+        </span>
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <Input
           label="Nome"
@@ -64,15 +100,6 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           onChange={handleChange}
           autoComplete="organization"
           data-testid="billing-company-input"
-        />
-        <Input
-          label="CEP"
-          name="billing_address.postal_code"
-          autoComplete="postal-code"
-          value={formData["billing_address.postal_code"]}
-          onChange={handleChange}
-          required
-          data-testid="billing-postal-input"
         />
         <Input
           label="Cidade"

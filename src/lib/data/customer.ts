@@ -14,6 +14,7 @@ import {
   removeCartId,
   setAuthToken,
 } from "./cookies"
+import { setAddresses } from "./cart"
 
 export const retrieveCustomer =
   async (): Promise<HttpTypes.StoreCustomer | null> => {
@@ -68,6 +69,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
     phone: formData.get("phone") as string,
   }
 
+  let registered = false
   try {
     const token = await sdk.auth.register("customer", "emailpass", {
       email: customerForm.email,
@@ -75,6 +77,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
     })
 
     await setAuthToken(token as string)
+    registered = true
 
     const headers = {
       ...(await getAuthHeaders()),
@@ -100,8 +103,47 @@ export async function signup(_currentState: unknown, formData: FormData) {
 
     return createdCustomer
   } catch (error: any) {
+    // Se já registramos o identity mas o create/login falhou, limpa o token pra
+    // não deixar uma identidade órfã que bloqueia a próxima tentativa com o
+    // mesmo e-mail (ela passaria a cair em "já existe" sem nunca ter conta).
+    if (registered) {
+      try {
+        await removeAuthToken()
+      } catch {}
+    }
     return error.toString()
   }
+}
+
+/**
+ * Action do passo de endereço do checkout. Se o cliente marcou "criar conta" e
+ * informou senha (`account_password`), registra a conta ANTES de gravar o
+ * endereço (reusa `signup`). Sem senha → segue como CONVIDADO (setAddresses
+ * intacto). Erro no registro (ex.: e-mail já existe) aborta e mostra a mensagem.
+ */
+export async function signupAndSetAddress(
+  currentState: unknown,
+  formData: FormData
+) {
+  const accountPassword = ((formData.get("account_password") as string) || "").trim()
+  if (accountPassword) {
+    const signupForm = new FormData()
+    signupForm.set("email", (formData.get("email") as string) || "")
+    signupForm.set("first_name", (formData.get("shipping_address.first_name") as string) || "")
+    signupForm.set("last_name", (formData.get("shipping_address.last_name") as string) || "")
+    signupForm.set("phone", (formData.get("shipping_address.phone") as string) || "")
+    signupForm.set("password", accountPassword)
+
+    const res = await signup(null, signupForm)
+    if (typeof res === "string") {
+      // erro no registro → não prossegue pro próximo passo
+      return /exist|already|registered|identity/i.test(res)
+        ? "Este e-mail já tem conta. Faça login ou siga sem criar conta (desmarque a opção)."
+        : res
+    }
+  }
+  // grava o endereço e avança (setAddresses faz o redirect ?step=delivery)
+  return setAddresses(currentState, formData)
 }
 
 export async function login(_currentState: unknown, formData: FormData) {

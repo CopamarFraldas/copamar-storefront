@@ -1,6 +1,6 @@
 "use client"
 
-import { setAddresses } from "@lib/data/cart"
+import { signupAndSetAddress } from "@lib/data/customer"
 import compareAddresses from "@lib/util/compare-addresses"
 import { CheckCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
@@ -37,7 +37,7 @@ const Addresses = ({
     router.push(pathname + "?step=address")
   }
 
-  const [message, formAction] = useActionState(setAddresses, null)
+  const [message, formAction] = useActionState(signupAndSetAddress, null)
 
   return (
     <div className="bg-ui-bg-base">
