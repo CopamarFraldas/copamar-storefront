@@ -34,7 +34,12 @@ const IdentificacaoFiscal = ({
 
   const docDigits = doc.replace(/\D/g, "")
   const docOk = tipo === "F" ? isValidCpf(docDigits) : isValidCnpj(docDigits)
-  const showDocError = docDigits.length > 0 && !docOk
+  // Só acusa erro quando o documento JÁ tem o tamanho esperado do tipo atual
+  // (11 p/ CPF, 14 p/ CNPJ). Assim não aparece "CNPJ inválido" durante a
+  // digitação nem logo após alternar PF↔Empresa (quando o nº ainda é do outro
+  // tamanho) — some o erro-fantasma do toggle.
+  const expectedLen = tipo === "F" ? 11 : 14
+  const showDocError = docDigits.length === expectedLen && !docOk
 
   return (
     <div className="mt-2" data-testid="identificacao-fiscal">

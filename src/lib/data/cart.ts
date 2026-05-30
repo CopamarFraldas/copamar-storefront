@@ -407,24 +407,27 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       fiscalMeta.inscricao_estadual = ""
       fiscalMeta.isento_ie = "false"
     }
-    // só grava se o cliente informou o documento (não sobrescreve com vazio)
-    if (fiscalMeta.fiscal_documento) {
-      // GATE FISCAL: documento inválido NÃO avança (NF-e exige CPF/CNPJ válido).
-      const docOk =
-        fiscalTipo === "J"
-          ? isValidCnpj(fiscalMeta.fiscal_documento)
-          : isValidCpf(fiscalMeta.fiscal_documento)
-      if (!docOk) {
-        return fiscalTipo === "J"
-          ? "CNPJ inválido — confira os números para emitir a nota fiscal."
-          : "CPF inválido — confira os números para emitir a nota fiscal."
-      }
-      if (fiscalTipo === "J" && !fiscalMeta.razao_social) {
-        return "Informe a razão social da empresa para a nota fiscal."
-      }
-      const existing = await retrieveCart(cartId, "id,metadata")
-      data.metadata = { ...(existing?.metadata || {}), ...fiscalMeta }
+    // GATE FISCAL (servidor, autoritativo — o `required` do input é só client).
+    // Presença é OBRIGATÓRIA: NF-e exige o documento do faturamento, e isso
+    // impede o backend de cair no fallback do doc do PAGADOR (ver bling-push).
+    if (!fiscalMeta.fiscal_documento) {
+      return "Informe o CPF ou CNPJ para emitir a nota fiscal."
     }
+    // documento inválido NÃO avança (DV do tipo certo).
+    const docOk =
+      fiscalTipo === "J"
+        ? isValidCnpj(fiscalMeta.fiscal_documento)
+        : isValidCpf(fiscalMeta.fiscal_documento)
+    if (!docOk) {
+      return fiscalTipo === "J"
+        ? "CNPJ inválido — confira os números para emitir a nota fiscal."
+        : "CPF inválido — confira os números para emitir a nota fiscal."
+    }
+    if (fiscalTipo === "J" && !fiscalMeta.razao_social) {
+      return "Informe a razão social da empresa para a nota fiscal."
+    }
+    const existing = await retrieveCart(cartId, "id,metadata")
+    data.metadata = { ...(existing?.metadata || {}), ...fiscalMeta }
 
     await updateCart(data)
   } catch (e: any) {

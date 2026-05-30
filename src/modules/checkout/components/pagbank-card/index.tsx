@@ -84,6 +84,7 @@ const PagBankCard = ({
   const [cpf, setCpf] = useState("")
   const [outraPessoa, setOutraPessoa] = useState(false)
   const [parcelas, setParcelas] = useState(1)
+  const [finalizeError, setFinalizeError] = useState<string | null>(null)
 
   // documento de cobrança que vai pro PagBank: do titular (outra pessoa) ou,
   // por padrão, o do faturamento.
@@ -114,9 +115,20 @@ const PagBankCard = ({
     document.body.appendChild(s)
   }, [])
 
+  // finaliza o pedido; se falhar DEPOIS de cobrado, mostra erro + botão de
+  // re-tentar (mesma blindagem do PIX — nunca trava em "Finalizando" tendo já
+  // pago). O cartão já foi capturado no backend; só falta criar o pedido.
   function finalizar() {
     setStage("paid")
-    setTimeout(() => placeOrder().catch((e) => setError(e?.message)), 1200)
+    setFinalizeError(null)
+    setTimeout(() => {
+      placeOrder().catch((e) =>
+        setFinalizeError(
+          e?.message ||
+            "Não foi possível finalizar o pedido. Seu pagamento está seguro — conclua de novo."
+        )
+      )
+    }, 1200)
   }
 
   // cartão em processamento (status não-síncrono): confirma via polling
@@ -211,7 +223,20 @@ const PagBankCard = ({
           </svg>
         </div>
         <p className="text-lg font-semibold text-ui-fg-base">Pagamento aprovado! 🎉</p>
-        <p className="text-sm text-ui-fg-subtle">Finalizando seu pedido…</p>
+        {finalizeError ? (
+          <>
+            <p className="text-sm text-ui-fg-subtle max-w-sm">
+              Recebemos seu pagamento, mas houve um erro ao finalizar o pedido.
+              Seu pagamento está seguro — é só concluir de novo.
+            </p>
+            <ErrorMessage error={finalizeError} />
+            <Button onClick={finalizar} className="mt-1">
+              Concluir pedido
+            </Button>
+          </>
+        ) : (
+          <p className="text-sm text-ui-fg-subtle">Finalizando seu pedido…</p>
+        )}
       </div>
     )
   }
@@ -312,18 +337,32 @@ const PagBankCard = ({
 
       {usarOutro ? (
         <>
+          {/* Dois casos: (a) "outra pessoa" marcado com doc de faturamento já
+              definido → este doc é só da COBRANÇA (titular do cartão); a NF-e
+              segue no doc do faturamento. (b) fallback sem doc de faturamento →
+              rótulo neutro (não há "titular" a contrastar). */}
           <label className="text-sm font-medium text-ui-fg-base">
-            CPF ou CNPJ do titular do cartão
+            {outraPessoa
+              ? "CPF ou CNPJ do titular do cartão"
+              : "CPF ou CNPJ do pagador"}
           </label>
           <input
             inputMode="numeric"
             value={cpf}
             onChange={(e) => setCpf(formatCpf(e.target.value))}
-            placeholder="CPF ou CNPJ de quem é o cartão"
+            placeholder={
+              outraPessoa ? "CPF ou CNPJ de quem é o cartão" : "CPF ou CNPJ"
+            }
             disabled={processing}
             data-testid="cartao-doc-titular"
             className="rounded-lg border border-ui-border-base bg-ui-bg-field px-3 py-2 text-ui-fg-base outline-none focus:border-[#1251b8] focus:ring-1 focus:ring-[#1251b8] disabled:opacity-60"
           />
+          {!hasFiscal && (
+            <p className="text-xs text-amber-600">
+              Não recebemos sua identificação fiscal — volte ao passo de
+              identificação para a nota sair correta.
+            </p>
+          )}
         </>
       ) : (
         <p className="text-xs text-ui-fg-muted">

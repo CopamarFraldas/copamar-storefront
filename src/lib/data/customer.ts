@@ -135,7 +135,12 @@ export async function signupAndSetAddress(
   const fiscalDocDigits = (
     (formData.get("fiscal_documento") as string) || ""
   ).replace(/\D/g, "")
-  if (fiscalDocDigits) {
+  // Presença OBRIGATÓRIA — mesmo gate de setAddresses, só que ANTES do signup
+  // pra não criar conta órfã quando o doc fiscal falta/está errado.
+  if (!fiscalDocDigits) {
+    return "Informe o CPF ou CNPJ para emitir a nota fiscal."
+  }
+  {
     const docOk =
       fiscalTipo === "J"
         ? isValidCnpj(fiscalDocDigits)
