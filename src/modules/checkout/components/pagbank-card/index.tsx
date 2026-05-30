@@ -9,11 +9,16 @@ import ErrorMessage from "../error-message"
 
 type Stage = "form" | "processing" | "pending" | "paid"
 
-// Só o caminho 'rc' é servido pelo PagBank (estável/latest dão 403). Fixamos o
-// conteúdo via SRI (integrity). ⚠️ MANUTENÇÃO: se o PagBank atualizar o SDK, este
-// hash precisa ser recomputado (senão o browser bloqueia o script).
-const SDK_SRC =
-  "https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js"
+// SDK do PagBank AUTO-HOSPEDADO em /public (mesma origem). Antes carregávamos
+// direto de assets.pagseguro.com.br, mas o CDN deles NÃO envia
+// Access-Control-Allow-Origin; como o <script> usa integrity (SRI), o browser
+// faz requisição CORS e RECUSA o arquivo sem esse header → "não foi possível
+// carregar o módulo de pagamento". Servindo da nossa origem, o SRI é checado
+// sem depender do CORS do PagBank.
+// ⚠️ MANUTENÇÃO: arquivo = canal 'rc' do PagBank, baixado em 2026-05-30 (102209
+// bytes). Pra atualizar: baixar o pagseguro.min.js novo, recomputar o sha384
+// (openssl dgst -sha384 -binary | openssl base64 -A) e trocar arquivo + SDK_SRI.
+const SDK_SRC = "/pagseguro.min.js"
 const SDK_SRI =
   "sha384-3pipk0SHgQsazqN+7OIBR5kOWArs1+A9Bd5sdPtQYcMaOHuMisO154O1kdzMlqua"
 
@@ -106,8 +111,9 @@ const PagBankCard = ({
     }
     const s = document.createElement("script")
     s.src = SDK_SRC
+    // mesma origem (/public) → SRI é checado sem CORS; crossOrigin não é
+    // necessário (e com o CDN externo sem ACAO era justamente o que quebrava).
     s.integrity = SDK_SRI
-    s.crossOrigin = "anonymous"
     s.async = true
     s.onload = () => setSdkReady(true)
     s.onerror = () =>
