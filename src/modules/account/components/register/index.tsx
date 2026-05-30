@@ -24,8 +24,7 @@ const Register = ({ setCurrentView }: Props) => {
         Crie sua conta na Copamar Fraldas
       </h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-4">
-        Crie sua conta e tenha acesso a uma experiência de compra completa
-        shopping experience.
+        Crie sua conta e tenha acesso a uma experiência de compra completa.
       </p>
       <form className="w-full flex flex-col" action={formAction}>
         <div className="flex flex-col w-full gap-y-2">
@@ -74,14 +73,14 @@ const Register = ({ setCurrentView }: Props) => {
             href="/content/privacy-policy"
             className="underline"
           >
-            Privacy Policy
+            Política de Privacidade
           </LocalizedClientLink>{" "}
-          and{" "}
+          e os{" "}
           <LocalizedClientLink
             href="/content/terms-of-use"
             className="underline"
           >
-            Terms of Use
+            Termos de Uso
           </LocalizedClientLink>
           .
         </span>
