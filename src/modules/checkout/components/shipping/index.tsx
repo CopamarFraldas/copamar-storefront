@@ -74,6 +74,10 @@ const Shipping: React.FC<ShippingProps> = ({
   const [calculatedPrazoMap, setCalculatedPrazoMap] = useState<
     Record<string, number>
   >({})
+  // detalhe da transportadora (ex.: "via iMile") — só o Frenet preenche
+  const [calculatedDetalheMap, setCalculatedDetalheMap] = useState<
+    Record<string, string>
+  >({})
   const [error, setError] = useState<string | null>(null)
   const [shippingMethodId, setShippingMethodId] = useState<string | null>(
     cart.shipping_methods?.at(-1)?.shipping_option_id || null
@@ -120,6 +124,7 @@ const Shipping: React.FC<ShippingProps> = ({
         Promise.allSettled(promises).then((res) => {
           const pricesMap: Record<string, number> = {}
           const prazoMap: Record<string, number> = {}
+          const detalheMap: Record<string, string> = {}
           res
             .filter((r) => r.status === "fulfilled")
             .forEach((p) => {
@@ -130,14 +135,24 @@ const Shipping: React.FC<ShippingProps> = ({
                 return
               }
               pricesMap[opt.id] = opt.amount
-              const prazo = opt?.calculated_price?.prazo_dias
-              if (typeof prazo === "number") {
-                prazoMap[opt.id] = prazo
+              const cp = opt?.calculated_price ?? {}
+              if (typeof cp.prazo_dias === "number") {
+                prazoMap[opt.id] = cp.prazo_dias
+              }
+              // transportadora (Frenet): "via iMile" / "via Correios (PAC)"
+              const transp = cp.transportadora || ""
+              const serv = cp.servico || ""
+              if (transp || serv) {
+                detalheMap[opt.id] =
+                  transp && serv && serv !== transp
+                    ? `via ${transp} (${serv})`
+                    : `via ${transp || serv}`
               }
             })
 
           setCalculatedPricesMap(pricesMap)
           setCalculatedPrazoMap(prazoMap)
+          setCalculatedDetalheMap(detalheMap)
           setIsLoadingPrices(false)
         })
       }
@@ -296,6 +311,7 @@ const Shipping: React.FC<ShippingProps> = ({
                       typeof calculatedPricesMap[option.id] !== "number"
 
                     const prazo = calculatedPrazoMap[option.id]
+                    const detalhe = calculatedDetalheMap[option.id]
 
                     return (
                       <Radio
@@ -321,10 +337,15 @@ const Shipping: React.FC<ShippingProps> = ({
                             <span className="text-base-regular">
                               {option.name}
                             </span>
-                            {typeof prazo === "number" && (
+                            {(typeof prazo === "number" || detalhe) && (
                               <span className="text-ui-fg-muted text-small-regular">
-                                Chega em até {prazo}{" "}
-                                {prazo === 1 ? "dia útil" : "dias úteis"}
+                                {detalhe ? `${detalhe}` : ""}
+                                {detalhe && typeof prazo === "number" ? " · " : ""}
+                                {typeof prazo === "number"
+                                  ? `Chega em até ${prazo} ${
+                                      prazo === 1 ? "dia útil" : "dias úteis"
+                                    }`
+                                  : ""}
                               </span>
                             )}
                           </div>
