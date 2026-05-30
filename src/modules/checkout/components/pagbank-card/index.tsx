@@ -78,6 +78,7 @@ const PagBankCard = ({ cartId }: { cartId: string }) => {
   }, [])
 
   async function pagar() {
+    if (stage === "processing") return // guard anti double-submit (nunca recobrar)
     setError(null)
     const numDigits = onlyDigits(number)
     const cpfDigits = onlyDigits(cpf)

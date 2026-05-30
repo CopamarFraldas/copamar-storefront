@@ -6,7 +6,7 @@ import { createPagbankPix, checkPagbankStatus } from "@lib/data/pagbank"
 import { placeOrder } from "@lib/data/cart"
 import ErrorMessage from "../error-message"
 
-type Stage = "form" | "qr" | "paid"
+type Stage = "form" | "qr" | "paid" | "expired"
 
 const formatCpf = (v: string) =>
   v
@@ -16,10 +16,18 @@ const formatCpf = (v: string) =>
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
 
+// ~15 min de validade do QR (polling a cada 4s → 225 ticks)
+const MAX_TICKS = 225
+
 /**
  * Checkout PIX PagBank — UX moderna: CPF → QR + copia-e-cola → polling ao vivo
  * detecta o pagamento automaticamente → finaliza o pedido. Sem botão de "revisão":
  * o próprio painel conduz até a confirmação.
+ *
+ * Hardening (revisão adversarial): o QR expira (não fica em polling infinito);
+ * falhas seguidas de status viram aviso não-bloqueante; e se o placeOrder falhar
+ * DEPOIS de pago, o cliente vê o erro + botão pra concluir de novo (nunca trava
+ * em "Finalizando…" tendo já pago).
  */
 const PagBankPix = ({ cartId }: { cartId: string }) => {
   const [stage, setStage] = useState<Stage>("form")
@@ -30,9 +38,25 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [warn, setWarn] = useState<string | null>(null)
+  const [finalizeError, setFinalizeError] = useState<string | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const ticksRef = useRef(0)
+  const failsRef = useRef(0)
 
   const cpfDigits = cpf.replace(/\D/g, "")
+
+  // finaliza o pedido; se falhar, mostra erro + permite re-tentar (cliente já pagou)
+  async function finalizar() {
+    setFinalizeError(null)
+    try {
+      await placeOrder()
+    } catch (e: any) {
+      setFinalizeError(
+        e?.message || "Não foi possível finalizar o pedido. Tente novamente."
+      )
+    }
+  }
 
   async function gerarPix() {
     setError(null)
@@ -55,20 +79,36 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
     }
   }
 
-  // polling ao vivo do pagamento
+  // polling ao vivo do pagamento — com expiração e aviso após falhas seguidas
   useEffect(() => {
     if (stage !== "qr" || !orderId) return
+    ticksRef.current = 0
+    failsRef.current = 0
     const tick = async () => {
+      ticksRef.current += 1
+      if (ticksRef.current > MAX_TICKS) {
+        if (pollRef.current) clearInterval(pollRef.current)
+        setStage("expired")
+        return
+      }
       try {
         const { paid } = await checkPagbankStatus(orderId)
+        failsRef.current = 0
+        setWarn(null)
         if (paid) {
           if (pollRef.current) clearInterval(pollRef.current)
           setStage("paid")
-          // pequena pausa pra mostrar o "confirmado" e então finaliza (redireciona)
-          setTimeout(() => placeOrder().catch((e) => setError(e?.message)), 1200)
+          // pequena pausa pra mostrar o "confirmado" e então finaliza
+          setTimeout(finalizar, 1200)
         }
       } catch {
-        /* silencioso — tenta de novo no próximo tick */
+        // falha isolada: tenta de novo. Persistente: avisa sem bloquear.
+        failsRef.current += 1
+        if (failsRef.current >= 5) {
+          setWarn(
+            "Estamos com dificuldade em confirmar o pagamento automaticamente. Se você já pagou, aguarde — seguimos tentando."
+          )
+        }
       }
     }
     pollRef.current = setInterval(tick, 4000)
@@ -99,7 +139,45 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
           </svg>
         </div>
         <p className="text-lg font-semibold text-ui-fg-base">Pagamento confirmado! 🎉</p>
-        <p className="text-sm text-ui-fg-subtle">Finalizando seu pedido…</p>
+        {finalizeError ? (
+          <>
+            <p className="text-sm text-ui-fg-subtle max-w-sm">
+              Recebemos seu pagamento, mas houve um erro ao finalizar o pedido.
+              Seu pagamento está seguro — é só concluir de novo.
+            </p>
+            <ErrorMessage error={finalizeError} />
+            <Button onClick={finalizar} className="mt-1">
+              Concluir pedido
+            </Button>
+          </>
+        ) : (
+          <p className="text-sm text-ui-fg-subtle">Finalizando seu pedido…</p>
+        )}
+      </div>
+    )
+  }
+
+  // ── estágio: QR expirado ──
+  if (stage === "expired") {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8 text-center">
+        <p className="text-lg font-semibold text-ui-fg-base">QR Code expirado</p>
+        <p className="text-sm text-ui-fg-subtle max-w-sm">
+          O código PIX expirou. Gere um novo para concluir o pagamento.
+        </p>
+        <Button
+          onClick={() => {
+            setError(null)
+            setWarn(null)
+            setQrText(null)
+            setQrImage(null)
+            setOrderId(null)
+            setStage("form")
+          }}
+          className="mt-1"
+        >
+          Gerar novo PIX
+        </Button>
       </div>
     )
   }
@@ -138,6 +216,9 @@ const PagBankPix = ({ cartId }: { cartId: string }) => {
           Aguardando pagamento… (confirma automaticamente)
         </div>
 
+        {warn && (
+          <p className="text-xs text-amber-600 text-center max-w-sm">{warn}</p>
+        )}
         <ErrorMessage error={error} />
       </div>
     )
