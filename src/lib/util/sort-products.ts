@@ -46,5 +46,14 @@ export function sortProducts(
     })
   }
 
+  // Rank manual (metadata.rank) tem prioridade: produtos com rank aparecem
+  // primeiro, em ordem crescente; os demais mantêm a ordenação acima (sort
+  // estável). Usado p/ fixar a ordem das fraldas: RN→P→M→G→XG→XXG.
+  sortedProducts.sort((a, b) => {
+    const ra = Number((a.metadata as any)?.rank ?? Infinity)
+    const rb = Number((b.metadata as any)?.rank ?? Infinity)
+    return ra - rb
+  })
+
   return sortedProducts
 }
