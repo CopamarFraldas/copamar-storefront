@@ -23,7 +23,9 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
       <div className="text-small-regular text-ui-fg-base my-2">
         <div className="flex items-center justify-between text-base-regular text-ui-fg-base mb-2">
           <span>Subtotal</span>
-          <span>{getAmount(order.subtotal)}</span>
+          {/* item_subtotal = só os produtos. order.subtotal no Medusa v2 já
+              inclui o frete, o que duplicava o frete no resumo. */}
+          <span>{getAmount(order.item_subtotal)}</span>
         </div>
         <div className="flex flex-col gap-y-1">
           {order.discount_total > 0 && (
@@ -42,10 +44,7 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
             <span>Frete</span>
             <span>{getAmount(order.shipping_total)}</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span>Impostos</span>
-            <span>{getAmount(order.tax_total)}</span>
-          </div>
+          {/* Linha de Impostos removida: no Brasil o imposto é embutido no preço. */}
         </div>
         <div className="h-px w-full border-b border-gray-200 border-dashed my-4" />
         <div className="flex items-center justify-between text-base-regular text-ui-fg-base mb-2">
