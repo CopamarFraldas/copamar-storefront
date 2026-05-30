@@ -13,14 +13,14 @@ export async function createPagbankPix(cartId: string, taxId: string) {
 
   const { cart } = await sdk.client.fetch<{ cart: any }>(
     `/store/carts/${cartId}`,
-    { method: "GET", query: { fields: "id,*payment_collection" }, headers, cache: "no-store" }
+    { method: "GET", query: { fields: "id,email,*payment_collection" }, headers, cache: "no-store" }
   )
 
   await sdk.store.payment.initiatePaymentSession(
     cart as any,
     {
       provider_id: "pp_pagbank_pagbank",
-      data: { tax_id: taxId, session_id: cartId },
+      data: { tax_id: taxId, session_id: cartId, email: (cart as any)?.email },
     } as any,
     {},
     headers
@@ -62,13 +62,15 @@ export async function createPagbankCard(
   cartId: string,
   taxId: string,
   cardEncrypted: string,
-  holderName: string
+  holderName: string,
+  installments: number = 1
 ) {
   const headers = { ...(await getAuthHeaders()) }
+  const parcelas = Math.min(3, Math.max(1, Math.floor(installments) || 1))
 
   const { cart } = await sdk.client.fetch<{ cart: any }>(
     `/store/carts/${cartId}`,
-    { method: "GET", query: { fields: "id,*payment_collection" }, headers, cache: "no-store" }
+    { method: "GET", query: { fields: "id,email,*payment_collection" }, headers, cache: "no-store" }
   )
 
   await sdk.store.payment.initiatePaymentSession(
@@ -80,7 +82,9 @@ export async function createPagbankCard(
         card_encrypted: cardEncrypted,
         holder_name: holderName,
         tax_id: taxId,
+        installments: parcelas,
         session_id: cartId,
+        email: (cart as any)?.email,
       },
     } as any,
     {},
@@ -112,11 +116,14 @@ export async function createPagbankCard(
   }
 }
 
-/** Consulta ao vivo se o PIX foi pago (rota backend que tem o token PagBank). */
-export async function checkPagbankStatus(orderId: string) {
+/**
+ * Consulta ao vivo se o PIX/cartão do carrinho foi pago. Escopo por cart_id
+ * (o backend resolve o pagbank_order_id internamente — sem IDOR).
+ */
+export async function checkPagbankStatus(cartId: string) {
   const headers = { ...(await getAuthHeaders()) }
   return await sdk.client.fetch<{ paid: boolean; status: string }>(
     `/store/pagbank/status`,
-    { method: "GET", query: { order_id: orderId }, headers, cache: "no-store" }
+    { method: "GET", query: { cart_id: cartId }, headers, cache: "no-store" }
   )
 }
