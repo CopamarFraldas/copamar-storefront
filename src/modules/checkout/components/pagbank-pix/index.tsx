@@ -218,7 +218,7 @@ const PagBankPix = ({
           </Button>
         </div>
 
-        <div className="mt-2 flex items-center gap-2 text-sm text-ui-fg-muted">
+        <div className="mt-2 flex items-center gap-2 text-sm text-ui-fg-subtle">
           <span className="relative flex h-2.5 w-2.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1251b8] opacity-75" />
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#1251b8]" />
@@ -243,7 +243,7 @@ const PagBankPix = ({
           Pagamento via <strong>PIX</strong> — aprovação na hora. É só gerar o
           código e pagar pelo app do seu banco.
         </p>
-        <p className="text-xs text-ui-fg-muted">
+        <p className="text-xs text-ui-fg-subtle">
           Identificação:{" "}
           <strong className="text-ui-fg-subtle">{formatCpf(fiscalDigits)}</strong>{" "}
           (documento do faturamento)

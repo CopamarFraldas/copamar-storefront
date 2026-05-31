@@ -245,7 +245,7 @@ const Shipping: React.FC<ShippingProps> = ({
               <span className="font-medium txt-medium text-ui-fg-base">
                 Forma de envio
               </span>
-              <span className="mb-4 text-ui-fg-muted txt-medium">
+              <span className="mb-4 text-ui-fg-subtle txt-medium">
                 Como você prefere receber
               </span>
             </div>
@@ -338,7 +338,7 @@ const Shipping: React.FC<ShippingProps> = ({
                               {option.name}
                             </span>
                             {(typeof prazo === "number" || detalhe) && (
-                              <span className="text-ui-fg-muted text-small-regular">
+                              <span className="text-ui-fg-subtle text-small-regular">
                                 {detalhe ? `${detalhe}` : ""}
                                 {detalhe && typeof prazo === "number" ? " · " : ""}
                                 {typeof prazo === "number"
@@ -393,7 +393,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 <span className="font-medium txt-medium text-ui-fg-base">
                   Loja
                 </span>
-                <span className="mb-4 text-ui-fg-muted txt-medium">
+                <span className="mb-4 text-ui-fg-subtle txt-medium">
                   Escolha um ponto de retirada
                 </span>
               </div>
@@ -432,7 +432,7 @@ const Shipping: React.FC<ShippingProps> = ({
                               <span className="text-base-regular">
                                 {option.name}
                               </span>
-                              <span className="text-base-regular text-ui-fg-muted">
+                              <span className="text-base-regular text-ui-fg-subtle">
                                 {formatAddress(
                                   (option as ShippingOptionWithZone).service_zone
                                     ?.fulfillment_set?.location?.address as

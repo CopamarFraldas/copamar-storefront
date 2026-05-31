@@ -46,6 +46,7 @@ export default async function ProductPreview({
             images={product.images}
             size="full"
             isFeatured={isFeatured}
+            title={product.title}
           />
           {esgotado && (
             <>
@@ -68,7 +69,7 @@ export default async function ProductPreview({
         </div>
       </LocalizedClientLink>
       {esgotado && aviso && (
-        <p className="mt-1 text-[11px] text-ui-fg-muted leading-snug">{aviso}</p>
+        <p className="mt-1 text-[11px] text-ui-fg-subtle leading-snug">{aviso}</p>
       )}
       {!esgotado && <AddToCartButton product={product} />}
     </div>

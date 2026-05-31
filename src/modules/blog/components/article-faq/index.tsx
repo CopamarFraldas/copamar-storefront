@@ -18,7 +18,7 @@ const ArticleFaq = ({ faqs }: { faqs?: Faq[] }) => {
           <details key={i} className="py-4 group">
             <summary className="cursor-pointer list-none flex justify-between items-center gap-4 text-base-semi text-ui-fg-base">
               <span>{f.pergunta}</span>
-              <span className="text-ui-fg-muted transition-transform group-open:rotate-45">
+              <span className="text-ui-fg-subtle transition-transform group-open:rotate-45">
                 +
               </span>
             </summary>

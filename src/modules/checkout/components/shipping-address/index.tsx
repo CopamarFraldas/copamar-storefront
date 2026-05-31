@@ -145,7 +145,7 @@ const ShippingAddress = ({
           required
           data-testid="shipping-postal-code-input"
         />
-        <span className="text-xs text-ui-fg-muted mt-1 block">
+        <span className="text-xs text-ui-fg-subtle mt-1 block">
           {cepLoading
             ? "Buscando endereço…"
             : "Digite o CEP que preenchemos o endereço pra você."}
@@ -264,7 +264,7 @@ const ShippingAddress = ({
                 required
                 data-testid="account-password-input"
               />
-              <span className="text-xs text-ui-fg-muted self-center">
+              <span className="text-xs text-ui-fg-subtle self-center">
                 Mínimo 8 caracteres. Usaremos o e-mail e o nome informados acima.
               </span>
             </div>

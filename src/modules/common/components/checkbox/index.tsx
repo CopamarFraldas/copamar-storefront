@@ -16,11 +16,16 @@ const CheckboxWithLabel: React.FC<CheckboxProps> = ({
   name,
   'data-testid': dataTestId
 }) => {
+  // id ÚNICO por instância (antes era fixo "checkbox" → vários no mesmo form
+  // colidiam e o htmlFor da label apontava sempre pro 1º). name tem prioridade
+  // por estabilidade; senão useId garante unicidade.
+  const reactId = React.useId()
+  const id = name || reactId
   return (
     <div className="flex items-center space-x-2 ">
       <Checkbox
         className="text-base-regular flex items-center gap-x-2"
-        id="checkbox"
+        id={id}
         role="checkbox"
         type="button"
         checked={checked}
@@ -30,7 +35,7 @@ const CheckboxWithLabel: React.FC<CheckboxProps> = ({
         data-testid={dataTestId}
       />
       <Label
-        htmlFor="checkbox"
+        htmlFor={id}
         className="!transform-none !txt-medium"
         size="large"
       >

@@ -43,6 +43,9 @@ const Hero = () => {
               width={820}
               height={462}
               priority
+              // LCP do mobile: 1 coluna ocupa ~100vw; 2 colunas (small+) ~50vw,
+              // teto 820px. Evita o Next servir a imagem cheia no celular.
+              sizes="(max-width: 1024px) 100vw, 820px"
               className="rounded-large shadow-md w-full h-auto"
             />
           </div>

@@ -18,7 +18,7 @@ const MobileCheckoutBar = ({ cart }: { cart: HttpTypes.StoreCart }) => {
   return (
     <div className="small:hidden sticky bottom-0 inset-x-0 z-[110] bg-ui-bg-base border-t border-ui-border-base px-4 py-3 flex items-center justify-between gap-x-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
       <div className="flex flex-col leading-tight">
-        <span className="text-xs text-ui-fg-muted">Total</span>
+        <span className="text-xs text-ui-fg-subtle">Total</span>
         <span className="text-base font-semibold text-ui-fg-base">
           {convertToLocale({
             amount: cart?.total ?? 0,

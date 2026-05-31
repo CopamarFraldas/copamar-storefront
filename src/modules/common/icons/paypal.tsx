@@ -6,7 +6,10 @@ const PayPal = () => {
       width="20"
       viewBox="0 0 26 25"
       id="paypalIcon"
+      role="img"
+      aria-label="Pagar com PayPal"
     >
+      <title>Pagar com PayPal</title>
       <path
         fill="none"
         stroke="#303c42"

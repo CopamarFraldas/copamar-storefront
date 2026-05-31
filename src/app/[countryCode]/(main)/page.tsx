@@ -6,20 +6,27 @@ import CategoriesSection from "@modules/home/components/categories-section"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
-export const metadata: Metadata = {
-  title:
-    "Fralda Geriátrica Direto da Fábrica | Atacadista — Copamar Fraldas",
-  description:
-    "Fraldas geriátricas direto da fábrica, com preço de atacado. Atacadista e distribuidora especializada há 20 anos em Santo André/SP. Fralda para idoso e acamado, parcelamento 3x sem juros, 5% à vista e entrega para todo o Brasil.",
-  keywords: [
-    "fralda geriátrica",
-    "fralda geriátrica direto da fábrica",
-    "fábrica de fraldas",
-    "fralda geriátrica atacado",
-    "atacadista de fraldas",
-    "fralda para idoso",
-    "fralda para acamado",
-  ],
+export async function generateMetadata(props: {
+  params: Promise<{ countryCode: string }>
+}): Promise<Metadata> {
+  const { countryCode } = await props.params
+  const { getSiteUrl } = await import("@lib/util/seo")
+  const description =
+    "Fraldas geriátricas direto da fábrica, com preço de atacado. Atacadista e distribuidora especializada há 20 anos em Santo André/SP. Fralda para idoso e acamado, parcelamento 3x sem juros, 5% à vista e entrega para todo o Brasil."
+  return {
+    title: "Fralda Geriátrica Direto da Fábrica | Atacadista — Copamar Fraldas",
+    description,
+    alternates: { canonical: `${getSiteUrl()}/${countryCode}` },
+    keywords: [
+      "fralda geriátrica",
+      "fralda geriátrica direto da fábrica",
+      "fábrica de fraldas",
+      "fralda geriátrica atacado",
+      "atacadista de fraldas",
+      "fralda para idoso",
+      "fralda para acamado",
+    ],
+  }
 }
 
 export default async function Home(props: {

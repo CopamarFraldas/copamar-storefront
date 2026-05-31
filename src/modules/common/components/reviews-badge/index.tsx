@@ -16,7 +16,7 @@ function Estrelas({ nota }: { nota: number }) {
       aria-hidden="true"
       style={{ fontSize: "1em" }}
     >
-      <span className="text-ui-fg-muted">★★★★★</span>
+      <span className="text-ui-fg-subtle">★★★★★</span>
       <span
         className="absolute left-0 top-0 overflow-hidden whitespace-nowrap text-amber-500"
         style={{ width: `${pct}%` }}

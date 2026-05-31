@@ -83,7 +83,7 @@ export default async function BlogArticlePage({ params }: Props) {
       />
 
       <article>
-        <nav className="text-xsmall-regular text-ui-fg-muted mb-6">
+        <nav className="text-xsmall-regular text-ui-fg-subtle mb-6">
           <LocalizedClientLink href="/blog" className="hover:text-ui-fg-base">
             Blog
           </LocalizedClientLink>
@@ -100,7 +100,7 @@ export default async function BlogArticlePage({ params }: Props) {
         <h1 className="text-3xl font-semibold text-ui-fg-base mb-3 max-w-2xl">
           {frontmatter.title}
         </h1>
-        <div className="text-xsmall-regular text-ui-fg-muted mb-8">
+        <div className="text-xsmall-regular text-ui-fg-subtle mb-8">
           {frontmatter.author} · {formatarData(frontmatter.publishedAt)}
         </div>
 

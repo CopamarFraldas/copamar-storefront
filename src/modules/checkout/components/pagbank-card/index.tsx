@@ -282,7 +282,7 @@ const PagBankCard = ({
           className="w-full rounded-lg border border-ui-border-base bg-ui-bg-field px-3 py-2 pr-20 text-ui-fg-base outline-none focus:border-[#1251b8] focus:ring-1 focus:ring-[#1251b8] disabled:opacity-60"
         />
         {brand && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-ui-fg-muted">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-ui-fg-subtle">
             {brand}
           </span>
         )}
@@ -371,7 +371,7 @@ const PagBankCard = ({
           )}
         </>
       ) : (
-        <p className="text-xs text-ui-fg-muted">
+        <p className="text-xs text-ui-fg-subtle">
           Cobrança no documento do faturamento:{" "}
           <strong className="text-ui-fg-subtle">{formatCpf(fiscalDigits)}</strong>
         </p>

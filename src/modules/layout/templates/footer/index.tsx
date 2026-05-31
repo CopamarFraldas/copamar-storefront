@@ -44,7 +44,7 @@ export default async function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col xsmall:flex-row w-full pb-10 gap-y-2 justify-between text-ui-fg-muted">
+        <div className="flex flex-col xsmall:flex-row w-full pb-10 gap-y-2 justify-between text-ui-fg-subtle">
           <Text className="txt-compact-small">
             © {new Date().getFullYear()} Copamar Fraldas. Todos os direitos reservados.
           </Text>
@@ -63,7 +63,7 @@ const Identidade = () => (
     >
       Copamar Fraldas
     </LocalizedClientLink>
-    <p className="txt-small text-ui-fg-muted leading-relaxed">
+    <p className="txt-small text-ui-fg-subtle leading-relaxed">
       Especialista em fraldas geriátricas desde 2006. Empresa familiar de
       Santo André/SP. CNPJ 08.140.992/0001-64.
     </p>

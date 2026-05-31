@@ -6,9 +6,11 @@ import { useRef, useState, useEffect } from "react"
 
 type ImageGalleryProps = {
   images: HttpTypes.StoreProductImage[]
+  /** nome do produto → alt descritivo por foto (a11y/SEO) */
+  title?: string
 }
 
-const ImageGallery = ({ images }: ImageGalleryProps) => {
+const ImageGallery = ({ images, title }: ImageGalleryProps) => {
   const trackRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
 
@@ -58,7 +60,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
               src={image.url!}
               priority={index === 0}
               className="absolute inset-0"
-              alt={`Imagem do produto ${index + 1}`}
+              alt={title ? `${title} — foto ${index + 1}` : `Imagem do produto ${index + 1}`}
               fill
               sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 700px"
               style={{ objectFit: "contain" }}

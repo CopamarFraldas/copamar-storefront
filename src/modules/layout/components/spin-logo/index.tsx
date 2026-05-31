@@ -50,7 +50,6 @@ const SpinLogo = () => {
       alt="Copamar Fraldas - Especialista em fraldas geriátricas"
       width={140}
       height={48}
-      priority
       className="will-change-transform"
       style={{ width: "auto", height: "44px" }}
     />

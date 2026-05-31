@@ -100,7 +100,7 @@ const AddToCartButton = ({ product }: { product: HttpTypes.StoreProduct }) => {
 
   return (
     <div className="mt-3" onClick={stop}>
-      <span className="text-xs text-ui-fg-muted mb-1 block">Escolha o tamanho:</span>
+      <span className="text-xs text-ui-fg-subtle mb-1 block">Escolha o tamanho:</span>
       <div className="flex flex-wrap gap-1.5">
         {values.map((value) => {
           const v = variantForValue(value)

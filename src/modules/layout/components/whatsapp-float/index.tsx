@@ -48,7 +48,7 @@ const WhatsAppFloat = () => {
             className="group flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200"
           >
             <span className="rounded-lg bg-white dark:bg-ui-bg-component shadow-md px-3 py-1.5 text-xs font-medium text-ui-fg-base whitespace-nowrap">
-              Atendente <span className="text-ui-fg-muted">· Seg-Sex 8h-17h</span>
+              Atendente <span className="text-ui-fg-subtle">· Seg-Sex 8h-17h</span>
             </span>
             <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#25D366] bg-white dark:bg-ui-bg-base text-[#25D366] shadow-md transition-transform group-hover:scale-110">
               <WAIcon />
@@ -63,7 +63,7 @@ const WhatsAppFloat = () => {
             className="group flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200"
           >
             <span className="rounded-lg bg-white dark:bg-ui-bg-component shadow-md px-3 py-1.5 text-xs font-medium text-ui-fg-base whitespace-nowrap">
-              Falar com a Mapa <span className="text-ui-fg-muted">· IA 24h</span>
+              Falar com a Mapa <span className="text-ui-fg-subtle">· IA 24h</span>
             </span>
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-md transition-transform group-hover:scale-110">
               <WAIcon />

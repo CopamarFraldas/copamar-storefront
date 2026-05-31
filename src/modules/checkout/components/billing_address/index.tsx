@@ -59,7 +59,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           required
           data-testid="billing-postal-input"
         />
-        <span className="text-xs text-ui-fg-muted mt-1 block">
+        <span className="text-xs text-ui-fg-subtle mt-1 block">
           {cepLoading
             ? "Buscando endereço…"
             : "Digite o CEP que preenchemos o endereço pra você."}

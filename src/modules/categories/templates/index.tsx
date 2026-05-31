@@ -66,7 +66,7 @@ export default function CategoryTemplate({
         )}
         {category.category_children && category.category_children.length > 0 && (
           <div className="mb-8">
-            <p className="mb-3 text-sm text-ui-fg-muted">Refine sua busca</p>
+            <p className="mb-3 text-sm text-ui-fg-subtle">Refine sua busca</p>
             <div className="flex flex-wrap gap-2">
               {[...category.category_children].sort(ordenaSubs).map((c) => (
                 <LocalizedClientLink

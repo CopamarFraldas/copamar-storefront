@@ -120,7 +120,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                   <div key={cat.handle} className="min-w-0">
                     <h3 className="mb-3 text-sm font-semibold text-ui-fg-base">
                       {cat.name}{" "}
-                      <span className="font-normal text-ui-fg-muted">({cat.count})</span>
+                      <span className="font-normal text-ui-fg-subtle">({cat.count})</span>
                     </h3>
                     {cat.subs.length > 0 ? (
                       <>
@@ -134,7 +134,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                                 role="menuitem"
                               >
                                 {s.name}{" "}
-                                <span className="text-ui-fg-muted">({s.count})</span>
+                                <span className="text-ui-fg-subtle">({s.count})</span>
                               </LocalizedClientLink>
                             </li>
                           ))}
@@ -223,7 +223,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                         >
                           <span>
                             {cat.name}{" "}
-                            <span className="text-ui-fg-muted">({cat.count})</span>
+                            <span className="text-ui-fg-subtle">({cat.count})</span>
                           </span>
                           <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden className={`transition-transform ${isOpen ? "rotate-90" : ""}`}>
                             <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -237,7 +237,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                         >
                           <span>
                             {cat.name}{" "}
-                            <span className="text-ui-fg-muted">({cat.count})</span>
+                            <span className="text-ui-fg-subtle">({cat.count})</span>
                           </span>
                         </LocalizedClientLink>
                       )}
@@ -251,7 +251,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                                 className="block py-2 text-sm text-ui-fg-subtle hover:text-[#1251b8]"
                               >
                                 {s.name}{" "}
-                                <span className="text-ui-fg-muted">({s.count})</span>
+                                <span className="text-ui-fg-subtle">({s.count})</span>
                               </LocalizedClientLink>
                             </li>
                           ))}

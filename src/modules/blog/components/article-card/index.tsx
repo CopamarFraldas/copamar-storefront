@@ -21,7 +21,7 @@ const ArticleCard = ({ post }: { post: BlogPost }) => {
       className="group flex flex-col gap-y-2 border border-ui-border-base rounded-lg p-6 hover:border-ui-border-interactive transition-colors"
       data-testid="blog-article-card"
     >
-      <span className="text-xsmall-regular text-ui-fg-muted">
+      <span className="text-xsmall-regular text-ui-fg-subtle">
         {formatarData(frontmatter.publishedAt)}
       </span>
       <h2 className="text-large-semi text-ui-fg-base group-hover:text-ui-fg-interactive transition-colors">

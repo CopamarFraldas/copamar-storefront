@@ -46,14 +46,27 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     type: "website",
     siteName: "Copamar Fraldas",
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Copamar Fraldas — distribuidora atacadista de fraldas geriátricas direto da fábrica",
+      },
+    ],
   },
 }
+
+// Host do R2 (CDN das fotos dos produtos). preconnect/dns-prefetch reduz o tempo
+// até a 1ª imagem (LCP em mobile). React 19 hoista <link> pro <head>.
+const R2_HOST = "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev"
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className="bg-ui-bg-base text-ui-fg-base">
+        <link rel="preconnect" href={R2_HOST} crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href={R2_HOST} />
         <ThemeProvider>
           <StructuredData />
           <main className="relative">{props.children}</main>

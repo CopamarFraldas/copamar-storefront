@@ -59,7 +59,7 @@ export default function SobrePage() {
               className="object-cover"
             />
           </div>
-          <figcaption className="text-xsmall-regular text-ui-fg-muted mt-2 text-center">
+          <figcaption className="text-xsmall-regular text-ui-fg-subtle mt-2 text-center">
             Nossa loja em Santo André/SP — estoque próprio e atendimento especializado.
           </figcaption>
         </figure>

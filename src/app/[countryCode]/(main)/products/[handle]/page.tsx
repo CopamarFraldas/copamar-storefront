@@ -113,7 +113,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       description: descricao,
       type: "website",
       url: canonical,
-      images: product.thumbnail ? [{ url: product.thumbnail }] : [],
+      images: product.thumbnail
+        ? [{ url: product.thumbnail, alt: `${product.title} — Copamar Fraldas` }]
+        : [],
     },
   }
 }

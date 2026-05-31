@@ -23,7 +23,7 @@ const BlocoCategoria = ({ cat, onLink }: { cat: NavCat; onLink?: () => void }) =
         className="hover:text-[#1251b8] transition-colors"
       >
         {cat.name}{" "}
-        <span className="font-normal text-ui-fg-muted">({cat.count})</span>
+        <span className="font-normal text-ui-fg-subtle">({cat.count})</span>
       </LocalizedClientLink>
     </h3>
     {cat.subs.length > 0 ? (
@@ -37,7 +37,7 @@ const BlocoCategoria = ({ cat, onLink }: { cat: NavCat; onLink?: () => void }) =
                 className="text-sm text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
               >
                 {s.name}{" "}
-                <span className="text-ui-fg-muted">({s.count})</span>
+                <span className="text-ui-fg-subtle">({s.count})</span>
               </LocalizedClientLink>
             </li>
           ))}
@@ -100,7 +100,7 @@ const FooterCategories = ({ categories }: Props) => {
               >
                 <span className="text-sm font-medium text-ui-fg-base">
                   {cat.name}{" "}
-                  <span className="font-normal text-ui-fg-muted">({cat.count})</span>
+                  <span className="font-normal text-ui-fg-subtle">({cat.count})</span>
                 </span>
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden
                   className={`transition-transform ${open ? "rotate-180" : ""}`}>
@@ -119,7 +119,7 @@ const FooterCategories = ({ categories }: Props) => {
                               className="text-sm text-ui-fg-subtle hover:text-[#1251b8]"
                             >
                               {s.name}{" "}
-                              <span className="text-ui-fg-muted">({s.count})</span>
+                              <span className="text-ui-fg-subtle">({s.count})</span>
                             </LocalizedClientLink>
                           </li>
                         ))}

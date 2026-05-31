@@ -32,7 +32,7 @@ export default function BlogPage() {
       </p>
 
       {posts.length === 0 ? (
-        <p className="text-ui-fg-muted">Em breve, novos conteúdos.</p>
+        <p className="text-ui-fg-subtle">Em breve, novos conteúdos.</p>
       ) : (
         <div className="grid grid-cols-1 small:grid-cols-2 gap-6">
           {posts.map((p) => (

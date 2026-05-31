@@ -45,7 +45,7 @@ const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
             "relative flex items-center text-base-regular border border-ui-border-base bg-ui-bg-subtle rounded-md hover:bg-ui-bg-field-hover",
             className,
             {
-              "text-ui-fg-muted": isPlaceholder,
+              "text-ui-fg-subtle": isPlaceholder,
             }
           )}
         >
