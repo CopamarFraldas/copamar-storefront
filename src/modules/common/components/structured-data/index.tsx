@@ -30,6 +30,28 @@ const HORARIOS = [
   },
 ] as const
 
+/**
+ * AggregateRating fica SÓ na Organization/LocalBusiness (rating em produto
+ * individual sem reviews reais = penalidade do Google). ⚠️ NÃO FABRICAR: só
+ * emite com a CONTAGEM REAL de avaliações. Defina NEXT_PUBLIC_REVIEW_COUNT com o
+ * nº real do Google Negócios pra ativar (a nota 4,9 foi informada pelo Marco).
+ */
+const REVIEW_RATING = "4.9"
+const REVIEW_COUNT: number | null = process.env.NEXT_PUBLIC_REVIEW_COUNT
+  ? parseInt(process.env.NEXT_PUBLIC_REVIEW_COUNT, 10) || null
+  : null
+const aggregateRating = () =>
+  REVIEW_COUNT
+    ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: REVIEW_RATING,
+          reviewCount: REVIEW_COUNT,
+          bestRating: "5",
+        },
+      }
+    : {}
+
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
@@ -107,6 +129,7 @@ export function organizationSchema() {
     ],
     taxID: "08.140.992/0001-64",
     areaServed: { "@type": "Country", name: "Brasil" },
+    ...aggregateRating(),
   }
 }
 
@@ -127,6 +150,7 @@ export function localBusinessSchema() {
       longitude: "-46.5147893",
     },
     openingHoursSpecification: HORARIOS,
+    ...aggregateRating(),
   }
 }
 
@@ -166,6 +190,8 @@ export type ProductSchemaInput = {
   description?: string
   image?: string | string[]
   sku?: string
+  /** GTIN/EAN-13 real (variant.barcode/ean). Sem rating em produto (guardrail). */
+  gtin?: string
   brand?: string
   url?: string
   price?: number | string
@@ -181,6 +207,10 @@ export function productSchema(product: ProductSchemaInput) {
     description: product.description,
     image: product.image,
     sku: product.sku,
+  }
+  // GTIN real (EAN-13) — forte sinal pro Google Shopping/GEO. Só com 13 dígitos.
+  if (product.gtin && /^\d{13}$/.test(product.gtin)) {
+    schema.gtin13 = product.gtin
   }
   if (product.brand) {
     schema.brand = { "@type": "Brand", name: product.brand }
@@ -271,7 +301,7 @@ export function JsonLd({ data }: { data: object | object[] }) {
   )
 }
 
-/** Schemas globais (Organization + WebSite) — usado no layout raiz. */
+/** Schemas globais (Organization + LocalBusiness + WebSite) — layout raiz. */
 export default function StructuredData() {
-  return <JsonLd data={[organizationSchema(), webSiteSchema()]} />
+  return <JsonLd data={[organizationSchema(), localBusinessSchema(), webSiteSchema()]} />
 }

@@ -4,6 +4,14 @@ import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
+import { getProductPrice } from "@lib/util/get-product-price"
+import { isProductOutOfStock } from "@lib/util/stock"
+import { getSiteUrl } from "@lib/util/seo"
+import {
+  JsonLd,
+  productSchema,
+  breadcrumbSchema,
+} from "@modules/common/components/structured-data"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -89,13 +97,23 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const { cheapestPrice } = getProductPrice({ product })
+  const precoTxt = cheapestPrice?.calculated_price
+    ? ` A partir de ${cheapestPrice.calculated_price}.`
+    : ""
+  const descricao = `Compre ${product.title} na Copamar Fraldas, especialista em fraldas geriátricas desde 2006.${precoTxt} Parcelamento em 3x sem juros, 5% de desconto à vista e entrega para todo o Brasil.`
+  const canonical = `${getSiteUrl()}/${params.countryCode}/products/${handle}`
+
   return {
     title: `${product.title} | Copamar Fraldas`,
-    description: `${product.title}`,
+    description: descricao,
+    alternates: { canonical },
     openGraph: {
       title: `${product.title} | Copamar Fraldas`,
-      description: `${product.title}`,
-      images: product.thumbnail ? [product.thumbnail] : [],
+      description: descricao,
+      type: "website",
+      url: canonical,
+      images: product.thumbnail ? [{ url: product.thumbnail }] : [],
     },
   }
 }
@@ -122,12 +140,40 @@ export default async function ProductPage(props: Props) {
 
   const images = getImagesForVariant(pricedProduct, selectedVariantId)
 
+  // ── JSON-LD Product + Breadcrumb (dados REAIS — sem rating em produto) ──
+  const site = getSiteUrl()
+  const url = `${site}/${params.countryCode}/products/${pricedProduct.handle}`
+  const { cheapestPrice } = getProductPrice({ product: pricedProduct })
+  const v0 = pricedProduct.variants?.[0]
+  const gtin = (v0 as any)?.barcode || (v0?.sku && /^\d{13}$/.test(v0.sku) ? v0.sku : undefined)
+  const esgotado = isProductOutOfStock(pricedProduct)
+  const ldProduto = productSchema({
+    name: pricedProduct.title,
+    description: pricedProduct.description || `${pricedProduct.title} — Copamar Fraldas`,
+    image: (pricedProduct.images || []).map((i) => i.url).filter(Boolean) as string[],
+    sku: v0?.sku || undefined,
+    gtin,
+    brand: pricedProduct.collection?.title || undefined,
+    url,
+    price: cheapestPrice?.calculated_price_number,
+    currency: "BRL",
+    availability: esgotado ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+  })
+  const ldCrumb = breadcrumbSchema([
+    { name: "Início", url: site },
+    { name: "Loja", url: `${site}/${params.countryCode}/store` },
+    { name: pricedProduct.title, url },
+  ])
+
   return (
-    <ProductTemplate
-      product={pricedProduct}
-      region={region}
-      countryCode={params.countryCode}
-      images={images}
-    />
+    <>
+      <JsonLd data={[ldProduto, ldCrumb]} />
+      <ProductTemplate
+        product={pricedProduct}
+        region={region}
+        countryCode={params.countryCode}
+        images={images}
+      />
+    </>
   )
 }

@@ -58,9 +58,20 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const { getSiteUrl } = await import("@lib/util/seo")
+  const canonical = `${getSiteUrl()}/${params.countryCode}/collections/${params.handle}`
+  const description = `${collection.title} na Copamar Fraldas — especialista em fraldas geriátricas desde 2006. Parcelamento 3x sem juros, 5% à vista e entrega para todo o Brasil.`
+
   const metadata = {
     title: `${collection.title} | Copamar Fraldas`,
-    description: `Coleção ${collection.title}`,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: `${collection.title} | Copamar Fraldas`,
+      description,
+      type: "website",
+      url: canonical,
+    },
   } as Metadata
 
   return metadata
