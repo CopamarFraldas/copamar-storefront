@@ -7,9 +7,19 @@ import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
-  title: "Copamar Fraldas — Cuidado e dignidade pra quem você ama",
+  title:
+    "Fralda Geriátrica Direto da Fábrica | Atacadista — Copamar Fraldas",
   description:
-    "Fraldas geriátricas, fraldas infantis e produtos de higiene pra cuidadores. Entrega para todo o Brasil. Atendimento especializado.",
+    "Fraldas geriátricas direto da fábrica, com preço de atacado. Atacadista e distribuidora especializada há 20 anos em Santo André/SP. Fralda para idoso e acamado, parcelamento 3x sem juros, 5% à vista e entrega para todo o Brasil.",
+  keywords: [
+    "fralda geriátrica",
+    "fralda geriátrica direto da fábrica",
+    "fábrica de fraldas",
+    "fralda geriátrica atacado",
+    "atacadista de fraldas",
+    "fralda para idoso",
+    "fralda para acamado",
+  ],
 }
 
 export default async function Home(props: {

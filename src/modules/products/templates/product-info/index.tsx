@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ReviewsBadge from "@modules/common/components/reviews-badge"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
@@ -18,13 +19,17 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
             {product.collection.title}
           </LocalizedClientLink>
         )}
+        {/* título = h1 da página (era h2, página ficava sem h1) */}
         <Heading
-          level="h2"
+          level="h1"
           className="text-3xl leading-10 text-ui-fg-base"
           data-testid="product-title"
         >
           {product.title}
         </Heading>
+
+        {/* prova social real da loja (C1) */}
+        <ReviewsBadge />
 
         <Text
           className="text-medium text-ui-fg-subtle whitespace-pre-line"
