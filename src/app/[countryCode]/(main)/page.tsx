@@ -1,9 +1,12 @@
 import { Metadata } from "next"
 
-import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
+import TrustStrip from "@modules/home/components/trust-strip"
+import FeaturedRail from "@modules/home/components/featured-rail"
 import CategoriesSection from "@modules/home/components/categories-section"
-import { listCollections } from "@lib/data/collections"
+import SocialProof from "@modules/home/components/social-proof"
+import B2bStrip from "@modules/home/components/b2b-strip"
+import HomeFaq from "@modules/home/components/home-faq"
 import { getRegion } from "@lib/data/regions"
 
 export async function generateMetadata(props: {
@@ -36,29 +39,22 @@ export async function generateMetadata(props: {
 export default async function Home(props: {
   params: Promise<{ countryCode: string }>
 }) {
-  const params = await props.params
-
-  const { countryCode } = params
-
+  const { countryCode } = await props.params
   const region = await getRegion(countryCode)
+  if (!region) return null
 
-  const { collections } = await listCollections({
-    fields: "id, handle, title",
-  })
-
-  if (!collections || !region) {
-    return null
-  }
-
+  // Estrutura aprovada (proposta-home.md): hero focado → confiança → mais
+  // procurados → categorias → prova social → B2B → FAQ. A barra de aviso (item 0)
+  // é site-wide, mora no Nav.
   return (
     <>
       <Hero />
+      <TrustStrip />
+      <FeaturedRail region={region} />
       <CategoriesSection />
-      <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
-        </ul>
-      </div>
+      <SocialProof />
+      <B2bStrip />
+      <HomeFaq />
     </>
   )
 }

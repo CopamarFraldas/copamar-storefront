@@ -43,9 +43,9 @@ const CategoriesSectionClient = ({ cards }: { cards: Card[] }) => {
   }, [])
 
   return (
-    <section id="nossos-produtos" className="bg-ui-bg-base py-12 lg:py-20" ref={ref}>
+    <section id="categorias" className="bg-ui-bg-base py-12 lg:py-20" ref={ref}>
       <div className="content-container max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-2 text-ui-fg-base">Nossos Produtos</h2>
+        <h2 className="text-3xl font-bold text-center mb-2 text-ui-fg-base">Navegue por categoria</h2>
         <p className="text-center text-ui-fg-subtle mb-10 lg:mb-12">
           Catálogo completo pra cuidar de quem você ama
         </p>

@@ -5,10 +5,14 @@ import CartButton from "@modules/layout/components/cart-button"
 import SpinLogo from "@modules/layout/components/spin-logo"
 import ThemeToggle from "@modules/layout/components/theme-toggle"
 import MegaMenu from "@modules/layout/components/mega-menu"
+import NoticeBar from "@modules/layout/components/notice-bar"
 
 export default async function Nav() {
   return (
-    <div className="sticky top-0 inset-x-0 z-50 group">
+    <>
+      {/* barra de aviso no topo (rola pra fora; o header abaixo é sticky) */}
+      <NoticeBar />
+      <div className="sticky top-0 inset-x-0 z-50 group">
       <header className="relative h-16 mx-auto border-b duration-200 bg-ui-bg-base border-ui-border-base">
         <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
           <div className="flex-1 basis-0 h-full flex items-center gap-x-4">
@@ -66,6 +70,7 @@ export default async function Nav() {
           </div>
         </nav>
       </header>
-    </div>
+      </div>
+    </>
   )
 }
