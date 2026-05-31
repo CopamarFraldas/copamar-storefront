@@ -61,6 +61,11 @@
   // ---- fila + envio ----
   var queue = [], timer = null, enterTs = Date.now();
   var scrollMarks = {}, sentExit = false, sentTime = false, lastUrl = location.href;
+  // dedupe do pageView (anti dobra): o React StrictMode em DEV (e às vezes
+  // push+replaceState do Next) chama pageView 2x pra mesma URL em ~1s → contava
+  // product_view/page_view/begin_checkout dobrado. Em produção isso não ocorre,
+  // mas o guard garante NUNCA contar dobrado.
+  var lastPvUrl = '', lastPvTs = 0;
 
   function send(tipo, extra) {
     if (!hasConsent()) return; // ZERO sem consentimento
@@ -114,7 +119,12 @@
 
   // ---- page_view (+ product_view / begin_checkout derivados) ----
   function pageView() {
-    enterTs = Date.now(); scrollMarks = {}; sentExit = false; sentTime = false;
+    var now = Date.now();
+    // mesma URL em janela curta (3s) = dobra do dev/StrictMode → ignora.
+    // Navegação real pra outra página (URL diferente) passa normalmente.
+    if (location.href === lastPvUrl && now - lastPvTs < 3000) return;
+    lastPvUrl = location.href; lastPvTs = now;
+    enterTs = now; scrollMarks = {}; sentExit = false; sentTime = false;
     send('page_view');
     if (isProductPage()) send('product_view', productData());
     if (isCheckoutPage()) send('begin_checkout');
