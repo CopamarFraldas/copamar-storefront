@@ -3,6 +3,7 @@ import { robotsMeta } from "@lib/util/seo"
 import { Metadata } from "next"
 import Script from "next/script"
 import CookieConsent from "@modules/common/components/cookie-consent"
+import IdentifyOnLogin from "@modules/common/components/identify-on-login"
 import StructuredData from "@modules/common/components/structured-data"
 import ThemeProvider from "@modules/common/components/theme-provider"
 import WhatsAppFloat from "@modules/layout/components/whatsapp-float"
@@ -58,6 +59,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           <main className="relative">{props.children}</main>
           <WhatsAppFloat />
           <CookieConsent />
+          <IdentifyOnLogin />
           {/* tracking on-site (LGPD): só roda com consentimento; carrega após interativo */}
           <Script src="/copamar-track.js" strategy="afterInteractive" />
         </ThemeProvider>

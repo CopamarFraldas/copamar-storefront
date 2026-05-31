@@ -11,6 +11,7 @@ import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
+import { getProductPrice } from "@lib/util/get-product-price"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -29,11 +30,20 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     return notFound()
   }
 
+  // data-attributes pro copamar-track.js capturar categoria/preço no product_view
+  // (hoje vêm NULL). sku = handle, mantendo a chave que o feed usa pra enriquecer.
+  const { cheapestPrice } = getProductPrice({ product })
+  const trackPreco = cheapestPrice?.calculated_price_number
+  const trackCategoria = (product.categories?.[0] as any)?.name
+
   return (
     <>
       <div
         className="content-container  flex flex-col small:flex-row small:items-start py-6 relative"
         data-testid="product-container"
+        data-track-sku={product.handle || undefined}
+        data-track-categoria={trackCategoria || undefined}
+        data-track-preco={trackPreco != null ? String(trackPreco) : undefined}
       >
         <div className="flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-6">
           <ProductInfo product={product} />
