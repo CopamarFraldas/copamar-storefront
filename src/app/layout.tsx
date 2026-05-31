@@ -1,4 +1,5 @@
 import { getBaseURL } from "@lib/util/env"
+import { robotsMeta } from "@lib/util/seo"
 import { Metadata } from "next"
 import Script from "next/script"
 import CookieConsent from "@modules/common/components/cookie-consent"
@@ -9,6 +10,9 @@ import "styles/globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
+  // 🚨 noindex/nofollow fora de produção (staging não vaza pro Google). Liga no
+  // cutover com NEXT_PUBLIC_ALLOW_INDEXING="true".
+  robots: robotsMeta(),
   title: {
     default:
       "Copamar Fraldas — Especialista em Fraldas Geriátricas desde 2006",

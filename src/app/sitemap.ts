@@ -1,8 +1,10 @@
 import { MetadataRoute } from "next"
 import { getAllPosts } from "@lib/data/blog"
 import { listProducts } from "@lib/data/products"
+import { getSiteUrl } from "@lib/util/seo"
 
-const SITE_URL = "https://copamarfraldas.com.br"
+// URL env-consciente (staging usa o host de staging; produção, o canônico).
+const SITE_URL = getSiteUrl()
 
 // revalida de hora em hora (produtos/artigos podem mudar)
 export const revalidate = 3600
