@@ -6,9 +6,11 @@
 
 const SITE_URL = "https://copamarfraldas.com.br"
 
+// NAP — bate EXATO com o Google Negócios (bairro no streetAddress; schema.org
+// PostalAddress não tem campo de bairro próprio).
 const ENDERECO = {
   "@type": "PostalAddress",
-  streetAddress: "Rua Iugoslávia, 167",
+  streetAddress: "Rua Iugoslávia, 167 - Parque das Nações",
   addressLocality: "Santo André",
   addressRegion: "SP",
   postalCode: "09280-110",
@@ -36,10 +38,13 @@ const HORARIOS = [
  * emite com a CONTAGEM REAL de avaliações. Defina NEXT_PUBLIC_REVIEW_COUNT com o
  * nº real do Google Negócios pra ativar (a nota 4,9 foi informada pelo Marco).
  */
-const REVIEW_RATING = "4.9"
+// Snapshot REAL do Google Negócios (perfil público, 31/05/2026): 4,6 / 143
+// avaliações. (NÃO confundir com o seller rating 4,9 do Merchant Center — métrica
+// diferente.) TODO #42: ligar no Places API pra manter atualizado automaticamente.
+const REVIEW_RATING = process.env.NEXT_PUBLIC_REVIEW_RATING || "4.6"
 const REVIEW_COUNT: number | null = process.env.NEXT_PUBLIC_REVIEW_COUNT
   ? parseInt(process.env.NEXT_PUBLIC_REVIEW_COUNT, 10) || null
-  : null
+  : 143
 const aggregateRating = () =>
   REVIEW_COUNT
     ? {
