@@ -37,7 +37,7 @@ export default async function SobrePage({ params }: Props) {
     <div className="content-container py-12">
       <JsonLd
         data={[
-          aboutPageSchema(),
+          aboutPageSchema(`${base}/sobre`),
           localBusinessSchema(),
           breadcrumbSchema([
             { name: "Início", url: base },

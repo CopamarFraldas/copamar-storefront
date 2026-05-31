@@ -1,7 +1,11 @@
 /**
  * Schema.org (JSON-LD) — dados estruturados pra SEO/GEO (Copamar Fraldas).
  * Dados oficiais confirmados via Receita Federal (24/05/2026).
- * SITE_URL = domínio canônico de produção (mesmo em staging — correto pro SEO).
+ * SITE_URL = domínio de produção usado como @id ESTÁVEL das entidades globais
+ * (Organization/LocalBusiness/WebSite) — identificador, não URL navegável, então
+ * fica estável entre staging e produção de propósito. URLs de PÁGINA (AboutPage,
+ * Article, breadcrumb, Product) vêm da própria página via getSiteUrl()+/<cc>,
+ * acompanhando o canonical (staging agora, produção no cutover).
  */
 
 const SITE_URL = "https://copamarfraldas.com.br"
@@ -277,12 +281,16 @@ export function articleSchema(article: ArticleSchemaInput) {
   }
 }
 
-export function aboutPageSchema() {
+// `url` = URL REAL da página (canonical env-consciente, com /<countryCode>),
+// passada pela página — assim a AboutPage acompanha o canonical (staging agora,
+// produção no cutover), igual ao articleSchema. O mainEntity ainda referencia o
+// @id ESTÁVEL da Organization (produção), que é identificador, não URL navegável.
+export function aboutPageSchema(url: string = `${SITE_URL}/sobre`) {
   return {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "@id": `${SITE_URL}/sobre#aboutpage`,
-    url: `${SITE_URL}/sobre`,
+    "@id": `${url}#aboutpage`,
+    url,
     name: "Quem somos — Copamar Fraldas",
     description:
       "A história da Copamar Fraldas: empresa familiar de Santo André/SP, fundada em 2006, especializada em fraldas geriátricas e produtos de higiene para idosos há 20 anos.",
