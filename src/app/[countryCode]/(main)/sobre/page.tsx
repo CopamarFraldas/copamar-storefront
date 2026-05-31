@@ -7,25 +7,32 @@ import {
   breadcrumbSchema,
   JsonLd,
 } from "@modules/common/components/structured-data"
+import { getSiteUrl } from "@lib/util/seo"
 
-const SITE_URL = "https://copamarfraldas.com.br"
+type Props = { params: Promise<{ countryCode: string }> }
 
-export const metadata: Metadata = {
-  title: "Quem somos — 20 anos de especialização em fraldas geriátricas",
-  description:
-    "A história da Copamar Fraldas: empresa familiar de Santo André/SP fundada em 2006, especializada em fraldas geriátricas e produtos de higiene para idosos há 20 anos.",
-  alternates: { canonical: `${SITE_URL}/sobre` },
-  openGraph: {
-    title: "Quem somos — Copamar Fraldas, 20 anos em fraldas geriátricas",
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { countryCode } = await params
+  const base = `${getSiteUrl()}/${countryCode}`
+  return {
+    title: "Quem somos — 20 anos de especialização em fraldas geriátricas",
     description:
-      "Empresa familiar de Santo André/SP fundada em 2006, especializada em fraldas geriátricas e produtos de higiene para idosos.",
-    url: `${SITE_URL}/sobre`,
-    type: "website",
-    images: [{ url: `${SITE_URL}/loja-fachada.jpg`, width: 1600, height: 900, alt: "Interior da loja Copamar Fraldas em Santo André/SP" }],
-  },
+      "A história da Copamar Fraldas: empresa familiar de Santo André/SP fundada em 2006, especializada em fraldas geriátricas e produtos de higiene para idosos há 20 anos.",
+    alternates: { canonical: `${base}/sobre` },
+    openGraph: {
+      title: "Quem somos — Copamar Fraldas, 20 anos em fraldas geriátricas",
+      description:
+        "Empresa familiar de Santo André/SP fundada em 2006, especializada em fraldas geriátricas e produtos de higiene para idosos.",
+      url: `${base}/sobre`,
+      type: "website",
+      images: [{ url: `${getSiteUrl()}/loja-fachada.jpg`, width: 1600, height: 900, alt: "Interior da loja Copamar Fraldas em Santo André/SP" }],
+    },
+  }
 }
 
-export default function SobrePage() {
+export default async function SobrePage({ params }: Props) {
+  const { countryCode } = await params
+  const base = `${getSiteUrl()}/${countryCode}`
   return (
     <div className="content-container py-12">
       <JsonLd
@@ -33,8 +40,8 @@ export default function SobrePage() {
           aboutPageSchema(),
           localBusinessSchema(),
           breadcrumbSchema([
-            { name: "Início", url: SITE_URL },
-            { name: "Quem somos", url: `${SITE_URL}/sobre` },
+            { name: "Início", url: base },
+            { name: "Quem somos", url: `${base}/sobre` },
           ]),
         ]}
       />

@@ -14,7 +14,11 @@ export async function generateMetadata(props: {
   const description =
     "Fraldas geriátricas direto da fábrica, com preço de atacado. Atacadista e distribuidora especializada há 20 anos em Santo André/SP. Fralda para idoso e acamado, parcelamento 3x sem juros, 5% à vista e entrega para todo o Brasil."
   return {
-    title: "Fralda Geriátrica Direto da Fábrica | Atacadista — Copamar Fraldas",
+    // absolute: o título já traz a marca; o template do layout anexaria de novo.
+    title: {
+      absolute:
+        "Fralda Geriátrica Direto da Fábrica | Atacadista — Copamar Fraldas",
+    },
     description,
     alternates: { canonical: `${getSiteUrl()}/${countryCode}` },
     keywords: [

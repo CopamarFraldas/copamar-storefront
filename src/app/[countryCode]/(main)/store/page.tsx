@@ -20,10 +20,29 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
   const description =
     "Catálogo completo de fraldas geriátricas e produtos de higiene — direto da fábrica, preço de atacado. Copamar Fraldas, atacadista especializada há 20 anos. Entrega para todo o Brasil."
   return {
-    title: "Fraldas geriátricas — catálogo (atacado e varejo) | Copamar Fraldas",
+    // absolute: evita o template do layout duplicar "| Copamar Fraldas".
+    title: {
+      absolute:
+        "Fraldas geriátricas — catálogo (atacado e varejo) | Copamar Fraldas",
+    },
     description,
     alternates: { canonical },
-    openGraph: { title: "Loja Copamar Fraldas", description, type: "website", url: canonical },
+    openGraph: {
+      title: "Loja Copamar Fraldas",
+      description,
+      type: "website",
+      url: canonical,
+      // explícito: definir openGraph aqui SUBSTITUI o objeto do layout pai (não
+      // mescla) — sem isto a /store ficava sem og:image.
+      images: [
+        {
+          url: `${getSiteUrl()}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: "Copamar Fraldas — catálogo de fraldas geriátricas, atacado e varejo",
+        },
+      ],
+    },
   }
 }
 

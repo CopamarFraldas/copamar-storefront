@@ -105,7 +105,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const canonical = `${getSiteUrl()}/${params.countryCode}/products/${handle}`
 
   return {
-    title: `${product.title} | Copamar Fraldas`,
+    // absolute: o título já traz a marca; o template do layout anexaria de novo.
+    title: { absolute: `${product.title} | Copamar Fraldas` },
     description: descricao,
     alternates: { canonical },
     openGraph: {

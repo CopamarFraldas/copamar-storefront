@@ -2,25 +2,31 @@ import { Metadata } from "next"
 import { getAllPosts } from "@lib/data/blog"
 import ArticleCard from "@modules/blog/components/article-card"
 import { breadcrumbSchema, JsonLd } from "@modules/common/components/structured-data"
+import { getSiteUrl } from "@lib/util/seo"
 
-const SITE_URL = "https://copamarfraldas.com.br"
+type Props = { params: Promise<{ countryCode: string }> }
 
-export const metadata: Metadata = {
-  title: "Blog — Guias sobre Fraldas Geriátricas e Cuidado de Idosos",
-  description:
-    "Guias e conteúdos da Copamar sobre fraldas geriátricas, incontinência e cuidado de pessoas idosas e acamadas. 20 anos de experiência a serviço de cuidadores.",
-  alternates: { canonical: `${SITE_URL}/blog` },
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { countryCode } = await params
+  return {
+    title: "Blog — Guias sobre Fraldas Geriátricas e Cuidado de Idosos",
+    description:
+      "Guias e conteúdos da Copamar sobre fraldas geriátricas, incontinência e cuidado de pessoas idosas e acamadas. 20 anos de experiência a serviço de cuidadores.",
+    alternates: { canonical: `${getSiteUrl()}/${countryCode}/blog` },
+  }
 }
 
-export default function BlogPage() {
+export default async function BlogPage({ params }: Props) {
+  const { countryCode } = await params
+  const base = `${getSiteUrl()}/${countryCode}`
   const posts = getAllPosts()
 
   return (
     <div className="content-container py-12">
       <JsonLd
         data={breadcrumbSchema([
-          { name: "Início", url: SITE_URL },
-          { name: "Blog", url: `${SITE_URL}/blog` },
+          { name: "Início", url: base },
+          { name: "Blog", url: `${base}/blog` },
         ])}
       />
       <h1 className="text-3xl font-semibold text-ui-fg-base mb-2">

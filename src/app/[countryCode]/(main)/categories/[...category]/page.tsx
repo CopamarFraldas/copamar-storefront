@@ -6,6 +6,7 @@ import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { getSiteUrl } from "@lib/util/seo"
 
 type Props = {
   params: Promise<{ category: string[]; countryCode: string }>
@@ -47,15 +48,19 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   try {
     const productCategory = await getCategoryByHandle(params.category)
 
-    const title = productCategory.name + " | Copamar Fraldas"
-
-    const description = productCategory.description ?? `${title} category.`
+    const description =
+      productCategory.description ??
+      `${productCategory.name}: fraldas geriátricas e produtos de higiene direto da fábrica, com preço de atacado. Copamar Fraldas, especialista há 20 anos.`
 
     return {
-      title: `${title} | Copamar Fraldas`,
+      // absolute: o template do layout já anexa "| Copamar Fraldas - ...". Sem
+      // isso a marca aparecia 3x no <title> da categoria.
+      title: { absolute: `${productCategory.name} | Copamar Fraldas` },
       description,
       alternates: {
-        canonical: `${params.category.join("/")}`,
+        // antes era só o handle ("fraldas-geriatricas"), que resolvia pra raiz
+        // do domínio. Agora a URL canônica real: /<cc>/categories/<handle>.
+        canonical: `${getSiteUrl()}/${params.countryCode}/categories/${params.category.join("/")}`,
       },
     }
   } catch (error) {

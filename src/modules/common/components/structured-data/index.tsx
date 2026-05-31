@@ -36,7 +36,7 @@ const HORARIOS = [
  * AggregateRating fica SÓ na Organization/LocalBusiness (rating em produto
  * individual sem reviews reais = penalidade do Google). ⚠️ NÃO FABRICAR: só
  * emite com a CONTAGEM REAL de avaliações. Defina NEXT_PUBLIC_REVIEW_COUNT com o
- * nº real do Google Negócios pra ativar (a nota 4,9 foi informada pelo Marco).
+ * nº real do Google Negócios pra ativar (snapshot real abaixo: 4,6 / 143).
  */
 // Snapshot REAL do Google Negócios (perfil público, 31/05/2026): 4,6 / 143
 // avaliações. (NÃO confundir com o seller rating 4,9 do Merchant Center — métrica

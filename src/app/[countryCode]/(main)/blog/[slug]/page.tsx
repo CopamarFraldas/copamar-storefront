@@ -9,15 +9,14 @@ import {
   JsonLd,
 } from "@modules/common/components/structured-data"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-
-const SITE_URL = "https://copamarfraldas.com.br"
+import { getSiteUrl, robotsMeta } from "@lib/util/seo"
 
 type Props = {
   params: Promise<{ countryCode: string; slug: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
+  const { slug, countryCode } = await params
   const post = getPostBySlug(slug)
   if (!post) {
     return { title: "Artigo não encontrado" }
@@ -27,9 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: frontmatter.title,
     description: frontmatter.description,
     keywords: frontmatter.keywords,
-    alternates: { canonical: `${SITE_URL}/blog/${slug}` },
-    // drafts não devem ser indexados até o Marco aprovar
-    robots: frontmatter.draft ? { index: false, follow: false } : undefined,
+    alternates: { canonical: `${getSiteUrl()}/${countryCode}/blog/${slug}` },
+    // drafts: noindex sempre. Publicados herdam o robots env-consciente do site
+    // (noindex em staging, index só no cutover). Antes era `undefined`, que
+    // SOBRESCREVIA o noindex do layout → o post publicado vazava pro Google.
+    robots: frontmatter.draft ? { index: false, follow: false } : robotsMeta(),
     openGraph: {
       title: frontmatter.title,
       description: frontmatter.description,
@@ -53,13 +54,14 @@ const formatarData = (iso: string) => {
 }
 
 export default async function BlogArticlePage({ params }: Props) {
-  const { slug } = await params
+  const { slug, countryCode } = await params
   const post = getPostBySlug(slug)
   if (!post) {
     notFound()
   }
   const { frontmatter, content } = post
-  const url = `${SITE_URL}/blog/${slug}`
+  const base = `${getSiteUrl()}/${countryCode}`
+  const url = `${base}/blog/${slug}`
 
   return (
     <div className="content-container py-12">
@@ -75,8 +77,8 @@ export default async function BlogArticlePage({ params }: Props) {
             author: frontmatter.author,
           }),
           breadcrumbSchema([
-            { name: "Início", url: SITE_URL },
-            { name: "Blog", url: `${SITE_URL}/blog` },
+            { name: "Início", url: base },
+            { name: "Blog", url: `${base}/blog` },
             { name: frontmatter.title, url },
           ]),
         ]}
