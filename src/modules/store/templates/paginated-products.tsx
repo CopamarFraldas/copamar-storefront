@@ -39,9 +39,10 @@ export default async function PaginatedProducts({
   }
 
   if (gridId) {
-    // fields explícito com +metadata → o filtro de tamanho lê metadata.tamanho
-    // (e a chave de cache muda, trazendo o metadata recém-normalizado).
-    queryParams["fields"] = "*variants.calculated_price,+metadata"
+    // fields explícito com +metadata (filtro de tamanho) MAS preservando os
+    // campos de estoque — senão o card marca "esgotado" por falta do campo.
+    queryParams["fields"] =
+      "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata"
   }
 
   if (collectionId) {

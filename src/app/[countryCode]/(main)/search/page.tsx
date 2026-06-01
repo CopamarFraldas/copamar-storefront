@@ -40,8 +40,14 @@ export default async function SearchPage({ params, searchParams }: Props) {
   } = termo
     ? await listProducts({
         countryCode,
-        // limit alto + metadata pro filtro client-side (tamanho) cobrir tudo
-        queryParams: { q: termo, limit: 48, fields: "*variants.calculated_price,+metadata" } as any,
+        // limit alto + metadata (filtro de tamanho) + inventory (senão o card
+        // marca "esgotado" por falta do campo). NÃO remover os campos de estoque.
+        queryParams: {
+          q: termo,
+          limit: 48,
+          fields:
+            "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata",
+        } as any,
       })
     : { response: { products: [], count: 0 } }
 
