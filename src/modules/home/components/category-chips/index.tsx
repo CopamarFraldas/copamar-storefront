@@ -22,12 +22,31 @@ const CategoryChips = async () => {
     })),
   ]
 
+  // nº6: trilha de atacado/CNPJ visível cedo — chip destacado pra revenda/asilos
+  // → WhatsApp de vendas (compra grande). Mantém o bloco B2B mais abaixo.
+  const atacadoWhats =
+    "https://wa.me/5511952050000?text=" +
+    encodeURIComponent(
+      "Olá! Tenho CNPJ / preciso de compra grande (atacado). Pode me passar as condições?"
+    )
+
   return (
     <nav
       aria-label="Categorias"
       className="border-b border-ui-border-base bg-ui-bg-base"
     >
       <ul className="content-container flex snap-x gap-2 overflow-x-auto py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {/* chip de atacado/CNPJ — destacado, primeiro */}
+        <li className="shrink-0 snap-start">
+          <a
+            href={atacadoWhats}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-x-1 whitespace-nowrap rounded-full border border-copamar-primary bg-copamar-primary/10 px-4 py-1.5 text-sm font-semibold text-copamar-primary transition hover:bg-copamar-primary/20"
+          >
+            🏢 Atacado / CNPJ
+          </a>
+        </li>
         {chips.map((c) => (
           <li key={c.handle} className="shrink-0 snap-start">
             <LocalizedClientLink

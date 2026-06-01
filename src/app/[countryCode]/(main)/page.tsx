@@ -3,6 +3,7 @@ import { Metadata } from "next"
 import Hero from "@modules/home/components/hero"
 import CategoryChips from "@modules/home/components/category-chips"
 import FreteCep from "@modules/shipping/components/frete-cep"
+import GuiaEscolha from "@modules/home/components/guia-escolha"
 import TrustStrip from "@modules/home/components/trust-strip"
 import FeaturedRail from "@modules/home/components/featured-rail"
 import CategoriesSection from "@modules/home/components/categories-section"
@@ -60,6 +61,8 @@ export default async function Home(props: {
           <FreteCep compact />
         </div>
       </div>
+      {/* nº3: ajuda o cuidador novo a escolher (dúvida = abandono nº1) */}
+      <GuiaEscolha />
       <FeaturedRail region={region} />
       <TrustStrip />
       <CategoriesSection />

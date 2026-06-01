@@ -4,6 +4,7 @@ import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import FiltrosBusca from "@modules/store/components/filtros-busca"
 import { getSiteUrl, robotsMeta } from "@lib/util/seo"
 
 type Props = {
@@ -60,6 +61,9 @@ export default async function SearchPage({ params, searchParams }: Props) {
           {count} {count === 1 ? "produto encontrado" : "produtos encontrados"}
         </p>
       )}
+
+      {/* filtros rápidos de refino (nº5) — afinam por tipo/absorção/gênero/tamanho */}
+      {termo && <div className="mt-4"><FiltrosBusca /></div>}
 
       {termo && products.length === 0 ? (
         <div className="mt-10 rounded-large border border-ui-border-base bg-ui-bg-subtle p-8 text-center">

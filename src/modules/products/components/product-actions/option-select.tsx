@@ -31,23 +31,26 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   const titleLabel = titlePt[title] ?? title
 
   return (
-    <div className="flex flex-col gap-y-3">
-      <span className="text-sm">Escolher {titleLabel.toLowerCase()}</span>
-      <div
-        className="flex flex-wrap justify-between gap-2"
-        data-testid={dataTestId}
-      >
+    <div className="flex flex-col gap-y-2">
+      <span className="text-sm font-medium text-ui-fg-base">
+        Escolha o {titleLabel.toLowerCase()}:
+      </span>
+      <div className="flex flex-wrap gap-2" data-testid={dataTestId}>
         {filteredOptions.map((v) => {
+          const selecionado = v === current
           return (
             <button
               onClick={() => updateOption(option.id, v)}
               key={v}
+              aria-pressed={selecionado}
               className={clx(
-                "border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 flex-1 ",
+                "h-11 min-w-[3.25rem] flex-1 rounded-lg border px-3 text-sm transition",
                 {
-                  "border-ui-border-interactive": v === current,
-                  "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":
-                    v !== current,
+                  // selecionado: preenchido + borda forte (claro pra olhos +velhos)
+                  "border-copamar-primary bg-copamar-primary/10 font-semibold text-copamar-primary ring-1 ring-copamar-primary":
+                    selecionado,
+                  "border-ui-border-base bg-ui-bg-subtle text-ui-fg-base hover:border-copamar-primary/60":
+                    !selecionado,
                 }
               )}
               disabled={disabled}
