@@ -12,6 +12,7 @@ import { HttpTypes } from "@medusajs/types"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
 import FreteCep from "@modules/shipping/components/frete-cep"
+import TamanhosIrmaos from "@modules/products/components/tamanhos-irmaos"
 import { getProductPrice } from "@lib/util/get-product-price"
 
 type ProductTemplateProps = {
@@ -55,6 +56,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         </div>
         <div className="flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-12">
           <ProductOnboardingCta />
+          {/* tamanhos irmãos (P·M·G·EG) — religa os produtos da mesma família */}
+          <TamanhosIrmaos product={product} countryCode={countryCode} />
           <Suspense
             fallback={
               <ProductActions

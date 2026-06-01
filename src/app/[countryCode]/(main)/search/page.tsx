@@ -40,7 +40,8 @@ export default async function SearchPage({ params, searchParams }: Props) {
   } = termo
     ? await listProducts({
         countryCode,
-        queryParams: { q: termo, limit: 24 } as any,
+        // limit alto + metadata pro filtro client-side (tamanho) cobrir tudo
+        queryParams: { q: termo, limit: 48, fields: "*variants.calculated_price,+metadata" } as any,
       })
     : { response: { products: [], count: 0 } }
 
@@ -62,8 +63,12 @@ export default async function SearchPage({ params, searchParams }: Props) {
         </p>
       )}
 
-      {/* filtros rápidos de refino (nº5) — afinam por tipo/absorção/gênero/tamanho */}
-      {termo && <div className="mt-4"><FiltrosBusca /></div>}
+      {/* filtros rápidos (nº5) — tamanho 100% (metadata) + tipo/absorção/gênero */}
+      {termo && products.length > 0 && (
+        <div className="mt-4">
+          <FiltrosBusca gridId="busca-grid" />
+        </div>
+      )}
 
       {termo && products.length === 0 ? (
         <div className="mt-10 rounded-large border border-ui-border-base bg-ui-bg-subtle p-8 text-center">
@@ -82,9 +87,16 @@ export default async function SearchPage({ params, searchParams }: Props) {
           </LocalizedClientLink>
         </div>
       ) : (
-        <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 small:grid-cols-3 small:gap-x-6 medium:grid-cols-4">
+        <ul
+          id="busca-grid"
+          className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 small:grid-cols-3 small:gap-x-6 medium:grid-cols-4"
+        >
           {products.map((p) => (
-            <li key={p.id}>
+            <li
+              key={p.id}
+              data-titulo={p.title}
+              data-tamanho={((p.metadata || {}) as any).tamanho || ""}
+            >
               <ProductPreview product={p} region={region} />
             </li>
           ))}
