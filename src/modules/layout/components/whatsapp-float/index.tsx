@@ -35,7 +35,12 @@ const WhatsAppFloat = () => {
   }, [open])
 
   return (
-    <div ref={ref} className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3">
+    <div
+      ref={ref}
+      // sobe pra não cobrir a barra de cookies quando ela está aberta
+      // (html.consent-bar-open). transição suave no bottom.
+      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3 transition-[bottom] duration-200 [html.consent-bar-open_&]:bottom-28 sm:[html.consent-bar-open_&]:bottom-24"
+    >
       {/* opções (aparecem quando aberto) */}
       {open && (
         <>

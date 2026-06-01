@@ -111,6 +111,16 @@ const CookieConsent = () => {
     return () => window.removeEventListener("open-cookie-consent", abrir)
   }, [])
 
+  // enquanto a barra está aberta, marca o <html> pra o WhatsApp flutuante subir
+  // e não cobrir o link "Personalizar" (necessário pra LGPD — o usuário precisa
+  // alcançar a customização de consentimento).
+  useEffect(() => {
+    const el = document.documentElement
+    if (visivel) el.classList.add("consent-bar-open")
+    else el.classList.remove("consent-bar-open")
+    return () => el.classList.remove("consent-bar-open")
+  }, [visivel])
+
   const salvar = (a: boolean, m: boolean) => {
     const consent: Consent = {
       essencial: true,
@@ -156,7 +166,7 @@ const CookieConsent = () => {
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-[60] border-t border-gray-200 bg-ui-bg-base shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+      className="fixed inset-x-0 bottom-0 z-[60] border-t border-ui-border-base bg-ui-bg-base shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
       role="dialog"
       aria-live="polite"
       aria-label="Aviso de cookies e privacidade"
@@ -165,14 +175,14 @@ const CookieConsent = () => {
         {/* barra COMPACTA: 1 linha de texto + ações inline. Não rouba a 1ª tela
             (antes era um card alto que cobria ~40% do mobile na entrada). */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-          <p className="text-xs leading-snug text-gray-600 sm:flex-1">
+          <p className="text-xs leading-snug text-ui-fg-subtle sm:flex-1">
             🍃 Usamos cookies pra melhorar sua experiência. Você decide o que
             aceitar — os essenciais são sempre necessários.{" "}
             {!detalhe && (
               <button
                 type="button"
                 onClick={() => setDetalhe(true)}
-                className="font-medium text-copamar-primary underline"
+                className="font-medium text-ui-fg-interactive underline"
                 data-testid="consent-customize"
               >
                 Personalizar
@@ -211,24 +221,24 @@ const CookieConsent = () => {
         </div>
 
         {detalhe && (
-          <div className="mt-3 flex flex-col gap-3 border-t border-gray-100 pt-3">
+          <div className="mt-3 flex flex-col gap-3 border-t border-ui-border-base pt-3">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-small-semi text-gray-900">Essenciais</p>
-                <p className="text-xsmall-regular text-gray-500">
+                <p className="text-small-semi text-ui-fg-base">Essenciais</p>
+                <p className="text-xsmall-regular text-ui-fg-subtle">
                   Indispensáveis pro funcionamento do site — carrinho, login e segurança.
                   Não podem ser desativados.
                 </p>
               </div>
-              <span className="text-xsmall-semi mt-1 whitespace-nowrap rounded-full bg-gray-100 px-3 py-1 text-gray-500">
+              <span className="text-xsmall-semi mt-1 whitespace-nowrap rounded-full bg-ui-bg-component px-3 py-1 text-ui-fg-subtle">
                 Sempre ativo
               </span>
             </div>
 
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-small-semi text-gray-900">Análise (Analytics)</p>
-                <p className="text-xsmall-regular text-gray-500">
+                <p className="text-small-semi text-ui-fg-base">Análise (Analytics)</p>
+                <p className="text-xsmall-regular text-ui-fg-subtle">
                   Nos ajudam a entender quais produtos e páginas mais interessam, pra
                   melhorar a loja pra você.
                 </p>
@@ -238,8 +248,8 @@ const CookieConsent = () => {
 
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-small-semi text-gray-900">Marketing</p>
-                <p className="text-xsmall-regular text-gray-500">
+                <p className="text-small-semi text-ui-fg-base">Marketing</p>
+                <p className="text-xsmall-regular text-ui-fg-subtle">
                   Permitem comunicações e ofertas mais relevantes pro seu momento.
                 </p>
               </div>
