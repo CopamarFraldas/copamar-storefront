@@ -208,8 +208,11 @@ const CookieConsent = () => {
                 Salvar
               </Button>
             ) : (
+              // LGPD: "Aceitar" e "Recusar/Só essenciais" com a MESMA proeminência
+              // (ambos secondary) — recusar tão fácil quanto aceitar, sem dark
+              // pattern de destacar só o aceite.
               <Button
-                variant="primary"
+                variant="secondary"
                 size="small"
                 onClick={() => salvar(true, true)}
                 data-testid="consent-accept-all"
