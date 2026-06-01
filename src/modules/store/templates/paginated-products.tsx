@@ -12,6 +12,7 @@ type PaginatedProductsParams = {
   category_id?: string[]
   id?: string[]
   order?: string
+  fields?: string
 }
 
 export default async function PaginatedProducts({
@@ -21,6 +22,7 @@ export default async function PaginatedProducts({
   categoryId,
   productsIds,
   countryCode,
+  gridId,
 }: {
   sortBy?: SortOptions
   page: number
@@ -28,9 +30,18 @@ export default async function PaginatedProducts({
   categoryId?: string
   productsIds?: string[]
   countryCode: string
+  gridId?: string
 }) {
   const queryParams: PaginatedProductsParams = {
-    limit: 12,
+    // modo filtro (gridId, ex. categoria): carrega mais pra o filtro client-side
+    // por data-attribute cobrir a categoria inteira (são poucos produtos).
+    limit: gridId ? 48 : 12,
+  }
+
+  if (gridId) {
+    // fields explícito com +metadata → o filtro de tamanho lê metadata.tamanho
+    // (e a chave de cache muda, trazendo o metadata recém-normalizado).
+    queryParams["fields"] = "*variants.calculated_price,+metadata"
   }
 
   if (collectionId) {
@@ -69,18 +80,24 @@ export default async function PaginatedProducts({
   return (
     <>
       <ul
+        id={gridId}
         className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
         data-testid="products-list"
       >
         {products.map((p) => {
           return (
-            <li key={p.id}>
+            <li
+              key={p.id}
+              data-titulo={p.title}
+              data-tamanho={((p.metadata || {}) as any).tamanho || ""}
+            >
               <ProductPreview product={p} region={region} />
             </li>
           )
         })}
       </ul>
-      {totalPages > 1 && (
+      {/* no modo filtro carrega tudo (sem paginação); senão pagina normal */}
+      {!gridId && totalPages > 1 && (
         <Pagination
           data-testid="product-pagination"
           page={page}

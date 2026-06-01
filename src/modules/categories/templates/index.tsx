@@ -6,6 +6,7 @@ import { ordenaSubs } from "@lib/data/nav-categories"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
+import FiltrosBusca from "@modules/store/components/filtros-busca"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
 
@@ -80,6 +81,8 @@ export default function CategoryTemplate({
             </div>
           </div>
         )}
+        {/* filtros rápidos (nº5) — tamanho 100% (metadata) + tipo/absorção */}
+        <FiltrosBusca gridId="categoria-grid" />
         <Suspense
           fallback={
             <SkeletonProductGrid
@@ -92,6 +95,7 @@ export default function CategoryTemplate({
             page={pageNumber}
             categoryId={category.id}
             countryCode={countryCode}
+            gridId="categoria-grid"
           />
         </Suspense>
       </div>

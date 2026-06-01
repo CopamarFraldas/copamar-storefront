@@ -20,18 +20,34 @@ const FiltrosBusca = ({ gridId }: { gridId: string }) => {
   const [selTipo, setSelTipo] = useState<Set<string>>(new Set())
   const [mostrando, setMostrando] = useState(0)
 
-  // lê os tamanhos presentes no grid (só mostra chips de tamanho que existem)
+  // lê os tamanhos presentes no grid (só mostra chips dos tamanhos que existem).
+  // retry: na categoria o grid chega via <Suspense> (depois do mount).
   useEffect(() => {
-    const grid = document.getElementById(gridId)
-    if (!grid) return
-    const lis = Array.from(grid.querySelectorAll<HTMLElement>("li[data-titulo]"))
-    const tam = new Set<string>()
-    lis.forEach((li) => {
-      const t = li.getAttribute("data-tamanho")
-      if (t) tam.add(t)
-    })
-    setTamanhos(Array.from(tam).sort((a, b) => ORDEM.indexOf(a) - ORDEM.indexOf(b)))
-    setMostrando(lis.length)
+    let cancel = false
+    let tries = 0
+    const ler = () => {
+      if (cancel) return
+      const grid = document.getElementById(gridId)
+      const lis = grid
+        ? Array.from(grid.querySelectorAll<HTMLElement>("li[data-titulo]"))
+        : []
+      if (lis.length === 0 && tries < 25) {
+        tries++
+        setTimeout(ler, 150)
+        return
+      }
+      const tam = new Set<string>()
+      lis.forEach((li) => {
+        const t = li.getAttribute("data-tamanho")
+        if (t) tam.add(t)
+      })
+      setTamanhos(Array.from(tam).sort((a, b) => ORDEM.indexOf(a) - ORDEM.indexOf(b)))
+      setMostrando(lis.length)
+    }
+    ler()
+    return () => {
+      cancel = true
+    }
   }, [gridId])
 
   // aplica o filtro escondendo os <li> que não casam
