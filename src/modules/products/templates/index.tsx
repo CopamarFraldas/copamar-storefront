@@ -11,6 +11,7 @@ import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
+import FreteCep from "@modules/shipping/components/frete-cep"
 import { getProductPrice } from "@lib/util/get-product-price"
 
 type ProductTemplateProps = {
@@ -65,6 +66,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           >
             <ProductActionsWrapper id={product.id} region={region} />
           </Suspense>
+          {/* consultor de frete por CEP (nº1 + parte do nº4 da PDP) — cotação
+              real com o peso da variante; lista completa de modalidades. */}
+          <FreteCep variantId={product.variants?.[0]?.id} />
         </div>
       </div>
       <div

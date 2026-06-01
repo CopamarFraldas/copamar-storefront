@@ -2,6 +2,7 @@ import { Metadata } from "next"
 
 import Hero from "@modules/home/components/hero"
 import CategoryChips from "@modules/home/components/category-chips"
+import FreteCep from "@modules/shipping/components/frete-cep"
 import TrustStrip from "@modules/home/components/trust-strip"
 import FeaturedRail from "@modules/home/components/featured-rail"
 import CategoriesSection from "@modules/home/components/categories-section"
@@ -52,6 +53,13 @@ export default async function Home(props: {
     <>
       <CategoryChips />
       <Hero />
+      {/* consultor de frete (nº1): mostra grátis/valor real cedo, antes mesmo de
+          escolher o produto. Compacto na home. */}
+      <div className="content-container py-5">
+        <div className="mx-auto max-w-md">
+          <FreteCep compact />
+        </div>
+      </div>
       <FeaturedRail region={region} />
       <TrustStrip />
       <CategoriesSection />
