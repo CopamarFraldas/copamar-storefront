@@ -4,39 +4,44 @@ import ReviewsBadge from "@modules/common/components/reviews-badge"
 const Hero = () => {
   return (
     <section className="relative bg-copamar-bg-light dark:bg-ui-bg-subtle border-b border-ui-border-base">
-      <div className="content-container py-12 small:py-16">
-        <div className="grid grid-cols-1 small:grid-cols-2 gap-8 items-center">
-          <div className="text-center small:text-left">
-            {/* posicionamento (C2): diferencial nº1 de busca, visível de cara */}
+      <div className="content-container py-6 small:py-16">
+        <div className="grid grid-cols-1 small:grid-cols-2 gap-5 small:gap-8 items-center">
+          {/* no mobile a imagem vem PRIMEIRO (order-1) pra dar visual logo de
+              cara; o texto fica enxuto embaixo. no desktop, texto à esquerda. */}
+          <div className="order-2 small:order-1 text-center small:text-left">
+            {/* posicionamento honesto (escolha do Marco): compram direto das
+                fábricas das marcas e repassam preço de atacado — sem afirmar ser
+                fabricante (a empresa é distribuidora/atacadista). */}
             <span className="inline-flex items-center gap-x-1.5 rounded-full bg-copamar-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-copamar-primary">
-              🏭 Direto da fábrica · Preço de atacado
+              🏭 Direto das fábricas · Atacado
             </span>
-            <h1 className="mt-3 text-3xl small:text-5xl font-bold text-copamar-primary dark:text-ui-fg-base leading-tight">
+            <h1 className="mt-3 text-[1.7rem] leading-tight small:text-5xl font-bold text-copamar-primary dark:text-ui-fg-base">
               Fraldas geriátricas
               <br />
-              direto da fábrica
+              direto das fábricas
             </h1>
-            <p className="mt-2 text-lg italic text-copamar-text dark:text-ui-fg-subtle">
+            <p className="mt-2 text-base small:text-lg italic text-copamar-text dark:text-ui-fg-subtle">
               Cuidado e dignidade pra quem você ama.
             </p>
-            <p className="text-base text-copamar-text dark:text-ui-fg-subtle mt-3 max-w-xl mx-auto small:mx-0">
+            {/* parágrafo institucional só no desktop — no mobile enxuga a dobra */}
+            <p className="hidden small:block text-base text-copamar-text dark:text-ui-fg-subtle mt-3 max-w-xl">
               Atacadista e distribuidora especializada em fraldas geriátricas há
-              20 anos, em Santo André/SP. Preço de fábrica e entrega para todo o
+              20 anos, em Santo André/SP. Preço de atacado e entrega para todo o
               Brasil — para cuidadores e profissionais de saúde.
             </p>
             {/* prova social real (C1) */}
-            <div className="mt-4 flex justify-center small:justify-start">
+            <div className="mt-3 small:mt-4 flex justify-center small:justify-start">
               <ReviewsBadge />
             </div>
             <a
               href="#nossos-produtos"
-              className="inline-block mt-6 px-6 py-3 bg-copamar-cta hover:bg-copamar-cta-dark text-white font-semibold rounded-large transition-colors"
+              className="inline-block mt-4 small:mt-6 px-6 py-3 bg-copamar-cta hover:bg-copamar-cta-dark text-white font-semibold rounded-large transition-colors"
               data-testid="hero-cta-explorar"
             >
-              Explorar nossos produtos
+              Ver produtos
             </a>
           </div>
-          <div>
+          <div className="order-1 small:order-2">
             <Image
               src="/hero-banner.png"
               alt="Copamar Fraldas — Qualidade de vida é o nosso negócio"

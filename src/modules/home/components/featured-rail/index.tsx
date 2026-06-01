@@ -64,9 +64,14 @@ const FeaturedRail = async ({ region }: { region: HttpTypes.StoreRegion }) => {
           Ver tudo →
         </LocalizedClientLink>
       </div>
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-8 small:grid-cols-4 small:gap-x-6">
+      {/* mobile: carrossel horizontal (scroll-x, snap) — mostra ~2,3 cards, o
+          corte à direita convida a deslizar (padrão Amazon/ML). desktop: grid. */}
+      <ul className="flex gap-4 overflow-x-auto pb-2 snap-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden small:grid small:grid-cols-4 small:gap-x-6 small:gap-y-8 small:overflow-visible small:pb-0">
         {ordenados.map((product) => (
-          <li key={product.id}>
+          <li
+            key={product.id}
+            className="w-[42vw] max-w-[200px] shrink-0 snap-start small:w-auto small:max-w-none"
+          >
             <ProductPreview product={product} region={region} />
           </li>
         ))}

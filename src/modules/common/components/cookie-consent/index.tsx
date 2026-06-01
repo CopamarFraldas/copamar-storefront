@@ -161,20 +161,57 @@ const CookieConsent = () => {
       aria-live="polite"
       aria-label="Aviso de cookies e privacidade"
     >
-      <div className="content-container mx-auto flex max-w-4xl flex-col gap-4 px-6 py-5">
-        <div>
-          <h2 className="text-base-semi mb-1 text-gray-900">
-            🍃 Sua privacidade é prioridade pra Copamar
-          </h2>
-          <p className="text-small-regular text-gray-600">
-            Usamos cookies pra fazer a loja funcionar, entender como você navega e oferecer
-            uma experiência melhor. Você decide o que aceitar. Os cookies essenciais são
-            sempre necessários; os demais dependem do seu consentimento.
+      <div className="content-container mx-auto max-w-4xl px-4 py-3">
+        {/* barra COMPACTA: 1 linha de texto + ações inline. Não rouba a 1ª tela
+            (antes era um card alto que cobria ~40% do mobile na entrada). */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <p className="text-xs leading-snug text-gray-600 sm:flex-1">
+            🍃 Usamos cookies pra melhorar sua experiência. Você decide o que
+            aceitar — os essenciais são sempre necessários.{" "}
+            {!detalhe && (
+              <button
+                type="button"
+                onClick={() => setDetalhe(true)}
+                className="font-medium text-copamar-primary underline"
+                data-testid="consent-customize"
+              >
+                Personalizar
+              </button>
+            )}
           </p>
+          <div className="flex shrink-0 gap-2">
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={() => salvar(false, false)}
+              data-testid="consent-essential-only"
+            >
+              Só essenciais
+            </Button>
+            {detalhe ? (
+              <Button
+                variant="primary"
+                size="small"
+                onClick={() => salvar(analytics, marketing)}
+                data-testid="consent-save-prefs"
+              >
+                Salvar
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                size="small"
+                onClick={() => salvar(true, true)}
+                data-testid="consent-accept-all"
+              >
+                Aceitar todos
+              </Button>
+            )}
+          </div>
         </div>
 
         {detalhe && (
-          <div className="flex flex-col gap-3 border-t border-gray-100 pt-3">
+          <div className="mt-3 flex flex-col gap-3 border-t border-gray-100 pt-3">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-small-semi text-gray-900">Essenciais</p>
@@ -210,44 +247,6 @@ const CookieConsent = () => {
             </div>
           </div>
         )}
-
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-          <Button
-            variant="secondary"
-            className="w-full sm:w-auto"
-            onClick={() => salvar(false, false)}
-            data-testid="consent-essential-only"
-          >
-            Apenas essenciais
-          </Button>
-          {detalhe ? (
-            <Button
-              variant="primary"
-              className="w-full sm:w-auto"
-              onClick={() => salvar(analytics, marketing)}
-              data-testid="consent-save-prefs"
-            >
-              Salvar preferências
-            </Button>
-          ) : (
-            <Button
-              variant="transparent"
-              className="w-full sm:w-auto"
-              onClick={() => setDetalhe(true)}
-              data-testid="consent-customize"
-            >
-              Personalizar
-            </Button>
-          )}
-          <Button
-            variant="primary"
-            className="w-full sm:w-auto"
-            onClick={() => salvar(true, true)}
-            data-testid="consent-accept-all"
-          >
-            Aceitar todos
-          </Button>
-        </div>
       </div>
     </div>
   )

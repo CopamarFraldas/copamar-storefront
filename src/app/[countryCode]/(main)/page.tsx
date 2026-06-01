@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 
 import Hero from "@modules/home/components/hero"
+import CategoryChips from "@modules/home/components/category-chips"
 import TrustStrip from "@modules/home/components/trust-strip"
 import FeaturedRail from "@modules/home/components/featured-rail"
 import CategoriesSection from "@modules/home/components/categories-section"
@@ -43,14 +44,16 @@ export default async function Home(props: {
   const region = await getRegion(countryCode)
   if (!region) return null
 
-  // Estrutura aprovada (proposta-home.md): hero focado → confiança → mais
-  // procurados → categorias → prova social → B2B → FAQ. A barra de aviso (item 0)
-  // é site-wide, mora no Nav.
+  // Ordem otimizada pra mobile (painel de design): chips de categoria → hero
+  // enxuto → MAIS PROCURADOS (produto sobe, logo após o hero) → confiança →
+  // categorias → prova social → B2B → FAQ. Busca + barra de aviso são site-wide
+  // (moram no Nav).
   return (
     <>
+      <CategoryChips />
       <Hero />
-      <TrustStrip />
       <FeaturedRail region={region} />
+      <TrustStrip />
       <CategoriesSection />
       <SocialProof />
       <B2bStrip />

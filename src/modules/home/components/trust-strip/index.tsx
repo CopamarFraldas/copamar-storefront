@@ -4,7 +4,7 @@
  * Todos fatos reais (sem claim médico). Server component, zero JS.
  */
 const ITENS = [
-  { icone: "🏭", titulo: "Direto da fábrica", sub: "Preço de atacado" },
+  { icone: "🏭", titulo: "Direto das fábricas", sub: "Preço de atacado" },
   { icone: "📦", titulo: "Entrega Brasil todo", sub: "Frete calculado no CEP" },
   { icone: "💳", titulo: "3x sem juros", sub: "ou 5% no PIX" },
   { icone: "🛡️", titulo: "20 anos de tradição", sub: "Especialista desde 2006" },
