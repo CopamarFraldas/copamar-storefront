@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useId, useState } from "react"
 
 /**
  * Barra de busca — a maior lacuna do mobile (Amazon/ML abrem com busca dominante
@@ -15,6 +15,9 @@ const SearchBar = ({ className = "" }: { className?: string }) => {
   const searchParams = useSearchParams()
   const cc = (params?.countryCode as string) || "br"
   const [q, setQ] = useState(searchParams?.get("q") ?? "")
+  // id ÚNICO por instância: há 2 SearchBar no DOM (mobile 2ª linha + desktop
+  // inline) — id fixo colidiria (HTML inválido + label apontando pro 1º).
+  const inputId = useId()
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,11 +42,11 @@ const SearchBar = ({ className = "" }: { className?: string }) => {
           <path d="m21 21-4.3-4.3" />
         </svg>
       </span>
-      <label htmlFor="site-search" className="sr-only">
+      <label htmlFor={inputId} className="sr-only">
         Buscar produtos
       </label>
       <input
-        id="site-search"
+        id={inputId}
         name="q"
         type="search"
         inputMode="search"
