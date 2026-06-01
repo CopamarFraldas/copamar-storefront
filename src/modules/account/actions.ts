@@ -12,28 +12,36 @@ import { redirect } from "next/navigation"
  */
 export async function reorderLastOrder(formData: FormData) {
   const countryCode = String(formData.get("countryCode") || "br")
-  let destino = `/${countryCode}/cart`
+  let adicionados = 0
+  let total = 0
   try {
     const orders = await listOrders(1)
     const order = orders?.[0]
-    if (!order?.items?.length) {
-      redirect(`/${countryCode}/account/orders`)
-    }
-    let adicionou = false
-    for (const it of order.items as any[]) {
-      const variantId = it?.variant_id || it?.variant?.id
-      const qty = Math.max(1, Number(it?.quantity ?? 1))
-      if (!variantId) continue
-      try {
-        await addToCart({ variantId, quantity: qty, countryCode })
-        adicionou = true
-      } catch {
-        /* item indisponível/esgotado → pula, não trava a recompra */
+    if (order?.items?.length) {
+      total = order.items.length
+      for (const it of order.items as any[]) {
+        const variantId = it?.variant_id || it?.variant?.id
+        const qty = Math.max(1, Number(it?.quantity ?? 1))
+        if (!variantId) continue
+        try {
+          // PREÇO ATUAL: passamos só variante + quantidade; o carrinho recalcula
+          // com o preço VIGENTE (nunca o unit_price antigo do pedido), então
+          // promoção/ajuste atual entra junto.
+          await addToCart({ variantId, quantity: qty, countryCode })
+          adicionados++
+        } catch {
+          /* indisponível/esgotado/descontinuado → pula, não quebra a recompra */
+        }
       }
     }
-    if (!adicionou) destino = `/${countryCode}/account/orders`
   } catch {
-    destino = `/${countryCode}/account/orders`
+    /* falha ao ler pedidos → cai no redirect pra /orders abaixo */
   }
-  redirect(destino)
+
+  // nada adicionado (sem pedido, ou tudo indisponível) → pros pedidos
+  if (adicionados === 0) {
+    redirect(`/${countryCode}/account/orders?recompra=vazia`)
+  }
+  // feedback no carrinho: "X de Y itens adicionados"
+  redirect(`/${countryCode}/cart?recompra=${adicionados}&de=${total}`)
 }
