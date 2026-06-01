@@ -7,8 +7,11 @@ import ThemeToggle from "@modules/layout/components/theme-toggle"
 import MegaMenu from "@modules/layout/components/mega-menu"
 import NoticeBar from "@modules/layout/components/notice-bar"
 import SearchBar from "@modules/layout/components/search-bar"
+import AccountButton from "@modules/layout/components/account-button"
+import { retrieveCustomer } from "@lib/data/customer"
 
 export default async function Nav() {
+  const customer = await retrieveCustomer().catch(() => null)
   return (
     <>
       {/* barra de aviso no topo (rola pra fora; o header abaixo é sticky) */}
@@ -52,14 +55,10 @@ export default async function Nav() {
                 >
                   Quem somos
                 </LocalizedClientLink>
-                <LocalizedClientLink
-                  className="hover:text-ui-fg-base"
-                  href="/account"
-                  data-testid="nav-account-link"
-                >
-                  Minha conta
-                </LocalizedClientLink>
               </div>
+              {/* conta — clara em mobile E desktop (visitante: Entrar; logado:
+                  dropdown com Minha conta · Meus pedidos · Comprar de novo) */}
+              <AccountButton nome={customer?.first_name} />
               <ThemeToggle />
               <Suspense
                 fallback={
