@@ -8,8 +8,16 @@ import MegaMenu from "@modules/layout/components/mega-menu"
 import NoticeBar from "@modules/layout/components/notice-bar"
 import SearchBar from "@modules/layout/components/search-bar"
 import AccountButton from "@modules/layout/components/account-button"
+import CategoryChips from "@modules/home/components/category-chips"
 import { retrieveCustomer } from "@lib/data/customer"
 
+/**
+ * Header — layout "híbrido E" (escolhido pelo Marco):
+ *   linha 1: [☰/links] · LOGO central · [conta · tema · carrinho]
+ *   linha 2: BUSCA full-width (espelho do mobile — o caminho nº1)
+ *   linha 3: barra de categorias global ([Categorias] no desktop + chips)
+ * No mobile o menu é o hambúrguer (linha 1) e a barra mostra só os chips.
+ */
 export default async function Nav() {
   const customer = await retrieveCustomer().catch(() => null)
   return (
@@ -17,74 +25,78 @@ export default async function Nav() {
       {/* barra de aviso no topo (rola pra fora; o header abaixo é sticky) */}
       <NoticeBar />
       <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative mx-auto border-b duration-200 bg-ui-bg-base border-ui-border-base">
-        <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex flex-col text-small-regular">
-          {/* linha 1 — responsivo:
-              mobile:  [☰ logo] ........... [conta · tema · carrinho]  (logo à
-                       esquerda, com respiro pras ações na direita)
-              desktop: [☰ logo  BUSCA larga] ... [Blog · Quem somos · conta · tema
-                       · carrinho]  (busca ao lado das Categorias, como pediu) */}
-          <div className="flex items-center justify-between w-full h-16 gap-x-3">
-            {/* esquerda: menu + logo + busca (desktop) */}
-            <div className="flex items-center gap-x-3 small:gap-x-4 flex-1 min-w-0">
-              <MegaMenu />
+        <header className="relative mx-auto border-b border-ui-border-base bg-ui-bg-base duration-200">
+          <nav className="content-container flex flex-col text-small-regular text-ui-fg-base">
+            {/* ── linha 1 — logo RESPONSIVO: central no desktop, à esquerda no
+                mobile (no celular o logo central espremia as ações). ── */}
+            <div className="flex h-16 w-full items-center justify-between gap-x-3">
+              {/* esquerda: hambúrguer(mobile)+logo(mobile)  /  links(desktop) */}
+              <div className="flex flex-1 min-w-0 items-center gap-x-3 small:gap-x-5">
+                <div className="small:hidden">
+                  <MegaMenu />
+                </div>
+                {/* logo à esquerda no MOBILE */}
+                <LocalizedClientLink
+                  href="/"
+                  aria-label="Início — Copamar Fraldas"
+                  className="flex shrink-0 items-center small:hidden"
+                  data-testid="nav-store-link"
+                >
+                  <SpinLogo />
+                </LocalizedClientLink>
+                {/* links institucionais no DESKTOP */}
+                <div className="hidden small:flex items-center gap-x-5 text-ui-fg-subtle">
+                  <LocalizedClientLink className="hover:text-ui-fg-base" href="/blog" data-testid="nav-blog-link">
+                    Blog
+                  </LocalizedClientLink>
+                  <LocalizedClientLink className="hover:text-ui-fg-base" href="/sobre" data-testid="nav-sobre-link">
+                    Quem somos
+                  </LocalizedClientLink>
+                </div>
+              </div>
+
+              {/* logo CENTRAL no DESKTOP */}
               <LocalizedClientLink
                 href="/"
-                className="flex items-center shrink-0"
-                data-testid="nav-store-link"
+                aria-label="Início — Copamar Fraldas"
+                className="hidden shrink-0 cursor-pointer items-center small:flex"
               >
                 <SpinLogo />
               </LocalizedClientLink>
-              {/* busca larga, do lado das categorias (só desktop) */}
-              <div className="hidden small:block flex-1 max-w-xl">
-                <SearchBar />
+
+              {/* direita: conta · tema · carrinho */}
+              <div className="flex shrink-0 items-center gap-x-4 small:flex-1 small:min-w-0 small:justify-end small:gap-x-5">
+                <AccountButton nome={customer?.first_name} />
+                <ThemeToggle />
+                <Suspense
+                  fallback={
+                    <LocalizedClientLink className="flex gap-2 hover:text-ui-fg-base" href="/cart" data-testid="nav-cart-link">
+                      Carrinho (0)
+                    </LocalizedClientLink>
+                  }
+                >
+                  <CartButton />
+                </Suspense>
               </div>
             </div>
 
-            {/* direita: links (desktop) + conta + tema + carrinho */}
-            <div className="flex items-center gap-x-4 small:gap-x-5 shrink-0">
-              <div className="hidden small:flex items-center gap-x-5">
-                <LocalizedClientLink
-                  className="hover:text-ui-fg-base"
-                  href="/blog"
-                  data-testid="nav-blog-link"
-                >
-                  Blog
-                </LocalizedClientLink>
-                <LocalizedClientLink
-                  className="hover:text-ui-fg-base"
-                  href="/sobre"
-                  data-testid="nav-sobre-link"
-                >
-                  Quem somos
-                </LocalizedClientLink>
+            {/* ── linha 2: busca full-width (o caminho nº1) ── */}
+            <div className="w-full pb-3">
+              <SearchBar />
+            </div>
+          </nav>
+
+          {/* ── linha 3: barra de categorias (global) ── */}
+          <div className="border-t border-ui-border-base bg-ui-bg-subtle/50">
+            <div className="content-container flex items-center gap-x-3 py-2">
+              {/* desktop: "Categorias" (mega-menu) como porta explícita */}
+              <div className="hidden small:block shrink-0">
+                <MegaMenu />
               </div>
-              {/* conta — clara em mobile E desktop */}
-              <AccountButton nome={customer?.first_name} />
-              <ThemeToggle />
-              <Suspense
-                fallback={
-                  <LocalizedClientLink
-                    className="hover:text-ui-fg-base flex gap-2"
-                    href="/cart"
-                    data-testid="nav-cart-link"
-                  >
-                    Carrinho (0)
-                  </LocalizedClientLink>
-                }
-              >
-                <CartButton />
-              </Suspense>
+              <CategoryChips inline />
             </div>
           </div>
-
-          {/* linha 2: busca full-width só no mobile (a porta de entrada do
-              cuidador que já sabe a marca/modelo) */}
-          <div className="small:hidden w-full pb-3">
-            <SearchBar />
-          </div>
-        </nav>
-      </header>
+        </header>
       </div>
     </>
   )
