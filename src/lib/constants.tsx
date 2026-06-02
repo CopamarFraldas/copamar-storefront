@@ -39,6 +39,24 @@ export const paymentInfoMap: Record<
     title: "PIX ou Cartão (PagBank)",
     icon: <CreditCard />,
   },
+  // PagHiper Boleto (#52) — 3ª forma de pagamento (pague em banco/lotérica/app)
+  "pp_paghiper-boleto_paghiper-boleto": {
+    title: "Boleto bancário",
+    icon: (
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        aria-hidden
+      >
+        <path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14" />
+      </svg>
+    ),
+  },
   // Add more payment providers here
 }
 
@@ -58,6 +76,10 @@ export const isManual = (providerId?: string) => {
 // PagBank — PIX assíncrono (mostra QR no checkout, confirma via status/webhook)
 export const isPagBank = (providerId?: string) => {
   return providerId?.startsWith("pp_pagbank")
+}
+// PagHiper Boleto (#52) — "pague depois": mostra a linha digitável/PDF no checkout
+export const isPagHiperBoleto = (providerId?: string) => {
+  return providerId?.startsWith("pp_paghiper-boleto")
 }
 
 // Add currencies that don't need to be divided by 100

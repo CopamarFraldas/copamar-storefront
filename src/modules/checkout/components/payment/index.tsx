@@ -1,7 +1,7 @@
 "use client"
 
 import { RadioGroup } from "@headlessui/react"
-import { isStripeLike, isPagBank, paymentInfoMap } from "@lib/constants"
+import { isStripeLike, isPagBank, isPagHiperBoleto, paymentInfoMap } from "@lib/constants"
 import { initiatePaymentSession } from "@lib/data/cart"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import { Button, Container, Heading, Text, clx } from "@medusajs/ui"
@@ -11,6 +11,7 @@ import PaymentContainer, {
 } from "@modules/checkout/components/payment-container"
 import PagBankPix from "@modules/checkout/components/pagbank-pix"
 import PagBankCard from "@modules/checkout/components/pagbank-card"
+import PagHiperBoleto from "@modules/checkout/components/paghiper-boleto"
 import Divider from "@modules/common/components/divider"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
@@ -229,6 +230,15 @@ const Payment = ({
                     .join(" ")}
                 />
               )}
+            </div>
+          ) : isPagHiperBoleto(selectedPaymentMethod) && !paidByGiftcard ? (
+            // Boleto PagHiper (#52): painel próprio (linha digitável/PDF) que
+            // conduz até a confirmação — não usa o botão de revisão, igual ao PagBank.
+            <div className="mt-6">
+              <PagHiperBoleto
+                cartId={cart.id}
+                fiscalDoc={cart?.metadata?.fiscal_documento as string}
+              />
             </div>
           ) : (
             <Button
