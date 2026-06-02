@@ -54,15 +54,15 @@ export default async function Home(props: {
     <>
       <CategoryChips />
       <Hero />
-      {/* consultor de frete (nº1): mostra grátis/valor real cedo, antes mesmo de
-          escolher o produto. Compacto na home. */}
+      {/* dois "ajudantes" cedo na página: consultor de frete (nº1) + guia de
+          escolha (nº3). Lado a lado no desktop (aproveita a largura, mais
+          parecido com o conceito mobile); empilhados no mobile. */}
       <div className="content-container py-5">
-        <div className="mx-auto max-w-md">
+        <div className="mx-auto grid max-w-5xl items-stretch gap-4 small:grid-cols-2">
           <FreteCep compact />
+          <GuiaEscolha />
         </div>
       </div>
-      {/* nº3: ajuda o cuidador novo a escolher (dúvida = abandono nº1) */}
-      <GuiaEscolha />
       <FeaturedRail region={region} />
       <TrustStrip />
       <CategoriesSection />

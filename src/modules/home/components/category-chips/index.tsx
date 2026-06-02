@@ -35,7 +35,7 @@ const CategoryChips = async () => {
       aria-label="Categorias"
       className="border-b border-ui-border-base bg-ui-bg-base"
     >
-      <ul className="content-container flex snap-x gap-2 overflow-x-auto py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <ul className="content-container flex snap-x gap-2 overflow-x-auto py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden small:flex-wrap small:overflow-visible">
         {/* chip de atacado/CNPJ — destacado, primeiro */}
         <li className="shrink-0 snap-start">
           <a

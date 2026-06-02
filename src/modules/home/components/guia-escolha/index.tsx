@@ -27,8 +27,8 @@ const DICAS = [
 ]
 
 const GuiaEscolha = () => (
-  <section aria-labelledby="guia-h" className="content-container py-4">
-    <div className="mx-auto max-w-3xl rounded-large border border-ui-border-base bg-copamar-bg-light dark:bg-ui-bg-subtle p-5">
+  <section aria-labelledby="guia-h" className="h-full">
+    <div className="flex h-full flex-col rounded-large border border-ui-border-base bg-copamar-bg-light dark:bg-ui-bg-subtle p-5">
       <div className="flex flex-col gap-4 small:flex-row small:items-center small:justify-between">
         <div className="flex items-start gap-x-3">
           <span aria-hidden className="text-2xl">

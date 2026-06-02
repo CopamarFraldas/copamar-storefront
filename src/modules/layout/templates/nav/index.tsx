@@ -19,28 +19,31 @@ export default async function Nav() {
       <div className="sticky top-0 inset-x-0 z-50 group">
       <header className="relative mx-auto border-b duration-200 bg-ui-bg-base border-ui-border-base">
         <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex flex-col text-small-regular">
-          {/* linha 1: menu · logo · (busca desktop) · ações */}
-          <div className="flex items-center justify-between w-full h-16">
-            <div className="flex-1 basis-0 h-full flex items-center gap-x-4">
+          {/* linha 1 — responsivo:
+              mobile:  [☰ logo] ........... [conta · tema · carrinho]  (logo à
+                       esquerda, com respiro pras ações na direita)
+              desktop: [☰ logo  BUSCA larga] ... [Blog · Quem somos · conta · tema
+                       · carrinho]  (busca ao lado das Categorias, como pediu) */}
+          <div className="flex items-center justify-between w-full h-16 gap-x-3">
+            {/* esquerda: menu + logo + busca (desktop) */}
+            <div className="flex items-center gap-x-3 small:gap-x-4 flex-1 min-w-0">
               <MegaMenu />
-            </div>
-
-            <div className="flex items-center h-full">
               <LocalizedClientLink
                 href="/"
-                className="flex items-center"
+                className="flex items-center shrink-0"
                 data-testid="nav-store-link"
               >
                 <SpinLogo />
               </LocalizedClientLink>
-            </div>
-
-            <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-              {/* busca inline no desktop (no mobile vai pra 2ª linha) */}
-              <div className="hidden small:block w-full max-w-xs">
+              {/* busca larga, do lado das categorias (só desktop) */}
+              <div className="hidden small:block flex-1 max-w-xl">
                 <SearchBar />
               </div>
-              <div className="hidden small:flex items-center gap-x-6 h-full">
+            </div>
+
+            {/* direita: links (desktop) + conta + tema + carrinho */}
+            <div className="flex items-center gap-x-4 small:gap-x-5 shrink-0">
+              <div className="hidden small:flex items-center gap-x-5">
                 <LocalizedClientLink
                   className="hover:text-ui-fg-base"
                   href="/blog"
@@ -56,8 +59,7 @@ export default async function Nav() {
                   Quem somos
                 </LocalizedClientLink>
               </div>
-              {/* conta — clara em mobile E desktop (visitante: Entrar; logado:
-                  dropdown com Minha conta · Meus pedidos · Comprar de novo) */}
+              {/* conta — clara em mobile E desktop */}
               <AccountButton nome={customer?.first_name} />
               <ThemeToggle />
               <Suspense

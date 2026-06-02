@@ -53,7 +53,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
 
   return (
     <div className="content-container py-8">
-      <h1 className="text-2xl font-semibold text-ui-fg-base">
+      <h1 className="text-2xl font-semibold text-ui-fg-base break-words">
         {termo ? (
           <>
             Resultados para{" "}
