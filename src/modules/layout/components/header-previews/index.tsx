@@ -154,10 +154,46 @@ const VarD = () => (
   </div>
 )
 
+// E — HÍBRIDA recomendada: logo central (de B) + busca full-width própria (de B,
+// = espelho do mobile) + BARRA de categorias estilo Amazon (de A). Junta as duas
+// direções que o dono citou. Navegação concentrada na barra (uma porta só).
+const VarE = () => (
+  <div className="bg-ui-bg-base">
+    <div className="content-container flex items-center justify-between py-3">
+      <div className="flex items-center gap-x-5 text-base text-ui-fg-subtle">
+        <span>Blog</span>
+        <span>Quem somos</span>
+      </div>
+      <Logo h={46} />
+      <div className="flex items-center gap-x-5 text-base text-ui-fg-base">
+        <span className="flex items-center gap-x-1.5"><IUser /> Entrar</span>
+        <span>🌙</span>
+        <span className="flex items-center gap-x-1.5"><IBag /> Carrinho (0)</span>
+      </div>
+    </div>
+    <div className="content-container pb-3"><Busca /></div>
+    <div className="border-t border-ui-border-base bg-ui-bg-subtle/60">
+      <div className="content-container flex items-center gap-x-3 py-2.5">
+        <button className="inline-flex shrink-0 items-center gap-x-2 rounded-full bg-copamar-primary px-4 py-2 text-sm font-semibold text-white">
+          <IMenu /> Todas as categorias
+        </button>
+        <div className="flex gap-2 overflow-x-auto">
+          {["🏢 Atacado / CNPJ", ...CHIPS].map((c, i) => (
+            <span key={c} className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-sm ${i === 0 ? "border-copamar-primary bg-copamar-primary/10 font-semibold text-copamar-primary" : "border-ui-border-base bg-ui-bg-base text-ui-fg-base"}`}>{c}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
 const HeaderPreviews = () => (
   <div className="content-container py-10">
     <h1 className="mb-1 text-2xl font-bold text-ui-fg-base">Protótipos de header (desktop)</h1>
     <p className="mb-8 text-sm text-ui-fg-subtle">Compare e me diga qual gostou (ou mistura de duas). É só mockup, NOINDEX.</p>
+    <Frame titulo="★ E · RECOMENDADA — logo central + barra de categorias (Amazon)" desc="Junta as duas que você citou: linha 1 = links · LOGO central · conta/carrinho · linha 2 = BUSCA full-width (igual ao mobile) · linha 3 = barra com 'Todas as categorias' + chips. A busca ganha a linha inteira (resolve o aperto do atual).">
+      <VarE />
+    </Frame>
     <Frame titulo="A · Amazon" desc="Logo no canto esquerdo · busca larga no centro · ações à direita. Categorias numa BARRA EMBAIXO (com 'Todas as categorias').">
       <VarA />
     </Frame>
