@@ -35,16 +35,6 @@ export default async function Nav() {
                 <div className="small:hidden">
                   <MegaMenu />
                 </div>
-                {/* logo à esquerda no MOBILE — maior que o desktop (52px vs 44px)
-                    e com respiro do grupo da direita (Marco, ajuste 04/06) */}
-                <LocalizedClientLink
-                  href="/"
-                  aria-label="Início — Copamar Fraldas"
-                  className="flex shrink-0 items-center small:hidden"
-                  data-testid="nav-store-link"
-                >
-                  <SpinLogo className="h-[52px]" />
-                </LocalizedClientLink>
                 {/* links institucionais no DESKTOP */}
                 <div className="hidden small:flex items-center gap-x-5 text-ui-fg-subtle">
                   <LocalizedClientLink className="hover:text-ui-fg-base" href="/blog" data-testid="nav-blog-link">
@@ -56,19 +46,22 @@ export default async function Nav() {
                 </div>
               </div>
 
-              {/* logo CENTRAL no DESKTOP */}
+              {/* logo CENTRAL — mobile E desktop (Marco 04/06: "volta pro meio").
+                  Maior no mobile (52px) que no desktop (44px). Os grupos laterais
+                  têm flex-1 simétrico, então o logo fica no centro geométrico. */}
               <LocalizedClientLink
                 href="/"
                 aria-label="Início — Copamar Fraldas"
-                className="hidden shrink-0 cursor-pointer items-center small:flex"
+                className="flex shrink-0 cursor-pointer items-center"
+                data-testid="nav-store-link"
               >
-                <SpinLogo />
+                <SpinLogo className="h-[52px] small:h-11" />
               </LocalizedClientLink>
 
               {/* direita: conta · carrinho no MOBILE (tema foi pro hambúrguer);
-                  conta · tema · carrinho no desktop. ml-4 garante o respiro
-                  entre o logo e este grupo no mobile. */}
-              <div className="ml-4 flex shrink-0 items-center gap-x-5 small:ml-0 small:flex-1 small:min-w-0 small:justify-end">
+                  conta · tema · carrinho no desktop. flex-1 espelha o lado
+                  esquerdo → logo central de verdade. */}
+              <div className="flex flex-1 min-w-0 items-center justify-end gap-x-5">
                 <AccountButton nome={customer?.first_name} />
                 <span className="hidden small:flex">
                   <ThemeToggle />
