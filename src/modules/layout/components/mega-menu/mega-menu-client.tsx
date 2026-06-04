@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
+import { useTheme } from "next-themes"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import type { NavCat } from "@lib/data/nav-categories"
 
@@ -13,6 +14,11 @@ type Props = { categories: NavCat[] }
  * só o link antigo de "Fraldas Geriátricas".
  */
 const MegaMenuClient = ({ categories }: Props) => {
+  // tema no DRAWER mobile (o toggle saiu do topo — Marco 04/06). O drawer só
+  // renderiza após interação (client-side), então não há risco de hydration.
+  const { theme, resolvedTheme, setTheme } = useTheme()
+  const isDark = (theme === "system" ? resolvedTheme : theme) === "dark"
+
   // ── DESKTOP: painel com hover-intent + clique + ESC ──
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -40,17 +46,41 @@ const MegaMenuClient = ({ categories }: Props) => {
   // ── MOBILE: drawer ──
   const [mobileOpen, setMobileOpen] = useState(false)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const mobileTriggerRef = useRef<HTMLButtonElement>(null)
+  const drawerRef = useRef<HTMLDivElement>(null)
   const toggleExpand = (handle: string) =>
     setExpanded((s) => { const n = new Set(s); n.has(handle) ? n.delete(handle) : n.add(handle); return n })
 
-  // bloqueia scroll do body + ESC fecha
+  // bloqueia scroll do body + ESC fecha + GESTÃO DE FOCO (revisão a11y 04/06):
+  // foco entra no drawer ao abrir, Tab cicla dentro (trap), e ao fechar — por
+  // qualquer via (ESC/overlay/link/X) — volta pro botão hambúrguer.
   useEffect(() => {
     if (!mobileOpen) return
     const orig = document.body.style.overflow
     document.body.style.overflow = "hidden"
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileOpen(false) }
+    const focusables = () =>
+      drawerRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], select, input, [tabindex]:not([tabindex="-1"])'
+      )
+    // foco depois do paint (o drawer precisa existir no DOM)
+    const raf = requestAnimationFrame(() => focusables()?.[0]?.focus())
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setMobileOpen(false); return }
+      if (e.key !== "Tab") return
+      const els = focusables()
+      if (!els?.length) return
+      const first = els[0]
+      const last = els[els.length - 1]
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    }
     document.addEventListener("keydown", onKey)
-    return () => { document.body.style.overflow = orig; document.removeEventListener("keydown", onKey) }
+    return () => {
+      cancelAnimationFrame(raf)
+      document.body.style.overflow = orig
+      document.removeEventListener("keydown", onKey)
+      mobileTriggerRef.current?.focus()
+    }
   }, [mobileOpen])
 
   // Fallback: sem categorias, ainda mostra um link pra /store
@@ -168,6 +198,7 @@ const MegaMenuClient = ({ categories }: Props) => {
 
       {/* ===== MOBILE (< small) — hamburger + drawer ===== */}
       <button
+        ref={mobileTriggerRef}
         type="button"
         aria-label="Abrir menu de categorias"
         aria-expanded={mobileOpen}
@@ -188,6 +219,7 @@ const MegaMenuClient = ({ categories }: Props) => {
             aria-hidden
           />
           <div
+            ref={drawerRef}
             role="dialog"
             aria-modal="true"
             aria-label="Categorias da loja"
@@ -276,6 +308,28 @@ const MegaMenuClient = ({ categories }: Props) => {
                   <li><LocalizedClientLink href="/blog" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Blog</LocalizedClientLink></li>
                   <li><LocalizedClientLink href="/sobre" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Quem somos</LocalizedClientLink></li>
                   <li><LocalizedClientLink href="/account" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Minha conta</LocalizedClientLink></li>
+                  {/* tema claro/escuro — morava no topo do header; aqui fica
+                      acessível sem disputar espaço com o logo (Marco 04/06) */}
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => setTheme(isDark ? "light" : "dark")}
+                      className="flex w-full items-center gap-x-2 py-2 text-left text-sm text-ui-fg-subtle"
+                      aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
+                    >
+                      {isDark ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <circle cx="12" cy="12" r="4" />
+                          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                        </svg>
+                      )}
+                      {isDark ? "Tema claro" : "Tema escuro"}
+                    </button>
+                  </li>
                 </ul>
               </div>
             </nav>

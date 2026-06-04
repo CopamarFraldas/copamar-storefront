@@ -35,14 +35,15 @@ export default async function Nav() {
                 <div className="small:hidden">
                   <MegaMenu />
                 </div>
-                {/* logo à esquerda no MOBILE */}
+                {/* logo à esquerda no MOBILE — maior que o desktop (52px vs 44px)
+                    e com respiro do grupo da direita (Marco, ajuste 04/06) */}
                 <LocalizedClientLink
                   href="/"
                   aria-label="Início — Copamar Fraldas"
                   className="flex shrink-0 items-center small:hidden"
                   data-testid="nav-store-link"
                 >
-                  <SpinLogo />
+                  <SpinLogo className="h-[52px]" />
                 </LocalizedClientLink>
                 {/* links institucionais no DESKTOP */}
                 <div className="hidden small:flex items-center gap-x-5 text-ui-fg-subtle">
@@ -64,14 +65,28 @@ export default async function Nav() {
                 <SpinLogo />
               </LocalizedClientLink>
 
-              {/* direita: conta · tema · carrinho */}
-              <div className="flex shrink-0 items-center gap-x-4 small:flex-1 small:min-w-0 small:justify-end small:gap-x-5">
+              {/* direita: conta · carrinho no MOBILE (tema foi pro hambúrguer);
+                  conta · tema · carrinho no desktop. ml-4 garante o respiro
+                  entre o logo e este grupo no mobile. */}
+              <div className="ml-4 flex shrink-0 items-center gap-x-5 small:ml-0 small:flex-1 small:min-w-0 small:justify-end">
                 <AccountButton nome={customer?.first_name} />
-                <ThemeToggle />
+                <span className="hidden small:flex">
+                  <ThemeToggle />
+                </span>
                 <Suspense
                   fallback={
-                    <LocalizedClientLink className="flex gap-2 hover:text-ui-fg-base" href="/cart" data-testid="nav-cart-link">
-                      Carrinho (0)
+                    <LocalizedClientLink
+                      className="flex items-center gap-x-1.5 text-ui-fg-subtle hover:text-ui-fg-base"
+                      href="/cart"
+                      data-testid="nav-cart-link"
+                      aria-label="Carrinho"
+                    >
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <path d="M3 6h18" />
+                        <path d="M16 10a4 4 0 0 1-8 0" />
+                      </svg>
+                      <span className="hidden small:inline">Carrinho</span>
                     </LocalizedClientLink>
                   }
                 >

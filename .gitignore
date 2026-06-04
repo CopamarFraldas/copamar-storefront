@@ -63,3 +63,4 @@ dump.rdb
 # package-lock.json (template usa yarn, mas docker entrypoint usa npm)
 # Lock files são regenerados pelo container — não versionar conflito
 package-lock.json
+.shots/

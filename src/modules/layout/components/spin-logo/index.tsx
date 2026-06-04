@@ -15,7 +15,7 @@ import { useEffect, useRef } from "react"
  * então não há "judder" na transição scroll→parado. Respeita prefers-reduced-motion
  * e pausa quando a aba não está visível.
  */
-const SpinLogo = () => {
+const SpinLogo = ({ className = "h-11" }: { className?: string }) => {
   const ref = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
@@ -50,8 +50,8 @@ const SpinLogo = () => {
       alt="Copamar Fraldas - Especialista em fraldas geriátricas"
       width={140}
       height={48}
-      className="will-change-transform"
-      style={{ width: "auto", height: "44px" }}
+      // altura via className (mobile usa logo maior que o desktop — ajuste 04/06)
+      className={`w-auto will-change-transform ${className}`}
     />
   )
 }

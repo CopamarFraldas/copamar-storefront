@@ -69,7 +69,11 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         >
           {item.product_title}
         </Text>
-        <LineItemOptions variant={item.variant} data-testid="product-variant" />
+        <LineItemOptions
+          variant={item.variant}
+          productTitle={item.product_title}
+          data-testid="product-variant"
+        />
       </Table.Cell>
 
       {type === "full" && (
@@ -83,6 +87,8 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               data-testid="product-select-button"
             >
               {/* TODO: Update this with the v2 way of managing inventory */}
+              {/* (a <option value=1> extra do starter foi removida — duplicava
+                  o "1" no dropdown de quantidade) */}
               {Array.from(
                 {
                   length: Math.min(maxQuantity, 10),
@@ -93,10 +99,6 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
                   </option>
                 )
               )}
-
-              <option value={1} key={1}>
-                1
-              </option>
             </CartItemSelect>
             {updating && <Spinner />}
           </div>

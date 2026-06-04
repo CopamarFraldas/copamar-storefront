@@ -81,11 +81,31 @@ const CartDropdown = ({
     >
       <Popover className="relative h-full">
         <PopoverButton className="h-full">
+          {/* ícone 🛒 + badge numérico (padrão e-commerce, Marco 04/06).
+              No desktop ganha o rótulo "Carrinho" ao lado. */}
           <LocalizedClientLink
-            className="hover:text-ui-fg-base"
+            className="flex items-center gap-x-1.5 text-ui-fg-subtle hover:text-ui-fg-base"
             href="/cart"
             data-testid="nav-cart-link"
-          >{`Carrinho (${totalItems})`}</LocalizedClientLink>
+            aria-label={`Carrinho com ${totalItems} ${totalItems === 1 ? "item" : "itens"}`}
+          >
+            <span className="relative">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <path d="M3 6h18" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              {totalItems > 0 && (
+                <span
+                  data-testid="nav-cart-count"
+                  className="absolute -right-2 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-copamar-primary px-1 text-[11px] font-bold leading-none text-white"
+                >
+                  {totalItems > 99 ? "99+" : totalItems}
+                </span>
+              )}
+            </span>
+            <span className="hidden small:inline">Carrinho</span>
+          </LocalizedClientLink>
         </PopoverButton>
         <Transition
           show={cartDropdownOpen}
@@ -144,6 +164,7 @@ const CartDropdown = ({
                                 </h3>
                                 <LineItemOptions
                                   variant={item.variant}
+                                  productTitle={item.product_title}
                                   data-testid="cart-item-variant"
                                   data-value={item.variant}
                                 />
