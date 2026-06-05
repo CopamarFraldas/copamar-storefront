@@ -29,7 +29,9 @@ const GoogleStoreWidget = () => {
       onLoad={() => {
         try {
           ;(window as any).merchantwidget?.start({
-            position: "LEFT_BOTTOM",
+            merchant_id: 122803740, // Merchant Center Copamar (programa ativado 05/06)
+            region: "BR",
+            position: "LEFT_BOTTOM", // canto esquerdo — longe do WhatsApp (direita)
             mobileBottomMargin: 96, // acima da barra fixa de checkout do mobile
           })
         } catch {
