@@ -4,6 +4,8 @@ import { Text } from "@medusajs/ui"
 type OrderDetailsProps = {
   order: HttpTypes.StoreOrder
   showStatus?: boolean
+  /** na confirmação o número já aparece em DESTAQUE no hero — evita duplicar */
+  hideNumero?: boolean
 }
 
 // Status do Medusa → rótulos em PT-BR (loja brasileira)
@@ -31,7 +33,7 @@ const PAYMENT_PT: Record<string, string> = {
   requires_action: "Ação necessária",
 }
 
-const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
+const OrderDetails = ({ order, showStatus, hideNumero }: OrderDetailsProps) => {
   // fallback: troca _ por espaço e capitaliza, caso surja um status não mapeado
   const formatStatus = (map: Record<string, string>, str?: string) => {
     if (!str) return "—"
@@ -58,9 +60,12 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
           {new Date(order.created_at).toLocaleDateString("pt-BR")}
         </span>
       </Text>
-      <Text className="mt-2 text-ui-fg-interactive">
-        Número do pedido: <span data-testid="order-id">{order.display_id}</span>
-      </Text>
+      {!hideNumero && (
+        <Text className="mt-2 text-ui-fg-interactive">
+          Número do pedido:{" "}
+          <span data-testid="order-id">{order.display_id}</span>
+        </Text>
+      )}
 
       <div className="flex items-center text-compact-small gap-x-4 mt-4">
         {showStatus && (

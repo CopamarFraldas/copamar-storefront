@@ -2,6 +2,7 @@ import { Heading } from "@medusajs/ui"
 import { cookies as nextCookies } from "next/headers"
 
 import CartTotals from "@modules/common/components/cart-totals"
+import ConfirmationHero from "@modules/order/components/confirmation-hero"
 import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
 import OnboardingCta from "@modules/order/components/onboarding-cta"
@@ -29,14 +30,10 @@ export default async function OrderCompletedTemplate({
           className="flex flex-col gap-4 max-w-4xl h-full bg-ui-bg-base w-full py-10"
           data-testid="order-complete-container"
         >
-          <Heading
-            level="h1"
-            className="flex flex-col gap-y-3 text-ui-fg-base text-3xl mb-4"
-          >
-            <span>Obrigado!</span>
-            <span>Seu pedido foi realizado com sucesso.</span>
-          </Heading>
-          <OrderDetails order={order} />
+          {/* hero caloroso + ciente da forma de pagamento (boleto re-exibido)
+              + nº do pedido em destaque (Marco 04/06) */}
+          <ConfirmationHero order={order} />
+          <OrderDetails order={order} hideNumero />
           <Heading level="h2" className="flex flex-row text-3xl-regular">
             Resumo
           </Heading>

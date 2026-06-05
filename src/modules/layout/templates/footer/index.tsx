@@ -119,5 +119,20 @@ const Atendimento = () => (
     >
       ou e-mail: vendas@copamarfraldas.com.br
     </a>
+    {/* páginas institucionais de atendimento (Marco 04/06) */}
+    <div className="mt-1 flex flex-col gap-y-1">
+      <LocalizedClientLink
+        href="/contato"
+        className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
+      >
+        Contato e endereço
+      </LocalizedClientLink>
+      <LocalizedClientLink
+        href="/trocas-e-devolucoes"
+        className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
+      >
+        Trocas e Devoluções
+      </LocalizedClientLink>
+    </div>
   </div>
 )
