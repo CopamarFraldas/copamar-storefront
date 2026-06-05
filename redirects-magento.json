@@ -1,0 +1,846 @@
+[
+ {
+  "source": "/toalha-umedecida.html",
+  "destination": "/br/categories/higiene-toalhas"
+ },
+ {
+  "source": "/roupa-intima-absorvente-para-vestir/plena-pants.html",
+  "destination": "/br/categories/pants-plena"
+ },
+ {
+  "source": "/fralda-infantil-1.html",
+  "destination": "/br/categories/fralda-infantil"
+ },
+ {
+  "source": "/roupa-intima-absorvente-para-vestir.html",
+  "destination": "/br/categories/roupa-intima"
+ },
+ {
+  "source": "/roupa-intima-absorvente-para-vestir/roupa-intima-abena.html",
+  "destination": "/br/categories/pants-abena"
+ },
+ {
+  "source": "/roupa-intima-absorvente-para-vestir/roupa-intima-tena-pants.html",
+  "destination": "/br/categories/pants-tena"
+ },
+ {
+  "source": "/fralda-geriatrica.html",
+  "destination": "/br/categories/fraldas-geriatricas"
+ },
+ {
+  "source": "/fralda-geriatrica/fralda-geriatrica-abena.html",
+  "destination": "/br/categories/fraldas-geriatricas-abena"
+ },
+ {
+  "source": "/fralda-geriatrica/fralda-geriatrica-adultcare.html",
+  "destination": "/br/categories/fraldas-geriatricas-adultcare"
+ },
+ {
+  "source": "/fralda-geriatrica/fralda-geriatrica-biofral.html",
+  "destination": "/br/categories/fraldas-geriatricas-biofral"
+ },
+ {
+  "source": "/fralda-geriatrica/fralda-geriatrica-comfort-life.html",
+  "destination": "/br/categories/fraldas-geriatricas-outras"
+ },
+ {
+  "source": "/fralda-geriatrica/fralda-geriatrica-tena.html",
+  "destination": "/br/categories/fraldas-geriatricas-tena"
+ },
+ {
+  "source": "/fralda-geriatrica/fralda-geriatrica-vitacare.html",
+  "destination": "/br/categories/fraldas-geriatricas-economicas"
+ },
+ {
+  "source": "/absorventes.html",
+  "destination": "/br/categories/absorventes"
+ },
+ {
+  "source": "/absorventes/absorvente-geriatrico.html",
+  "destination": "/br/categories/absorvente-geriatrico"
+ },
+ {
+  "source": "/absorventes/absorvente-masculino.html",
+  "destination": "/br/categories/absorvente-masculino"
+ },
+ {
+  "source": "/absorventes/absorventes-tena-lady-discreet.html",
+  "destination": "/br/categories/absorvente-feminino-tena-lady"
+ },
+ {
+  "source": "/absorventes/lencol-descartavel-absorvente.html",
+  "destination": "/br/categories/protetores-de-cama"
+ },
+ {
+  "source": "/luva-de-procedimento.html",
+  "destination": "/br/categories/higiene-luvas"
+ },
+ {
+  "source": "/fralda-geriatrica-biofral-classic-generic.html",
+  "destination": "/br/categories/fraldas-geriatricas-biofral"
+ },
+ {
+  "source": "/fralda-geriatrica-biofral-classic-generic-grande-com-28-fraldas.html",
+  "destination": "/br/products/fralda-geriatrica-biofral-classic-grande-c-28"
+ },
+ {
+  "source": "/fralda-geriatrica-biofral-classic-generic-extra-grande-com-24-fraldas.html",
+  "destination": "/br/products/fralda-geriatrica-biofral-classic-eg-c-24"
+ },
+ {
+  "source": "/fralda-geriatrica-tena-confort.html",
+  "destination": "/br/products/fralda-geriatrica-tena-confort-p-c-30"
+ },
+ {
+  "source": "/absorvente-adultcare-premium.html",
+  "destination": "/br/products/absorvente-geriatrico-adultcare-premium-c-20-unidades"
+ },
+ {
+  "source": "/absorvente-unissex-comfort-life-com-20-unidades.html",
+  "destination": "/br/products/absorvente-comfort-life-c-20"
+ },
+ {
+  "source": "/absorvente-geriatrico-com-50-unidades.html",
+  "destination": "/br/categories/absorvente-geriatrico"
+ },
+ {
+  "source": "/absorvente-geriatrico-adultcare.html",
+  "destination": "/br/categories/absorvente-geriatrico"
+ },
+ {
+  "source": "/fralda-geriatrica-tena-confort-media-com-26-fraldas-103.html",
+  "destination": "/br/products/fralda-geriatrica-tena-confort-m-26-unidades"
+ },
+ {
+  "source": "/fralda-geriatrica-tena-confort-grande-com-20-fraldas.html",
+  "destination": "/br/products/fralda-geriatrica-tena-confort-g-20-unidades"
+ },
+ {
+  "source": "/fralda-geriatrica-tena-confort-extra-grande-com-18-fraldas.html",
+  "destination": "/br/products/fralda-geriatrica-tena-confort-eg-c-18"
+ },
+ {
+  "source": "/absorvente-tena-lady-discreet-normal-com-16-unidades.html",
+  "destination": "/br/products/tena-lady-discreet-normal-com-16-unidades"
+ },
+ {
+  "source": "/tena-lady-discreet-max-night-com-14-unidades.html",
+  "destination": "/br/products/tena-lady-discreet-max-night-com-14-unidades"
+ },
+ {
+  "source": "/absorvente-maxi-geriatric.html",
+  "destination": "/br/products/absorvente-biofral-maxi-geriatric-com-20-unidades"
+ },
+ {
+  "source": "/lencol-descartavel-adultcare-grande.html",
+  "destination": "/br/categories/protetores-de-cama"
+ },
+ {
+  "source": "/lencol-descartavel-adultcare-medio.html",
+  "destination": "/br/products/lencol-descartavel-adultcare-medio-com-6"
+ },
+ {
+  "source": "/lencol-descartavel-mili-vita-com-6-unidades.html",
+  "destination": "/br/products/lencol-descartavel-mili-vita-c-6"
+ },
+ {
+  "source": "/toalha-umedecida-tena-confort.html",
+  "destination": "/br/products/toalha-umedecida-tena-confort-40-unidades"
+ },
+ {
+  "source": "/toalha-tena-dermacare-com-40-unidades.html",
+  "destination": "/br/products/toalha-tena-dermacare-c-40"
+ },
+ {
+  "source": "/toalha-umedecida-adultcare.html",
+  "destination": "/br/products/toalha-umedecida-adulto-adultcare-c-40"
+ },
+ {
+  "source": "/toalha-umedecidas-infantil-dry-baby-com-100-unidades-flowpack.html",
+  "destination": "/br/categories/higiene-toalhas"
+ },
+ {
+  "source": "/absorvente-tena-men-level-2-active-fit-com-10-unidades.html",
+  "destination": "/br/products/tena-men-level-2-active-fit-c-10-unidades"
+ },
+ {
+  "source": "/calcinha-descartavel-roupa-intima-tena-pants-mulher-nude-g-eg-16-unidades.html",
+  "destination": "/br/products/roupa-intima-tena-pants-mulher-nude-g-eg-c-16"
+ },
+ {
+  "source": "/calcinha-descartavel-roupa-intima-tena-pants-mulher-nude-p-m-16-unidades.html",
+  "destination": "/br/products/calcinha-descartavel-roupa-intima-tena-pants-mulher-p-m-c-16"
+ },
+ {
+  "source": "/roupa-intima-tena-pants-confort-com-16-pm.html",
+  "destination": "/br/products/tena-pants-confort-c-16-p-m"
+ },
+ {
+  "source": "/tena-pants-confort-com-16-geg.html",
+  "destination": "/br/products/tena-pants-men-g-eg-c-16"
+ },
+ {
+  "source": "/luva-de-procedimento-latex-descarpack-742.html",
+  "destination": "/br/categories/higiene-luvas"
+ },
+ {
+  "source": "/luva-de-procedimento-latex-descarpack-media.html",
+  "destination": "/br/products/luva-de-procedimento-latex-c-100-pequena"
+ },
+ {
+  "source": "/luva-de-procedimento-latex-descarpack-grande-744.html",
+  "destination": "/br/categories/higiene-luvas"
+ },
+ {
+  "source": "/luva-de-procedimento-vinil-p.html",
+  "destination": "/br/products/luva-de-procedimento-vinil-s-po-p"
+ },
+ {
+  "source": "/luva-de-procedimento-vinil-descarpack-g.html",
+  "destination": "/br/products/luva-de-procedimento-vinil-s-po-g"
+ },
+ {
+  "source": "/luva-de-procedimento-vinil-descarpack-media.html",
+  "destination": "/br/products/luva-de-procedimento-vinil-m"
+ },
+ {
+  "source": "/luva-descartavel-vinilica-tpe-media.html",
+  "destination": "/br/categories/higiene-luvas"
+ },
+ {
+  "source": "/luva-descartavel-vinilica-tpe-grande.html",
+  "destination": "/br/products/luva-descartavel-vinilica-tpe-grande"
+ },
+ {
+  "source": "/luva-nitrilica-sem-po-azul-media.html",
+  "destination": "/br/categories/higiene-luvas"
+ },
+ {
+  "source": "/luva-nitrilica-sem-po-azul-grande.html",
+  "destination": "/br/products/luva-nitrilica-sem-po-azul-grande"
+ },
+ {
+  "source": "/luva-nitrilica-rosa-sem-po-com-50-pares-grande.html",
+  "destination": "/br/products/luva-nitrilica-grande-sem-po-rosa"
+ },
+ {
+  "source": "/luva-nitrilica-rosa-sem-po-com-50-pares-media.html",
+  "destination": "/br/products/luva-nitrilica-sem-po-rosa-media"
+ },
+ {
+  "source": "/fralda-geriatrica-m-comfort-life-basic.html",
+  "destination": "/br/categories/fraldas-geriatricas"
+ },
+ {
+  "source": "/fralda-geriatrica-eg-comfort-life-basic.html",
+  "destination": "/br/categories/fraldas-geriatricas"
+ },
+ {
+  "source": "/fralda-geriatrica-pacotao-com-50-fraldas-g.html",
+  "destination": "/br/products/fralda-noturna-g-master-clean-c-50"
+ },
+ {
+  "source": "/fralda-geriatrica-adultcare-media-plus.html",
+  "destination": "/br/products/fralda-geriatrica-m-adultcare-plus-com-26"
+ },
+ {
+  "source": "/fralda-geriatrica-g-adultcare-plus.html",
+  "destination": "/br/products/fralda-geriatrica-g-adultcare-plus-com-24"
+ },
+ {
+  "source": "/fralda-geriatrica-eg-adultcare-plus.html",
+  "destination": "/br/products/fralda-geriatrica-eg-adultcare-plus-com-21"
+ },
+ {
+  "source": "/fralda-geriatrica-m-vitacare-com-50-unidades.html",
+  "destination": "/br/products/fralda-geriatrica-vita-plus-c-50-media"
+ },
+ {
+  "source": "/fralda-geriatrica-g-vitacare-com-50-unidades.html",
+  "destination": "/br/products/fralda-noturna-g-master-clean-c-50"
+ },
+ {
+  "source": "/fralda-geriatrica-vitacare-com-46-unidades-eg.html",
+  "destination": "/br/products/fralda-geriatrica-vita-plus-c-46-eg"
+ },
+ {
+  "source": "/tena-lady-discreet-extra-com-20-absorventes.html",
+  "destination": "/br/products/tena-lady-discreet-extra-c-20"
+ },
+ {
+  "source": "/absorvente-masculino-dryman.html",
+  "destination": "/br/products/absorvente-masculino-dryman-c-10"
+ },
+ {
+  "source": "/absorvente-feminino-drylady-normal.html",
+  "destination": "/br/products/absorvente-feminino-drylady-c-8"
+ },
+ {
+  "source": "/luva-de-procedimento-vinil-sem-po-grande.html",
+  "destination": "/br/products/luva-de-procedimento-vinil-s-po-g"
+ },
+ {
+  "source": "/luva-de-procedimento-vinil-sem-po-media.html",
+  "destination": "/br/products/luva-de-procedimento-vinil-m"
+ },
+ {
+  "source": "/roupa-intima-abena-pants-s2-premium.html",
+  "destination": "/br/products/roupa-intima-absorvente-abena-pants-s2-premium-16-unidades"
+ },
+ {
+  "source": "/roupa-intima-abena-pants-m3-premium.html",
+  "destination": "/br/products/roupa-intima-absorvente-abena-pants-m3-premium-15-unidades"
+ },
+ {
+  "source": "/abena-pants-l3-premium.html",
+  "destination": "/br/products/roupa-intima-absorvente-abena-pants-m3-premium-15-unidades"
+ },
+ {
+  "source": "/abena-pants-xl2-premium.html",
+  "destination": "/br/products/roupa-intima-absorvente-abena-pants-xl2-premium-16-unidades"
+ },
+ {
+  "source": "/fralda-abena-slip-m4-premium-com-21.html",
+  "destination": "/br/products/fralda-geriatrica-abena-slip-m4-premium-21-unidades"
+ },
+ {
+  "source": "/fralda-abena-slip-l4-premium-com-18.html",
+  "destination": "/br/products/fralda-abena-slip-l4-premium-c-18-un"
+ },
+ {
+  "source": "/fralda-geriatrica-noturna-m-master-clean.html",
+  "destination": "/br/categories/fraldas-geriatricas"
+ },
+ {
+  "source": "/fralda-geriatrica-noturna-grande-master-clean.html",
+  "destination": "/br/products/fralda-noturna-g-master-clean-c-50"
+ },
+ {
+  "source": "/fralda-geriatrica-noturna-master-clean-com-46.html",
+  "destination": "/br/categories/fraldas-geriatricas"
+ },
+ {
+  "source": "/absorvente-tena-lady-discreet-dia-e-noite-c-12.html",
+  "destination": "/br/products/tena-lady-discreet-dia-e-noite-c-12"
+ },
+ {
+  "source": "/tena-pants-confort-p-m-com-32-unidades.html",
+  "destination": "/br/products/tena-pants-confort-p-m-c-32"
+ },
+ {
+  "source": "/tena-pants-confort-g-eg-com-32-unidades.html",
+  "destination": "/br/products/tena-pants-confort-g-eg-c-32"
+ },
+ {
+  "source": "/tena-pants-geg-lady-discreet-nude-com-16-unidades-844.html",
+  "destination": "/br/products/roupa-intima-tena-pants-mulher-nude-g-eg-c-16"
+ },
+ {
+  "source": "/tena-pants-pm-lady-discreet-nude-com-16-unidades.html",
+  "destination": "/br/products/calcinha-descartavel-roupa-intima-tena-pants-mulher-p-m-c-16"
+ },
+ {
+  "source": "/tena-pants-men-com-16-unidades-geg-846.html",
+  "destination": "/br/products/tena-pants-men-g-eg-c-16"
+ },
+ {
+  "source": "/tena-pants-men-com-16-unidades-pm.html",
+  "destination": "/br/products/tena-pants-men-g-eg-c-16"
+ },
+ {
+  "source": "/fralda-abena-slip-xl4-premium-com-12.html",
+  "destination": "/br/products/fralda-geriatrica-abena-slip-xl4-premium-c-12-un"
+ },
+ {
+  "source": "/lencol-descartavel-abena-abri-soft-com-30-unidade.html",
+  "destination": "/br/products/lencol-descartavel-abena-abri-soft-com-30-unidades"
+ },
+ {
+  "source": "/absorvente-tena-men-level-3.html",
+  "destination": "/br/products/absorvente-tena-men-protetor-masculino-noturno-level-3-c-48"
+ },
+ {
+  "source": "/2512365-tena-plus-size-care-xxg.html",
+  "destination": "/br/products/fralda-tena-plus-size-care-xxg-c-8"
+ },
+ {
+  "source": "/tena-pants-plus-size-xxg-com-8-unidades.html",
+  "destination": "/br/products/fralda-tena-plus-size-care-xxg-c-8"
+ },
+ {
+  "source": "/tena-pants-noturna-g-eg-com-32-unidades.html",
+  "destination": "/br/products/tena-pants-noturna-g-eg-c-32"
+ },
+ {
+  "source": "/tena-pants-noturna-p-m-com-32-unidades.html",
+  "destination": "/br/products/tena-pants-noturna-p-m-c-32"
+ },
+ {
+  "source": "/2512365-tena-pants-dermacare-com-32-roupa-intima-pm.html",
+  "destination": "/br/products/tena-pants-dermacare-c-32-p-m"
+ },
+ {
+  "source": "/tena-pants-dermacare-com-32-roupa-intima-geg.html",
+  "destination": "/br/products/tena-pants-dermacare-c-32-g-eg"
+ },
+ {
+  "source": "/luva-de-procedimento-vinil-sem-po-p.html",
+  "destination": "/br/products/luva-de-procedimento-vinil-s-po-p"
+ },
+ {
+  "source": "/luva-nitrilica-sem-po-preta-grande.html",
+  "destination": "/br/products/luva-nitrilica-s-po-preta-grande"
+ },
+ {
+  "source": "/luva-nitrilica-sem-po-preta-media.html",
+  "destination": "/br/products/luva-nitrilica-s-po-preta-media"
+ },
+ {
+  "source": "/fralda-geriatrica-noturna-vitalidade-p-com-30.html",
+  "destination": "/br/products/fralda-geriatrica-noturna-vitalidade-p-c-30"
+ },
+ {
+  "source": "/fralda-geriatrica-noturna-m-vitalidade-com-30.html",
+  "destination": "/br/products/fralda-geriatrica-noturna-vitalidade-m-c-30"
+ },
+ {
+  "source": "/fralda-geriatrica-noturna-g-vitalidade-com-30.html",
+  "destination": "/br/products/fralda-geriatrica-noturna-vitalidade-g-c-30"
+ },
+ {
+  "source": "/fralda-geriatrica-noturna-eg-vitalidade-com-26.html",
+  "destination": "/br/products/fralda-geriatrica-noturna-vitalidade-eg-c-26"
+ },
+ {
+  "source": "/fralda-geriatrica-noturna-sxg-vitalidade-com-26.html",
+  "destination": "/br/products/fralda-geriatrica-noturna-vitalidade-sxg-c-24"
+ },
+ {
+  "source": "/lencol-descartavel-cahe-economico-60-x-80-cm.html",
+  "destination": "/br/categories/protetores-de-cama"
+ },
+ {
+  "source": "/fralda-geriatrica-tena-slip-noturna-eg-com-24-unidades.html",
+  "destination": "/br/products/tena-slip-dermacare-eg-c-24-unidades"
+ },
+ {
+  "source": "/fralda-geriatrica-tena-slip-dermacare-eg-com-24-unidades.html",
+  "destination": "/br/products/tena-slip-dermacare-eg-c-24-unidades"
+ },
+ {
+  "source": "/fralda-geriatrica-absorv-m-com-50-unidades.html",
+  "destination": "/br/categories/fraldas-geriatricas"
+ },
+ {
+  "source": "/fralda-geriatrica-absorv-g-com-50-unidades.html",
+  "destination": "/br/products/fralda-noturna-g-master-clean-c-50"
+ },
+ {
+  "source": "/fralda-geriatrica-absorv-xg-com-46-unidades.html",
+  "destination": "/br/products/fralda-geriatrica-vita-plus-c-46-eg"
+ },
+ {
+  "source": "/absorvente-unissex-unifral-com-20-unidades.html",
+  "destination": "/br/products/absorvente-comfort-life-c-20"
+ },
+ {
+  "source": "/absorvente-feminino-abena-extra-3-com-10-unidades.html",
+  "destination": "/br/products/absorvente-abena-light-extra-3-c-10-unidades"
+ },
+ {
+  "source": "/absorvente-feminino-abena-abri-light-super-30-unidades.html",
+  "destination": "/br/products/absorvente-feminino-abena-abri-light-super-30-unidades"
+ },
+ {
+  "source": "/absorvente-masculino-abena-man-formula-2-com-15.html",
+  "destination": "/br/products/absorvente-masculino-abena-man-formula-2-c-15"
+ },
+ {
+  "source": "/absorvente-masculino-dryman-com-12-pacotes-de-10-unidades.html",
+  "destination": "/br/products/absorvente-masculino-dryman-c-10"
+ },
+ {
+  "source": "/absorvente-tena-men-level-3-com-48-inidades.html",
+  "destination": "/br/products/absorvente-tena-men-protetor-masculino-noturno-level-3-c-48"
+ },
+ {
+  "source": "/roupa-intima-plena-pm-com-14-unidades.html",
+  "destination": "/br/products/roupa-intima-plena-p-m-c-14"
+ },
+ {
+  "source": "/roupa-intima-plena-geg-com-14-unidades.html",
+  "destination": "/br/products/roupa-intima-plena-g-eg-c-14"
+ },
+ {
+  "source": "/roupa-intima-plena-xxg-com-12-unidades.html",
+  "destination": "/br/products/roupa-intima-plena-xxg-c-12"
+ },
+ {
+  "source": "/roupa-intima-max-care-pants-geg-com-28-unidades.html",
+  "destination": "/br/categories/pants-outras"
+ },
+ {
+  "source": "/roupa-intima-max-care-pants-pm-com-28-unidades.html",
+  "destination": "/br/products/max-care-pants-p-m-c-28"
+ },
+ {
+  "source": "/fralda-geriatrica-tena-slip-noturna-media-32-unidades.html",
+  "destination": "/br/products/fralda-slip-noturna-media-c-32-unidades"
+ },
+ {
+  "source": "/fralda-geriatrica-g-tena-slip-dermacare-com-32-unidades.html",
+  "destination": "/br/products/fralda-tena-slip-dermacare-grande-c-32"
+ },
+ {
+  "source": "/fralda-geriatrica-m-tena-slip-dermacare-com-32-unidades.html",
+  "destination": "/br/products/tena-pants-dermacare-c-32-p-m"
+ },
+ {
+  "source": "/protetor-de-colch-o-gerialife-c-6-unidades.html",
+  "destination": "/br/products/protetor-de-colchao-gerialife-c-6-unidades"
+ },
+ {
+  "source": "/fralda-geriatrica-tena-slip-noturna-grande-com-32-unidades.html",
+  "destination": "/br/products/fralda-slip-noturna-grande-c-32-unidades"
+ },
+ {
+  "source": "/absorvente-geriatrico-adultcare-932.html",
+  "destination": "/br/categories/absorvente-geriatrico"
+ },
+ {
+  "source": "/fralda-infantil-enzzo-baby-c-100-rn.html",
+  "destination": "/br/products/fralda-descartavel-enzzo-mega-pacotao-rn-100-unidades-genero-sem-genero-tamanho-recem-nasc"
+ },
+ {
+  "source": "/fralda-infantil-enzzo-baby-c-60-sxg.html",
+  "destination": "/br/products/fralda-infantil-enzzo-baby-xxg-c-60-unidades-extra-extra-grande-xxg-sem-genero"
+ },
+ {
+  "source": "/fralda-infantil-enzzo-baby-c-70-xg.html",
+  "destination": "/br/products/fralda-infantil-enzzo-baby-com-70-un-tamanho-extra-grande-extra-grande-xg-sem-genero"
+ },
+ {
+  "source": "/fralda-infantil-enzzo-baby-c-80-g.html",
+  "destination": "/br/products/fralda-descartavel-enzzo-baby-hiper-p-m-g-xg-atacado-genero-sem-genero-tamanho-grande-g"
+ },
+ {
+  "source": "/fralda-infantil-enzzo-baby-c-90-m.html",
+  "destination": "/br/products/fralda-descartavel-enzzo-baby-hiper-p-m-g-xg-atacado-genero-sem-genero-tamanho-medio-m"
+ },
+ {
+  "source": "/fralda-infantil-enzzo-baby-c-100-p.html",
+  "destination": "/br/products/fralda-descartavel-enzzo-baby-hiper-p"
+ },
+ {
+  "source": "/home",
+  "destination": "/br"
+ },
+ {
+  "source": "/trocas-e-devolucoes",
+  "destination": "/br/trocas-e-devolucoes"
+ },
+ {
+  "source": "/formas-de-envio",
+  "destination": "/br/perguntas-frequentes"
+ },
+ {
+  "source": "/enable-cookies",
+  "destination": "/br"
+ },
+ {
+  "source": "/formas-de-pagamento",
+  "destination": "/br/perguntas-frequentes"
+ },
+ {
+  "source": "/politica-de-privacidade",
+  "destination": "/br"
+ },
+ {
+  "source": "/quem-somos",
+  "destination": "/br/sobre"
+ },
+ {
+  "source": "/newsletter",
+  "destination": "/br"
+ },
+ {
+  "source": "/absorventes-descartaveis",
+  "destination": "/br/categories/absorventes"
+ },
+ {
+  "source": "/fralda-geriatrica-no-atacado",
+  "destination": "/br/categories/fraldas-geriatricas"
+ },
+ {
+  "source": "/fralda-de-vestir",
+  "destination": "/br/categories/roupa-intima"
+ },
+ {
+  "source": "/blog/fralda-de-vestir/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fralda--geriatrica/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fralda_geriatrica_dicas/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/luvas/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fralda-nao-vaza/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fralda-cueca/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/usar-2-fralda-geriatrica/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/incontinencia-idosos-quando-hora-de-comprar-fraldas-geriatricas/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/4-razoes-pelas-quais-comprar-fraldas-geriatricas-no-atacado-pode-ser-uma-boa-opcao-para-voce/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fralda-infantil-5-fatores-que-devem-ser-levados-em-consideracao-para-escolher-o-melhor-modelo/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fraldas-geriatricas-6-fatores-que-devem-ser-levados-em-consideracao-na-hora-de-adquirir-o-item/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/Incontinencia-urinaria-como-comprar-absorventes-de-acordo-com-suas-necessidades/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/Lencol-descartavel-absorvente-o-que-e-beneficios-e-onde-comprar/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-usar-o-absorvente-urinario-masculino-e-garantir-mais-conforto-no-dia-a-dia/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/4-motivos-para-voce-escolher-a-fralda-geriatrica-Tena/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/as-vantagens-das-fraldas-geriatricas-no-cuidado-com-idosos-dependentes/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/absorvente-masculino-como-escolher-o-produto-ideal-para-sua-necessidade/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-escolher-os-melhores-produtos-de-higiene-pessoal-para-garantir-uma-rotina-saudavel-e-confortavel/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fraldas-geriatricas-noturnas-uma-solucao-eficiente-para-incontinencia-urinaria/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/absorvente-masculino-para-incontinencia-urinaria-mitos-sobre-seu-uso/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-cuidar-da-pele-do-idoso-ao-utilizar-fraldas-geriatricas-noturnas/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/o-que-e-e-para-que-serve-a-roupa-intima-descartavel/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/por-que-as-fraldas-calcinhas-absorventes-sao-uma-opcao-mais-pratica-e-confortavel-para-quem-sofre-com-incontinencia-urinaria/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-a-roupa-intima-descartavel-pode-ajudar-em-emergencia/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/comprar-roupa-intima-descartavel-dicas-essenciais-para-nao-errar-na-escolha/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fraldas-geriatricas-em-promocao-dicas-para-escolher-a-melhor-opcao-para-voce-ou-seu-familiar/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-escolher-o-melhor-absorvente-geriatrico-masculino-para-seu-conforto-e-seguranca/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/cuidados-com-a-higiene-intima-tudo-o-que-voce-precisa-saber-sobre-roupa-intima-descartavel/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/descubra-os-beneficios-do-absorvente-masculino-dryman-para-a-sua-saude-e-bem-estar/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-o-absorvente-geriatrico-pode-melhorar-a-qualidade-de-vida/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/lencol-absorvente-geriatrico-uma-solucao-pratica-para-incontinencia-urinaria/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/por-que-considerar-comprar-roupa-intima-descartavel/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/meias-de-compressao-uma-meia-aliada-no-combate-de-inchaco-nas-pernas/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fralda-calcinha-absorvente-para-quem-e-indicada-e-como-usa-la-corretamente/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/os-beneficios-de-usar-toalhas-umedecidas-infantis/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-as-meias-de-compressao-podem-melhorar-a-sua-circulacao-sanguinea/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/por-que-a-roupa-intima-descartavel-e-uma-boa-escolha-para-viagens/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fraldas-descartaveis-para-adultos-uma-solucao-eficaz-para-garantir-a-qualidade-de-vida/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-os-absorventes-noturnos-podem-transformar-suas-noites-de-sono/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/por-que-investir-em-produtos-de-higiene-pessoal-de-qualidade-e-importante-para-sua-saude/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/economize-tempo-e-dinheiro-ao-comprar-fraldas-online/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/absorventes-para-fluxo-intenso-uma-solucao-eficaz-para-a-incontinencia-urinaria/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-encontrar-fraldas-geriatricas-baratas-e-com-qualidade/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/o-papel-das-roupas-intimas-descartaveis-ao-lidar-com-a-incontinencia-urinaria/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fraldas-infantis-de-qualidade-conheca-os-beneficios-para-o-bebe/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/descubra-as-vantagens-de-comprar-em-uma-loja-online-de-fraldas-geriatricas/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/comprar-fraldas-geriatricas-online-praticidade-e-conveniencia-para-cuidar-dos-idosos/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/descubra-os-beneficios-do-absorvente-feminino-drylady-na-incontinencia-urinaria/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/cuidados-pos-parto-como-escolher-o-absorvente-feminino-ideal-para-essa-fase/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/incontinencia-urinaria-durante-a-noite-descubra-como-o-absorvente-noturno-pode-ajudar/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/os-beneficios-da-luva-de-procedimento-na-prevencao-de-contaminacoes/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/por-que-investir-em-roupa-intima-masculina-descartavel-pode-ser-uma-otima-opcao-para-sua-rotina/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/a-importancia-da-escolha-certa-da-fralda-geriatrica-feminina-na-terceira-idade/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/por-que-o-absorvente-urinario-masculino-e-uma-solucao-pratica-e-discreta/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/incontinencia-urinaria-descubra-como-as-fraldas-calcinhas-absorventes-podem-oferecer-conforto-e-seguranca/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/dicas-para-escolher-a-melhor-luva-de-procedimento-vinil-para-suas-necessidades/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/o-papel-essencial-do-absorvente-geriatrico-no-bem-estar-dos-idosos/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-evitar-vazamentos-com-fraldas-geriatricas/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/dicas-para-escolher-a-fralda-geriatrica-plus-size-ideal-para-voce/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/escape-de-xixi-entenda-as-causas-e-saiba-como-lidar-com-esse-problema-comum/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/a-importancia-das-fraldas-geriatricas-na-vida-dos-idosos/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/a-copamar-fraldas-foi-responsavel-pela-venda-e-entrega-de-153-mil-fraldas-geriatricas-em-piracicaba/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/como-viver-melhor-com-a-incontinencia-urinaria/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/conheca-3-exercicios-que-ajudam-na-incontinencia-urinaria/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/fralda-geriatrica-nao-vaza/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/incontinencia-idosos-quando-hora-de-comprar-fralda-geriatrica/",
+  "destination": "/br/blog"
+ },
+ {
+  "source": "/blog/roupa-intima-descartave/",
+  "destination": "/br/blog"
+ }
+]

@@ -12,6 +12,26 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  // ── 301 do Magento → site novo (#62, caminho crítico do cutover) ──
+  // Mapa gerado da migração (sitemap antigo crawleado + matching contra o
+  // catálogo novo + revisão multi-agente). Reviewável em redirects-magento.csv
+  // (gdrive). Ativo também no staging (as rotas antigas não existem aqui, então
+  // não conflita com nada) — no cutover o mesmo código atende o domínio real.
+  async redirects() {
+    const mapa = require("./redirects-magento.json")
+    return [
+      ...mapa.map((r) => ({
+        source: r.source,
+        destination: r.destination,
+        permanent: true, // 301
+      })),
+      // redes de segurança pro cutover: NENHUMA URL antiga vira 404.
+      // (nenhuma rota nova usa .html; /blog/<slug> antigo não-mapeado → índice)
+      { source: "/blog/:path*", destination: "/br/blog", permanent: true },
+      { source: "/:path*.html", destination: "/br", permanent: true },
+    ]
+  },
+
   reactStrictMode: true,
   // Esconde o Dev Indicator ("N") no canto — mantém dev mode + hot reload.
   // Erros de compile/runtime ainda aparecem. (Next 15.3: buildActivity foi deprecado; usar `false`.)
