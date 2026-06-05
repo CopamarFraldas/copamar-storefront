@@ -122,3 +122,14 @@ html,
 body {
   overflow-x: clip;
 }
+
+/* iframe do store widget do Google (#42): com color-scheme dark no site, o
+   Chrome força um BACKPLATE BRANCO em iframe transparente cujo conteúdo não
+   declara dark → "quadrado branco" em volta da pílula 4,9★ (Marco 05/06).
+   color-scheme: light no PRÓPRIO iframe restaura a transparência. */
+iframe[src*="merchantverse"],
+iframe[src*="gstatic.com/shopping"] {
+  color-scheme: light;
+  background: transparent !important;
+  border: 0;
+}
