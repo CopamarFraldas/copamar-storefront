@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { buscarIdsProdutos } from "@lib/data/busca"
 
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
@@ -35,20 +36,24 @@ export default async function SearchPage({ params, searchParams }: Props) {
   const region = await getRegion(countryCode)
   if (!region) return null
 
+  // busca ACENTO-INSENSÍVEL (unaccent no backend); fallback = ?q nativo.
+  const idsBusca = termo ? await buscarIdsProdutos(termo, 48) : null
   const {
     response: { products, count },
   } = termo
-    ? await listProducts({
-        countryCode,
-        // limit alto + metadata (filtro de tamanho) + inventory (senão o card
-        // marca "esgotado" por falta do campo). NÃO remover os campos de estoque.
-        queryParams: {
-          q: termo,
-          limit: 48,
-          fields:
-            "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata",
-        } as any,
-      })
+    ? idsBusca && idsBusca.ids.length === 0
+      ? { response: { products: [], count: 0 } }
+      : await listProducts({
+          countryCode,
+          // limit alto + metadata (filtro de tamanho) + inventory (senão o card
+          // marca "esgotado" por falta do campo). NÃO remover os campos de estoque.
+          queryParams: {
+            ...(idsBusca ? { id: idsBusca.ids } : { q: termo }),
+            limit: 48,
+            fields:
+              "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata",
+          } as any,
+        })
     : { response: { products: [], count: 0 } }
 
   return (

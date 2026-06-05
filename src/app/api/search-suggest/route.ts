@@ -34,10 +34,31 @@ export async function GET(req: NextRequest) {
 
   const base = process.env.MEDUSA_BACKEND_URL || "http://medusa-backend:9000"
   const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
-  const url =
+
+  // busca ACENTO-INSENSÍVEL: ids via /store/busca (unaccent) e hidrata por id[].
+  // Se o endpoint falhar, cai no ?q nativo (comportamento antigo).
+  let url =
     `${base}/store/products?q=${encodeURIComponent(q)}&limit=6` +
     `&region_id=${region.id}` +
     `&fields=handle,title,thumbnail,*variants.calculated_price`
+  let countUnaccent: number | null = null
+  try {
+    const rb = await fetch(`${base}/store/busca?q=${encodeURIComponent(q)}&limit=6`, {
+      headers: { "x-publishable-api-key": pk },
+      next: { revalidate: 60 },
+    })
+    if (rb.ok) {
+      const db = await rb.json()
+      if (Array.isArray(db.ids)) {
+        countUnaccent = db.count ?? db.ids.length
+        if (db.ids.length === 0) return NextResponse.json({ produtos: [], count: 0 })
+        url =
+          `${base}/store/products?${db.ids.map((i: string) => `id[]=${i}`).join("&")}` +
+          `&limit=6&region_id=${region.id}` +
+          `&fields=handle,title,thumbnail,*variants.calculated_price`
+      }
+    }
+  } catch { /* fallback ?q */ }
 
   try {
     const r = await fetch(url, {
@@ -52,7 +73,7 @@ export async function GET(req: NextRequest) {
       thumbnail: p.thumbnail || null,
       preco: menorPreco(p.variants),
     }))
-    return NextResponse.json({ produtos, count: d.count || 0 })
+    return NextResponse.json({ produtos, count: countUnaccent ?? (d.count || 0) })
   } catch {
     return NextResponse.json({ produtos: [], count: 0 })
   }
