@@ -172,55 +172,35 @@ const CookieConsent = () => {
       aria-label="Aviso de cookies e privacidade"
     >
       <div className="content-container mx-auto max-w-4xl px-4 py-3">
-        {/* barra COMPACTA: 1 linha de texto + ações inline. Não rouba a 1ª tela
-            (antes era um card alto que cobria ~40% do mobile na entrada). */}
+        {/* 1ª TELA enxuta (Marco 05/06): "Aceitar todos" (primário) + "Gerenciar"
+            (secundário). O recusar continua a 1 passo: dentro do Gerenciar, o
+            "Só o necessário" é botão de rodapé bem visível — LGPD ok (recusa
+            fácil, não enterrada; 1 clique a mais que o aceite). */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
           <p className="text-xs leading-snug text-ui-fg-subtle sm:flex-1">
             🍃 Usamos cookies pra melhorar sua experiência. Você decide o que
-            aceitar — os essenciais são sempre necessários.{" "}
-            {!detalhe && (
-              <button
-                type="button"
-                onClick={() => setDetalhe(true)}
-                className="font-medium text-ui-fg-interactive underline"
-                data-testid="consent-customize"
-              >
-                Personalizar
-              </button>
-            )}
+            aceitar — os essenciais são sempre necessários.
           </p>
-          <div className="flex shrink-0 gap-2">
-            <Button
-              variant="secondary"
-              size="small"
-              onClick={() => salvar(false, false)}
-              data-testid="consent-essential-only"
-            >
-              Só essenciais
-            </Button>
-            {detalhe ? (
-              <Button
-                variant="primary"
-                size="small"
-                onClick={() => salvar(analytics, marketing)}
-                data-testid="consent-save-prefs"
-              >
-                Salvar
-              </Button>
-            ) : (
-              // LGPD: "Aceitar" e "Recusar/Só essenciais" com a MESMA proeminência
-              // (ambos secondary) — recusar tão fácil quanto aceitar, sem dark
-              // pattern de destacar só o aceite.
+          {!detalhe && (
+            <div className="flex shrink-0 gap-2">
               <Button
                 variant="secondary"
+                size="small"
+                onClick={() => setDetalhe(true)}
+                data-testid="consent-customize"
+              >
+                Gerenciar
+              </Button>
+              <Button
+                variant="primary"
                 size="small"
                 onClick={() => salvar(true, true)}
                 data-testid="consent-accept-all"
               >
                 Aceitar todos
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {detalhe && (
@@ -257,6 +237,29 @@ const CookieConsent = () => {
                 </p>
               </div>
               <Toggle ativo={marketing} onChange={setMarketing} label="Cookies de marketing" />
+            </div>
+
+            {/* rodapé do Gerenciar — 2 ações claras e com mesmo peso visual
+                (LGPD: recusar os opcionais é 1 clique, bem visível) */}
+            <div className="mt-1 flex flex-col gap-2 border-t border-ui-border-base pt-3 sm:flex-row sm:justify-end">
+              <Button
+                variant="secondary"
+                size="base"
+                onClick={() => salvar(false, false)}
+                data-testid="consent-essential-only"
+                className="sm:min-w-[170px]"
+              >
+                Só o necessário
+              </Button>
+              <Button
+                variant="primary"
+                size="base"
+                onClick={() => salvar(analytics, marketing)}
+                data-testid="consent-save-prefs"
+                className="sm:min-w-[170px]"
+              >
+                Salvar preferências
+              </Button>
             </div>
           </div>
         )}
