@@ -106,11 +106,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   return {
     // absolute: o título já traz a marca; o template do layout anexaria de novo.
-    title: { absolute: `${product.title} | Copamar Fraldas` },
+    // #56: qualificador curto só no <title>/OG (o H1 da página segue limpo).
+    title: { absolute: `${product.title} — Atacado | Copamar Fraldas` },
     description: descricao,
     alternates: { canonical },
     openGraph: {
-      title: `${product.title} | Copamar Fraldas`,
+      title: `${product.title} — Atacado | Copamar Fraldas`,
       description: descricao,
       type: "website",
       url: canonical,

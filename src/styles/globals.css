@@ -114,3 +114,11 @@ html { scroll-behavior: smooth; }
     @apply text-[32px] leading-[44px] font-semibold;
   }
 }
+
+/* anti-"gelatina" no mobile (Marco 05/06): nenhum estouro lateral cria pan
+   horizontal da página. clip (não hidden) preserva position:sticky. A causa
+   raiz do zoom era input <16px (auto-zoom iOS) — corrigida na busca e no CEP. */
+html,
+body {
+  overflow-x: clip;
+}

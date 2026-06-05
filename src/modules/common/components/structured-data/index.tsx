@@ -37,29 +37,21 @@ const HORARIOS = [
 ] as const
 
 /**
- * AggregateRating fica SÓ na Organization/LocalBusiness (rating em produto
- * individual sem reviews reais = penalidade do Google). ⚠️ NÃO FABRICAR: só
- * emite com a CONTAGEM REAL de avaliações. Defina NEXT_PUBLIC_REVIEW_COUNT com o
- * nº real do Google Negócios pra ativar (snapshot real abaixo: 4,6 / 143).
+ * ⚠️ AggregateRating REMOVIDO do JSON-LD (#42, 05/06/2026 — decisão de
+ * consistência + política do Google):
+ *
+ * O site agora FEATURA visivelmente o Seller Rating 4,9/600 (Google Customer
+ * Reviews, com link pra fonte — ver reviews-badge). Manter 4,6/143 (Maps) no
+ * markup criaria inconsistência visível×estruturado; e ALINHAR o markup pro
+ * 4,9 violaria a diretriz de review snippets: aggregateRating self-serving em
+ * Organization/LocalBusiness deve vir de avaliações coletadas no PRÓPRIO site
+ * (first-party) — nota "emprestada" do Google (Maps OU Seller Rating) é
+ * justamente o que a política veda, com risco de ação manual.
+ *
+ * Caminho: selo visível linkado (fonte verificável) hoje; se um dia a loja
+ * coletar reviews first-party, reintroduzir o markup com ESSES dados.
+ * NADA fabricado.
  */
-// Snapshot REAL do Google Negócios (perfil público, 31/05/2026): 4,6 / 143
-// avaliações. (NÃO confundir com o seller rating 4,9 do Merchant Center — métrica
-// diferente.) TODO #42: ligar no Places API pra manter atualizado automaticamente.
-const REVIEW_RATING = process.env.NEXT_PUBLIC_REVIEW_RATING || "4.6"
-const REVIEW_COUNT: number | null = process.env.NEXT_PUBLIC_REVIEW_COUNT
-  ? parseInt(process.env.NEXT_PUBLIC_REVIEW_COUNT, 10) || null
-  : 143
-const aggregateRating = () =>
-  REVIEW_COUNT
-    ? {
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: REVIEW_RATING,
-          reviewCount: REVIEW_COUNT,
-          bestRating: "5",
-        },
-      }
-    : {}
 
 export function organizationSchema() {
   return {
@@ -138,7 +130,6 @@ export function organizationSchema() {
     ],
     taxID: "08.140.992/0001-64",
     areaServed: { "@type": "Country", name: "Brasil" },
-    ...aggregateRating(),
   }
 }
 
@@ -159,7 +150,6 @@ export function localBusinessSchema() {
       longitude: "-46.5147893",
     },
     openingHoursSpecification: HORARIOS,
-    ...aggregateRating(),
   }
 }
 
@@ -268,7 +258,10 @@ export function articleSchema(article: ArticleSchemaInput) {
     "@type": "Article",
     headline: article.title,
     description: article.description,
-    image: article.image ? [article.image] : undefined,
+    // sempre URL absoluta (frontmatter pode trazer caminho relativo)
+    image: article.image
+      ? [article.image.startsWith("http") ? article.image : `${SITE_URL}${article.image}`]
+      : undefined,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
     author: {

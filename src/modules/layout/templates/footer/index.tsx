@@ -1,6 +1,7 @@
 import { Text } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ReviewsBadge from "@modules/common/components/reviews-badge"
 import ConfigurarCookiesButton from "@modules/common/components/cookie-consent/configure-button"
 import FooterCategories from "@modules/layout/components/footer-categories"
 import { getNavCategories } from "@lib/data/nav-categories"
@@ -67,6 +68,8 @@ const Identidade = () => (
       Especialista em fraldas geriátricas desde 2006. Empresa familiar de
       Santo André/SP. CNPJ 08.140.992/0001-64.
     </p>
+    {/* selo de confiança (#42) — avaliações reais da loja no Google */}
+    <ReviewsBadge />
     <LocalizedClientLink
       href="/sobre"
       className="txt-small text-[#1251b8] hover:underline"
@@ -132,6 +135,12 @@ const Atendimento = () => (
         className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
       >
         Trocas e Devoluções
+      </LocalizedClientLink>
+      <LocalizedClientLink
+        href="/perguntas-frequentes"
+        className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
+      >
+        Perguntas frequentes
       </LocalizedClientLink>
     </div>
   </div>

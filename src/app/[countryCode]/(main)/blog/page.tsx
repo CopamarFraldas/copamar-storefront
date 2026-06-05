@@ -13,6 +13,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description:
       "Guias e conteúdos da Copamar sobre fraldas geriátricas, incontinência e cuidado de pessoas idosas e acamadas. 20 anos de experiência a serviço de cuidadores.",
     alternates: { canonical: `${getSiteUrl()}/${countryCode}/blog` },
+    openGraph: {
+      title: "Blog — Guias sobre Fraldas Geriátricas e Cuidado de Idosos",
+      description:
+        "Guias e conteúdos da Copamar sobre fraldas geriátricas, incontinência e cuidado de pessoas idosas e acamadas.",
+      type: "website",
+      url: `${getSiteUrl()}/${countryCode}/blog`,
+      images: [
+        { url: `${getSiteUrl()}/og-image.png`, width: 1200, height: 630, alt: "Blog Copamar Fraldas" },
+      ],
+    },
   }
 }
 

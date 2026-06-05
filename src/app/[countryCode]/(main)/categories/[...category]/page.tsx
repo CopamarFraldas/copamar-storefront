@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { JsonLd, breadcrumbSchema } from "@modules/common/components/structured-data"
 import { notFound } from "next/navigation"
 
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
@@ -55,8 +56,23 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     return {
       // absolute: o template do layout já anexa "| Copamar Fraldas - ...". Sem
       // isso a marca aparecia 3x no <title> da categoria.
-      title: { absolute: `${productCategory.name} | Copamar Fraldas` },
+      // #56: a loja é atacadista — qualificador natural no title da categoria.
+      title: { absolute: `${productCategory.name} no Atacado | Copamar Fraldas` },
       description,
+      openGraph: {
+        title: `${productCategory.name} no Atacado | Copamar Fraldas`,
+        description,
+        type: "website",
+        url: `${getSiteUrl()}/${params.countryCode}/categories/${params.category.join("/")}`,
+        images: [
+          {
+            url: `${getSiteUrl()}/og-image.png`,
+            width: 1200,
+            height: 630,
+            alt: `${productCategory.name} — Copamar Fraldas`,
+          },
+        ],
+      },
       alternates: {
         // antes era só o handle ("fraldas-geriatricas"), que resolvia pra raiz
         // do domínio. Agora a URL canônica real: /<cc>/categories/<handle>.
@@ -79,12 +95,27 @@ export default async function CategoryPage(props: Props) {
     notFound()
   }
 
+  // breadcrumb estruturado (auditoria #54): Início → Loja → categoria
+  const { getSiteUrl } = await import("@lib/util/seo")
+  const base = `${getSiteUrl()}/${params.countryCode}`
+  const ldCrumb = breadcrumbSchema([
+    { name: "Início", url: base },
+    { name: "Loja", url: `${base}/store` },
+    {
+      name: productCategory.name,
+      url: `${base}/categories/${params.category.join("/")}`,
+    },
+  ])
+
   return (
+    <>
+    <JsonLd data={ldCrumb} />
     <CategoryTemplate
       category={productCategory}
       sortBy={sortBy}
       page={page}
       countryCode={params.countryCode}
     />
+    </>
   )
 }

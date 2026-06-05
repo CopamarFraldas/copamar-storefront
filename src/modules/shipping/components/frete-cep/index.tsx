@@ -120,7 +120,7 @@ const FreteCep = ({
             if (m.replace(/\D/g, "").length === 8) consultar(m)
           }}
           placeholder="Digite seu CEP"
-          className="h-10 w-36 rounded-lg border border-ui-border-base bg-ui-bg-base px-3 text-sm text-ui-fg-base outline-none focus:border-copamar-primary focus:ring-1 focus:ring-copamar-primary"
+          className="h-10 w-36 rounded-lg border border-ui-border-base bg-ui-bg-base px-3 text-base small:text-sm text-ui-fg-base outline-none focus:border-copamar-primary focus:ring-1 focus:ring-copamar-primary"
         />
         <button
           type="submit"

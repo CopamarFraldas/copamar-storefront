@@ -25,8 +25,14 @@ const StoreTemplate = ({
     >
       <RefinementList sortBy={sort} />
       <div className="w-full">
-        <div className="mb-8 text-2xl-semi">
-          <h1 data-testid="store-page-title">Todos os produtos</h1>
+        <div className="mb-8">
+          {/* #56: H1 com as keywords reais (era "Todos os produtos", genérico) */}
+          <h1 className="text-2xl-semi" data-testid="store-page-title">
+            Fraldas Geriátricas no Atacado — Catálogo Completo
+          </h1>
+          <p className="mt-1 text-sm text-ui-fg-subtle">
+            Direto das fábricas, com preço de atacado. Entrega para todo o Brasil.
+          </p>
         </div>
         <Suspense fallback={<SkeletonProductGrid />}>
           <PaginatedProducts

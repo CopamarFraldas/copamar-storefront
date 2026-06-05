@@ -37,6 +37,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: frontmatter.publishedAt,
       modifiedTime: frontmatter.updatedAt || frontmatter.publishedAt,
+      // OG da página SUBSTITUI o do layout — garante og:image no share
+      images: [
+        {
+          url: frontmatter.image
+            ? (frontmatter.image.startsWith("http") ? frontmatter.image : `${getSiteUrl()}${frontmatter.image}`)
+            : `${getSiteUrl()}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: frontmatter.title,
+        },
+      ],
     },
   }
 }

@@ -4,11 +4,18 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 // RASCUNHO em revisão (Marco + pai) → noindex EXPLÍCITO nesta página, mesmo
 // após o go-live do site (gotcha: robots de página SOBRESCREVE o do layout —
 // aqui é proposital). Quando aprovarem, remover o robots + o banner.
-export const metadata: Metadata = {
-  title: "Trocas e Devoluções",
-  description:
-    "Política de trocas e devoluções da Copamar Fraldas: arrependimento em até 7 dias (CDC) e troca por defeito de fábrica.",
-  robots: { index: false, follow: false },
+export async function generateMetadata(props: {
+  params: Promise<{ countryCode: string }>
+}): Promise<Metadata> {
+  const { countryCode } = await props.params
+  const { getSiteUrl } = await import("@lib/util/seo")
+  return {
+    title: "Trocas e Devoluções",
+    description:
+      "Política de trocas e devoluções da Copamar Fraldas: arrependimento em até 7 dias (CDC) e troca por defeito de fábrica.",
+    alternates: { canonical: `${getSiteUrl()}/${countryCode}/trocas-e-devolucoes` },
+    robots: { index: false, follow: false }, // RASCUNHO — tirar na aprovação
+  }
 }
 
 /**

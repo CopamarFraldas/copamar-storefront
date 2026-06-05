@@ -1,9 +1,16 @@
 import { Metadata } from "next"
 
-export const metadata: Metadata = {
-  title: "Contato",
-  description:
-    "Fale com a Copamar Fraldas: WhatsApp (11) 95205-0000, e-mail vendas@copamarfraldas.com.br. Rua Iugoslávia, 167 — Parque das Nações, Santo André/SP. Seg a Sex, 08h às 17h.",
+export async function generateMetadata(props: {
+  params: Promise<{ countryCode: string }>
+}): Promise<Metadata> {
+  const { countryCode } = await props.params
+  const { getSiteUrl } = await import("@lib/util/seo")
+  return {
+    title: "Contato",
+    description:
+      "Fale com a Copamar Fraldas: WhatsApp (11) 95205-0000, e-mail vendas@copamarfraldas.com.br. Rua Iugoslávia, 167 — Parque das Nações, Santo André/SP. Seg a Sex, 08h às 17h.",
+    alternates: { canonical: `${getSiteUrl()}/${countryCode}/contato` },
+  }
 }
 
 const WHATS_ATENDENTE = "https://wa.me/5511952050000"

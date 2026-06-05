@@ -1,11 +1,21 @@
 /**
- * Badge de avaliações reais do Google Negócios (#C1) — sóbrio, sem redesenho.
- * Usa o MESMO snapshot do structured-data (4,6 / 143, sobrescrevível por env).
- * ⚠️ Nada fabricado: são os números reais informados pelo Marco. TODO #42:
- * Places API pra manter atualizado.
+ * Selo de avaliações REAIS da loja no Google (#42).
+ *
+ * Fonte featurada (decisão Marco 05/06): **Seller Rating / Google Customer
+ * Reviews** — 4,9 com 600 avaliações (Merchant Center 122803740) — mais forte
+ * que o 4,6/143 do Maps. Números reais, sobrescrevíveis por env quando o
+ * snapshot mudar. O selo LINKA pro perfil público de avaliações no Google
+ * (transparência: dá pra conferir na fonte).
+ *
+ * ⚠️ Nada fabricado. E o JSON-LD NÃO carrega mais essa nota (política do
+ * Google: aggregateRating em markup deve vir de reviews first-party do próprio
+ * site, não de nota "emprestada" do Google — ver structured-data/index.tsx).
  */
-const RATING = process.env.NEXT_PUBLIC_REVIEW_RATING || "4.6"
-const COUNT = process.env.NEXT_PUBLIC_REVIEW_COUNT || "143"
+const RATING = process.env.NEXT_PUBLIC_REVIEW_RATING || "4.9"
+const COUNT = process.env.NEXT_PUBLIC_REVIEW_COUNT || "600"
+const RATINGS_URL =
+  process.env.NEXT_PUBLIC_REVIEW_URL ||
+  "https://www.google.com/shopping/ratings/account/lookup?q=copamarfraldas.com.br"
 
 function Estrelas({ nota }: { nota: number }) {
   // 5 estrelas com preenchimento proporcional à nota (acessível via aria-label)
@@ -28,16 +38,20 @@ function Estrelas({ nota }: { nota: number }) {
 }
 
 const ReviewsBadge = ({ className = "" }: { className?: string }) => {
-  const nota = parseFloat(RATING.replace(",", ".")) || 4.6
+  const nota = parseFloat(RATING.replace(",", ".")) || 4.9
   return (
-    <span
-      className={`inline-flex items-center gap-x-1.5 text-sm ${className}`}
-      aria-label={`Nota ${RATING.replace(".", ",")} de 5 no Google, ${COUNT} avaliações`}
+    <a
+      href={RATINGS_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`inline-flex items-center gap-x-1.5 text-sm transition-opacity hover:opacity-80 ${className}`}
+      aria-label={`Nota ${RATING.replace(".", ",")} de 5 — ${COUNT} avaliações de clientes no Google. Abrir o perfil de avaliações.`}
+      data-testid="reviews-badge"
     >
       <Estrelas nota={nota} />
       <strong className="text-ui-fg-base">{RATING.replace(".", ",")}</strong>
-      <span className="text-ui-fg-subtle">· {COUNT} avaliações no Google</span>
-    </span>
+      <span className="text-ui-fg-subtle">· {COUNT} avaliações · Google</span>
+    </a>
   )
 }
 

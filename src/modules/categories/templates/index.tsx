@@ -58,8 +58,20 @@ export default function CategoryTemplate({
                 /
               </span>
             ))}
-          <h1 data-testid="category-page-title">{category.name}</h1>
+          {/* #56: a categoria-pilar ganha o qualificador de atacado no H1
+              (slot mais valioso da landing); as demais ficam com o nome puro */}
+          <h1 data-testid="category-page-title">
+            {category.handle === "fraldas-geriatricas"
+              ? "Fraldas Geriátricas no Atacado"
+              : category.name}
+          </h1>
         </div>
+        {category.handle === "fraldas-geriatricas" && (
+          <p className="-mt-6 mb-8 text-sm text-ui-fg-subtle">
+            Direto das fábricas das principais marcas, com preço de atacado e
+            entrega para todo o Brasil.
+          </p>
+        )}
         {category.description && (
           <div className="mb-8 text-base-regular">
             <p>{category.description}</p>

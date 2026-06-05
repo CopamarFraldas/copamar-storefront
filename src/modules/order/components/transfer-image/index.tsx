@@ -1,7 +1,7 @@
 import { SVGProps } from "react"
 
 const TransferImage = (props: SVGProps<SVGSVGElement>) => (
-  <svg
+  <svg aria-hidden="true"
     width="280"
     height="181"
     viewBox="0 0 280 181"

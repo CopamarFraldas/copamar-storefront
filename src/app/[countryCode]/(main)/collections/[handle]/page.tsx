@@ -71,6 +71,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       description,
       type: "website",
       url: canonical,
+      // OG da página SUBSTITUI o do layout — sem images aqui o share saía sem og:image
+      images: [
+        {
+          url: `${getSiteUrl()}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `${collection.title} — Copamar Fraldas`,
+        },
+      ],
     },
   } as Metadata
 
