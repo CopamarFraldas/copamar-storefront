@@ -1,3 +1,4 @@
+import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
 
@@ -23,12 +24,21 @@ export default function CheckoutLayout({
               Voltar
             </span>
           </LocalizedClientLink>
+          {/* LOGO no centro (era só texto — Marco 04/06: consistência/confiança
+              no checkout). Estático e leve, sem navegação extra. */}
           <LocalizedClientLink
             href="/"
-            className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
+            className="flex shrink-0 items-center"
+            aria-label="Copamar Fraldas — voltar à loja"
             data-testid="store-link"
           >
-            Copamar Fraldas
+            <Image
+              src="/logo.png"
+              alt="Copamar Fraldas"
+              width={140}
+              height={48}
+              className="h-10 w-auto"
+            />
           </LocalizedClientLink>
           <div className="flex-1 basis-0" />
         </nav>
