@@ -18,7 +18,13 @@ import { useEffect } from "react"
  *   fluxo inteiro ser testável sem poluir os dados do Ads.
  */
 const GADS_ID = process.env.NEXT_PUBLIC_GADS_ID || ""
-const LIVE = process.env.NEXT_PUBLIC_GADS_LIVE === "true"
+const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID || ""
+const ADS_LIVE = process.env.NEXT_PUBLIC_GADS_LIVE === "true"
+const GA4_LIVE = process.env.NEXT_PUBLIC_GA4_LIVE === "true"
+// o gtag.js real só carrega se ALGUM produto estiver live (staging: nenhum →
+// stub de simulação; a propriedade GA4 está medindo o site Magento VIVO e
+// staging não pode poluir os dados)
+const LIVE = ADS_LIVE || GA4_LIVE
 const CONSENT_KEY = "copamar_consent_v1"
 
 function aplicaConsentSalvo() {
@@ -76,7 +82,8 @@ export default function GoogleAdsTag() {
             wait_for_update: 500
           });
           gtag('js', new Date());
-          gtag('config', '${GADS_ID}');
+          ${ADS_LIVE || !LIVE ? `gtag('config', '${GADS_ID}');` : ""}
+          ${GA4_ID && (GA4_LIVE || !LIVE) ? `gtag('config', '${GA4_ID}');` : ""}
           ${
             LIVE
               ? ""
