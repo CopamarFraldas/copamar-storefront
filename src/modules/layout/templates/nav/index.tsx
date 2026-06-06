@@ -2,6 +2,7 @@ import { Suspense } from "react"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
+import PacLoader from "@modules/layout/components/pac-loader"
 import SpinLogo from "@modules/layout/components/spin-logo"
 import ThemeToggle from "@modules/layout/components/theme-toggle"
 import MegaMenu from "@modules/layout/components/mega-menu"
@@ -55,7 +56,10 @@ export default async function Nav() {
                 className="flex shrink-0 cursor-pointer items-center"
                 data-testid="nav-store-link"
               >
-                <SpinLogo className="h-[52px] small:h-11" />
+                {/* 👻 anel Pac-Man de carregamento ao redor do logo (mimo 06/06) */}
+                <PacLoader>
+                  <SpinLogo className="h-[52px] small:h-11" />
+                </PacLoader>
               </LocalizedClientLink>
 
               {/* direita: conta · carrinho no MOBILE (tema foi pro hambúrguer);
