@@ -3,7 +3,7 @@
 import { Table, Text, clx } from "@medusajs/ui"
 import { updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
-import CartItemSelect from "@modules/cart/components/cart-item-select"
+import QuantityInput from "@modules/cart/components/quantity-input"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -42,13 +42,13 @@ const Item = ({ item, type = "full", currencyCode, disponivel }: ItemProps) => {
       })
   }
 
-  // Quantidade máxima respeitando o SALDO REAL (#46 anti-oversell): cap em
-  // min(10, disponível); nunca abaixo da quantity atual (pra dar pra REDUZIR).
+  // Quantidade LIVRE (Marco 06/06): sem teto artificial — o limite é o saldo
+  // real; nunca abaixo da quantity atual (pra dar pra REDUZIR).
   const capSaldo =
     item.variant?.manage_inventory && !item.variant?.allow_backorder && disponivel != null
-      ? Math.min(10, Math.max(0, disponivel))
-      : 10
-  const maxQuantity = Math.max(item.quantity, capSaldo)
+      ? Math.max(0, disponivel)
+      : undefined
+  const maxQuantity = capSaldo != null ? Math.max(item.quantity, capSaldo) : undefined
   const acimaDoSaldo = disponivel != null && item.quantity > Math.max(0, disponivel)
 
   return (
@@ -88,25 +88,13 @@ const Item = ({ item, type = "full", currencyCode, disponivel }: ItemProps) => {
         <Table.Cell>
           <div className="flex gap-2 items-center w-28">
             <DeleteButton id={item.id} data-testid="product-delete-button" />
-            <CartItemSelect
+            <QuantityInput
               value={item.quantity}
-              onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="w-14 h-10 p-4"
+              max={maxQuantity}
+              onChange={(q) => changeQuantity(q)}
+              disabled={updating}
               data-testid="product-select-button"
-            >
-              {/* (a <option value=1> extra do starter foi removida — duplicava
-                  o "1" no dropdown de quantidade) */}
-              {Array.from(
-                {
-                  length: maxQuantity,
-                },
-                (_, i) => (
-                  <option value={i + 1} key={i}>
-                    {i + 1}
-                  </option>
-                )
-              )}
-            </CartItemSelect>
+            />
             {updating && <Spinner />}
           </div>
           {acimaDoSaldo && (

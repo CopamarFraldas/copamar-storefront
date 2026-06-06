@@ -126,9 +126,17 @@ export default function ProductActions({
 
     setIsAdding(true)
 
+    // FARDO (06/06): a PDP do fardo é um ATALHO — põe N unidades da UNIDADE
+    // no carrinho (preço de atacado vem do tier por quantidade). Fardo e
+    // avulso saem do MESMO estoque físico; assim a baixa é sempre na unidade
+    // (anti-oversell por construção).
+    const meta = (product.metadata || {}) as any
+    const fardoVariant = meta.fardo_de_variant as string | undefined
+    const fardoN = Number(meta.fardo_n) || 0
+
     await addToCart({
-      variantId: selectedVariant.id,
-      quantity: 1,
+      variantId: fardoVariant && fardoN > 0 ? fardoVariant : selectedVariant.id,
+      quantity: fardoVariant && fardoN > 0 ? fardoN : 1,
       countryCode,
     })
 

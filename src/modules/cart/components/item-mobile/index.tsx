@@ -3,7 +3,7 @@
 import { updateLineItem } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
-import CartItemSelect from "@modules/cart/components/cart-item-select"
+import QuantityInput from "@modules/cart/components/quantity-input"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -38,13 +38,13 @@ const ItemMobile = ({ item, currencyCode, disponivel }: ItemMobileProps) => {
       .finally(() => setUpdating(false))
   }
 
-  // cap pelo SALDO REAL (#46 anti-oversell); nunca abaixo da quantity atual
-  // (pra dar pra REDUZIR)
+  // Quantidade LIVRE (Marco 06/06): sem teto artificial — o limite é o saldo
+  // real; nunca abaixo da quantity atual (pra dar pra REDUZIR)
   const capSaldo =
     item.variant?.manage_inventory && !item.variant?.allow_backorder && disponivel != null
-      ? Math.min(10, Math.max(0, disponivel))
-      : 10
-  const maxQuantity = Math.max(item.quantity, capSaldo)
+      ? Math.max(0, disponivel)
+      : undefined
+  const maxQuantity = capSaldo != null ? Math.max(item.quantity, capSaldo) : undefined
   const acimaDoSaldo = disponivel != null && item.quantity > Math.max(0, disponivel)
 
   return (
@@ -84,18 +84,13 @@ const ItemMobile = ({ item, currencyCode, disponivel }: ItemMobileProps) => {
         {/* quantidade + remover  ·  preço */}
         <div className="mt-auto flex items-end justify-between pt-2">
           <div className="flex items-center gap-x-2">
-            <CartItemSelect
+            <QuantityInput
               value={item.quantity}
-              onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="h-9 w-14 p-2"
+              max={maxQuantity}
+              onChange={(q) => changeQuantity(q)}
+              disabled={updating}
               data-testid="product-select-button"
-            >
-              {Array.from({ length: maxQuantity }, (_, i) => (
-                <option value={i + 1} key={i}>
-                  {i + 1}
-                </option>
-              ))}
-            </CartItemSelect>
+            />
             <DeleteButton id={item.id} data-testid="product-delete-button" />
             {updating && <Spinner />}
           </div>
