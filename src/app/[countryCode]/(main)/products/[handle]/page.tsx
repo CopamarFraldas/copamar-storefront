@@ -6,6 +6,7 @@ import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { isProductOutOfStock } from "@lib/util/stock"
+import { extrairSpecs } from "@lib/util/specs"
 import { getSiteUrl } from "@lib/util/seo"
 import {
   JsonLd,
@@ -162,10 +163,26 @@ export default async function ProductPage(props: Props) {
     price: cheapestPrice?.calculated_price_number,
     currency: "BRL",
     availability: esgotado ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+    specs: extrairSpecs(pricedProduct),
   })
+  // breadcrumb pela CATEGORIA REAL (06/06 — antes era "Loja" genérico):
+  // Início → [categoria-pai →] categoria → produto, alinhado à navegação
+  const catFolha = (pricedProduct.categories || [])
+    .slice()
+    .sort((a: any, b: any) => (b.parent_category_id ? 1 : 0) - (a.parent_category_id ? 1 : 0))[0]
+  const trilhaCat: { name: string; url: string }[] = []
+  if (catFolha) {
+    const pai = (catFolha as any).parent_category
+    if (pai?.handle) {
+      trilhaCat.push({ name: pai.name, url: `${site}/${params.countryCode}/categories/${pai.handle}` })
+    }
+    trilhaCat.push({ name: catFolha.name, url: `${site}/${params.countryCode}/categories/${catFolha.handle}` })
+  } else {
+    trilhaCat.push({ name: "Loja", url: `${site}/${params.countryCode}/store` })
+  }
   const ldCrumb = breadcrumbSchema([
     { name: "Início", url: site },
-    { name: "Loja", url: `${site}/${params.countryCode}/store` },
+    ...trilhaCat,
     { name: pricedProduct.title, url },
   ])
 

@@ -73,12 +73,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // segue sem categorias se o fetch falhar
   }
 
-  // produtos individuais — degrada gracioso se o backend não responder
+  // produtos individuais — degrada gracioso se o backend não responder.
+  // limit 1000 (06/06): o cap de 100 derrubaria produtos novos do sitemap em
+  // silêncio quando o catálogo passar de 100 (hoje ~99). + images (lastmod
+  // real já vinha do updated_at).
   let produtos: MetadataRoute.Sitemap = []
   try {
     const { response } = await listProducts({
       countryCode: CC,
-      queryParams: { limit: 100, fields: "handle,updated_at" },
+      queryParams: { limit: 1000, fields: "handle,updated_at,thumbnail" },
     })
     produtos = response.products
       .filter((p) => p.handle)
@@ -87,6 +90,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: p.updated_at ? new Date(p.updated_at) : now,
         changeFrequency: "weekly" as const,
         priority: 0.6,
+        // imagem do produto no sitemap (Google Imagens / rich results)
+        ...(p.thumbnail ? { images: [p.thumbnail] } : {}),
       }))
   } catch {
     // sem produtos no sitemap se o fetch falhar; páginas principais permanecem

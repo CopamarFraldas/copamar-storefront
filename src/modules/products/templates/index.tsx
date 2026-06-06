@@ -13,6 +13,8 @@ import { HttpTypes } from "@medusajs/types"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import FreteCep from "@modules/shipping/components/frete-cep"
 import TamanhosIrmaos from "@modules/products/components/tamanhos-irmaos"
+import BreadcrumbPdp from "@modules/products/components/breadcrumb-pdp"
+import ProductSpecs from "@modules/products/components/product-specs"
 import { getProductPrice } from "@lib/util/get-product-price"
 
 type ProductTemplateProps = {
@@ -40,6 +42,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
   return (
     <>
+      {/* breadcrumb visível: caminho de volta pra categoria (#54 linking) */}
+      <BreadcrumbPdp product={product} />
       <div
         className="content-container  flex flex-col small:flex-row small:items-start py-6 relative"
         data-testid="product-container"
@@ -49,6 +53,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       >
         <div className="flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-6">
           <ProductInfo product={product} />
+          {/* specs factuais em tabela (GEO/AEO #54) */}
+          <ProductSpecs product={product} />
           <ProductTabs product={product} />
         </div>
         <div className="block w-full relative">

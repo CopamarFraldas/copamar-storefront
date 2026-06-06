@@ -32,6 +32,12 @@ const HomeFaq = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    inLanguage: "pt-BR",
+    // speakable (GEO/voz): assistentes sabem o que ler em voz alta
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["#faq-h", "[data-faq-item]"],
+    },
     mainEntity: FAQS.map((f) => ({
       "@type": "Question",
       name: f.q,
@@ -53,7 +59,7 @@ const HomeFaq = () => {
       </h2>
       <div className="mx-auto max-w-2xl divide-y divide-ui-border-base">
         {FAQS.map((f) => (
-          <details key={f.q} className="group py-4">
+          <details key={f.q} data-faq-item className="group py-4">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-x-4 text-base font-medium text-ui-fg-base">
               {f.q}
               <span

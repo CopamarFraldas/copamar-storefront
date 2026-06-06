@@ -48,6 +48,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    // AVIF antes de WebP (#54 perf): ~20% menor; o cache do optimizer absorve
+    // o custo do encode. Browser sem suporte cai pro WebP automaticamente.
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "http",

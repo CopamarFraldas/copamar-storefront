@@ -76,6 +76,12 @@ function faqSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    inLanguage: "pt-BR",
+    // speakable (GEO/voz): o que assistentes podem ler em voz alta
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["[data-faq-item]"],
+    },
     mainEntity: FAQS.map((f) => ({
       "@type": "Question",
       name: f.q,
@@ -110,6 +116,7 @@ export default function PerguntasFrequentesPage() {
         {FAQS.map((f) => (
           <details
             key={f.q}
+            data-faq-item
             className="group rounded-xl border border-ui-border-base bg-ui-bg-base px-5 py-4"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-ui-fg-base">

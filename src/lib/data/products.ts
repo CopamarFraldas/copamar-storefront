@@ -63,7 +63,9 @@ export const listProducts = async ({
           offset,
           region_id: region?.id,
           fields:
-            "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.images,*variants.options,+variants.title,*options,*options.values,+metadata,+tags,",
+            // *categories (06/06): destrava RelatedProducts, breadcrumb real e
+            // tracking de categoria — a store API NÃO retorna categories sem pedir
+            "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.images,*variants.options,+variants.title,+variants.weight,+variants.barcode,+variants.sku,+weight,*options,*options.values,+metadata,+tags,*categories,*categories.parent_category,",
           ...queryParams,
         },
         headers,

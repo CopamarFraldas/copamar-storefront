@@ -124,32 +124,47 @@ export function organizationSchema() {
       availableLanguage: "Portuguese",
       hoursAvailable: HORARIOS,
     },
-    sameAs: [
-      "https://www.instagram.com/copamarfraldas/",
-      "https://www.facebook.com/fraldageriatrica",
-    ],
+    sameAs: SAME_AS,
+    email: "vendas@copamarfraldas.com.br",
     taxID: "08.140.992/0001-64",
     areaServed: { "@type": "Country", name: "Brasil" },
   }
 }
 
+// Perfis REAIS linkados pelo site oficial antigo (verificados 06/06/2026):
+// IG/FB no footer do Magento; canal YouTube "Fraldas Geriátricas" ativo
+// (HTTP 200) e linkado pelo site. NADA fabricado.
+const SAME_AS = [
+  "https://www.instagram.com/copamarfraldas/",
+  "https://www.facebook.com/fraldageriatrica",
+  "https://www.youtube.com/channel/UCMl709u_KxLuEAJPGzi2YmA",
+]
+
 export function localBusinessSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    // Store = subtipo de LocalBusiness mais específico (loja de varejo)
+    "@type": ["LocalBusiness", "Store"],
     "@id": `${SITE_URL}/#localbusiness`,
     name: "Copamar Fraldas - Loja Física",
     image: `${SITE_URL}/loja-fachada-square.jpg`,
     telephone: "+5511952050000",
+    email: "vendas@copamarfraldas.com.br",
     url: SITE_URL,
     priceRange: "$$",
     address: ENDERECO,
     geo: {
+      // ponto da Rua Iugoslávia no OSM/Nominatim (validado 06/06/2026)
       "@type": "GeoCoordinates",
       latitude: "-23.6363979",
       longitude: "-46.5147893",
     },
+    hasMap:
+      "https://www.google.com/maps/search/?api=1&query=" +
+      encodeURIComponent("Rua Iugoslávia, 167 - Parque das Nações, Santo André - SP"),
     openingHoursSpecification: HORARIOS,
+    sameAs: SAME_AS,
+    parentOrganization: { "@id": `${SITE_URL}/#organization` },
   }
 }
 
@@ -160,12 +175,44 @@ export function webSiteSchema() {
     "@id": `${SITE_URL}/#website`,
     url: SITE_URL,
     name: "Copamar Fraldas",
+    alternateName: "Copamar",
+    inLanguage: "pt-BR",
     publisher: { "@id": `${SITE_URL}/#organization` },
     potentialAction: {
       "@type": "SearchAction",
-      target: `${SITE_URL}/search?q={search_term_string}`,
+      // URL real da busca inclui o prefixo de país (/br/search?q=)
+      target: `${SITE_URL}/br/search?q={search_term_string}`,
       "query-input": "required name=search_term_string",
     },
+  }
+}
+
+/**
+ * SiteNavigationElement — navegação principal pro Google/IAs entenderem a
+ * arquitetura do site (SEO/GEO #54 avançado). Itens = menu real da loja.
+ */
+export function siteNavigationSchema() {
+  const itens: [string, string][] = [
+    ["Loja — catálogo completo", "/br/store"],
+    ["Fraldas Geriátricas", "/br/categories/fraldas-geriatricas"],
+    ["Roupa Íntima Descartável (Pants)", "/br/categories/roupa-intima"],
+    ["Absorventes", "/br/categories/absorventes"],
+    ["Luvas Descartáveis", "/br/categories/higiene-luvas"],
+    ["Protetores de Cama", "/br/categories/protetores-de-cama"],
+    ["Blog", "/br/blog"],
+    ["Quem Somos", "/br/sobre"],
+    ["Contato", "/br/contato"],
+  ]
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${SITE_URL}/#sitenavigation`,
+    itemListElement: itens.map(([name, path], i) => ({
+      "@type": "SiteNavigationElement",
+      position: i + 1,
+      name,
+      url: `${SITE_URL}${path}`,
+    })),
   }
 }
 
@@ -196,6 +243,8 @@ export type ProductSchemaInput = {
   price?: number | string
   currency?: string
   availability?: string
+  /** specs FACTUAIS (tamanho/quantidade do catálogo) → additionalProperty (GEO/AEO) */
+  specs?: { name: string; value: string }[]
 }
 
 export function productSchema(product: ProductSchemaInput) {
@@ -214,6 +263,14 @@ export function productSchema(product: ProductSchemaInput) {
   if (product.brand) {
     schema.brand = { "@type": "Brand", name: product.brand }
   }
+  // specs estruturadas factuais (tamanho, unidades por pacote...) pra IA citar
+  if (product.specs?.length) {
+    schema.additionalProperty = product.specs.map((s) => ({
+      "@type": "PropertyValue",
+      name: s.name,
+      value: s.value,
+    }))
+  }
   if (product.price != null) {
     schema.offers = {
       "@type": "Offer",
@@ -221,8 +278,32 @@ export function productSchema(product: ProductSchemaInput) {
       priceCurrency: product.currency || "BRL",
       availability:
         product.availability || "https://schema.org/InStock",
+      // produto novo (loja não vende usado/recondicionado)
+      itemCondition: "https://schema.org/NewCondition",
       url: product.url,
       seller: { "@id": `${SITE_URL}/#organization` },
+      // Frete: entrega pra todo o Brasil (fato). Valores/prazos variam por
+      // CEP (frete próprio + transportadoras via cotação ao vivo) — NÃO
+      // declaramos rate/prazo fixos pra não fabricar números.
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "BR",
+        },
+      },
+      // Política REAL: desistência em 7 dias corridos (CDC art. 49) com
+      // pacote lacrado; detalhes em /trocas-e-devolucoes
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "BR",
+        returnPolicyCategory:
+          "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+        merchantReturnLink: `${SITE_URL}/br/trocas-e-devolucoes`,
+      },
     }
   }
   return schema
@@ -230,10 +311,23 @@ export function productSchema(product: ProductSchemaInput) {
 
 export type FaqItem = { pergunta: string; resposta: string }
 
-export function faqPageSchema(faqs: FaqItem[]) {
+/**
+ * FAQPage + speakable (GEO/voz): cssSelector aponta os blocos de FAQ reais
+ * (details/summary) — assistentes de voz/IA sabem o que ler em voz alta.
+ */
+export function faqPageSchema(faqs: FaqItem[], speakableSelector?: string) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    inLanguage: "pt-BR",
+    ...(speakableSelector
+      ? {
+          speakable: {
+            "@type": "SpeakableSpecification",
+            cssSelector: [speakableSelector],
+          },
+        }
+      : {}),
     mainEntity: faqs.map((f) => ({
       "@type": "Question",
       name: f.pergunta,
@@ -256,6 +350,7 @@ export function articleSchema(article: ArticleSchemaInput) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
+    inLanguage: "pt-BR",
     headline: article.title,
     description: article.description,
     // sempre URL absoluta (frontmatter pode trazer caminho relativo)
@@ -307,7 +402,16 @@ export function JsonLd({ data }: { data: object | object[] }) {
   )
 }
 
-/** Schemas globais (Organization + LocalBusiness + WebSite) — layout raiz. */
+/** Schemas globais (Organization + LocalBusiness + WebSite + navegação) — layout raiz. */
 export default function StructuredData() {
-  return <JsonLd data={[organizationSchema(), localBusinessSchema(), webSiteSchema()]} />
+  return (
+    <JsonLd
+      data={[
+        organizationSchema(),
+        localBusinessSchema(),
+        webSiteSchema(),
+        siteNavigationSchema(),
+      ]}
+    />
+  )
 }

@@ -3,7 +3,6 @@ import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import {
   aboutPageSchema,
-  localBusinessSchema,
   breadcrumbSchema,
   JsonLd,
 } from "@modules/common/components/structured-data"
@@ -35,10 +34,11 @@ export default async function SobrePage({ params }: Props) {
   const base = `${getSiteUrl()}/${countryCode}`
   return (
     <div className="content-container py-12">
+      {/* LocalBusiness já vem do layout raiz (StructuredData) — duplicado
+          aqui confundia o parser (review SEO 06/06) */}
       <JsonLd
         data={[
           aboutPageSchema(`${base}/sobre`),
-          localBusinessSchema(),
           breadcrumbSchema([
             { name: "Início", url: base },
             { name: "Quem somos", url: `${base}/sobre` },
