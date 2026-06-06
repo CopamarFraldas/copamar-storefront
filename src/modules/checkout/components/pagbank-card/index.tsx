@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Button } from "@medusajs/ui"
 import { createPagbankCard, checkPagbankStatus } from "@lib/data/pagbank"
 import { placeOrder } from "@lib/data/cart"
+import { validarEstoqueCarrinho } from "@lib/data/estoque"
 import { isValidCpfOrCnpj, maskCpfCnpj } from "@lib/util/cpf"
 import ErrorMessage from "../error-message"
 
@@ -98,6 +99,7 @@ const PagBankCard = ({
   const [error, setError] = useState<string | null>(null)
   const [sdkReady, setSdkReady] = useState(false)
   const sdkRef = useRef(false)
+  const pagandoRef = useRef(false) // trava síncrona anti double-submit
 
   const brand = brandOf(number)
 
@@ -176,8 +178,23 @@ const PagBankCard = ({
       return setError("Módulo de pagamento ainda carregando. Tente novamente em instantes.")
     }
 
+    // trava SÍNCRONA anti double-submit (review 06/06): o guard de stage lê o
+    // closure do render atual — 2 cliques no mesmo tick passariam ambos e
+    // tokenizariam/cobrariam 2×; o ref fecha a janela. Liberado no finally
+    // (os guards de stage cobrem os estados pós-submissão).
+    if (pagandoRef.current) return
+    pagandoRef.current = true
+
     setStage("processing")
     try {
+      // gate anti-oversell (#46): saldo FRESCO antes de cobrar o cartão —
+      // sem isso, estoque que caiu com o item já no carrinho viraria
+      // "cobrado mas sem pedido"
+      const estoque = await validarEstoqueCarrinho()
+      if (!estoque.ok) {
+        setStage("form")
+        return setError(estoque.mensagem)
+      }
       // ── tokenização NO CLIENTE (o número não sai daqui) ──
       const enc = PagSeguro.encryptCard({
         publicKey: process.env.NEXT_PUBLIC_PAGBANK_PUBLIC_KEY,
@@ -216,6 +233,8 @@ const PagBankCard = ({
     } catch (e: any) {
       setStage("form")
       setError(e?.message || "Falha ao processar o cartão.")
+    } finally {
+      pagandoRef.current = false
     }
   }
 

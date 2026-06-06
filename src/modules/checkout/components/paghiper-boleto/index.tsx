@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Button } from "@medusajs/ui"
 import { createPagHiperBoleto } from "@lib/data/paghiper"
 import { placeOrder } from "@lib/data/cart"
+import { validarEstoqueCarrinho } from "@lib/data/estoque"
 import { isValidCpfOrCnpj, maskCpfCnpj } from "@lib/util/cpf"
 import ErrorMessage from "../error-message"
 
@@ -51,6 +52,7 @@ const PagHiperBoleto = ({
   const [cpf, setCpf] = useState("")
   const [boleto, setBoleto] = useState<Boleto | null>(null)
   const [loading, setLoading] = useState(false)
+  const gerandoRef = useRef(false) // trava síncrona anti double-submit
   const [finalizing, setFinalizing] = useState(false)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -66,8 +68,19 @@ const PagHiperBoleto = ({
       setError("Informe um CPF ou CNPJ válido.")
       return
     }
+    // trava SÍNCRONA (review 06/06): `loading` é closure do render — 2 cliques
+    // no mesmo tick passariam ambos e emitiriam 2 boletos
+    if (gerandoRef.current) return
+    gerandoRef.current = true
     setLoading(true)
     try {
+      // gate anti-oversell (#46): saldo FRESCO antes de emitir o boleto —
+      // evita boleto emitido pra produto que acabou de esgotar
+      const estoque = await validarEstoqueCarrinho()
+      if (!estoque.ok) {
+        setError(estoque.mensagem)
+        return
+      }
       const r = await createPagHiperBoleto(cartId, docToUse)
       if (!r.linha_digitavel || !r.transaction_id) {
         throw new Error("Não foi possível gerar o boleto. Tente novamente.")
@@ -77,6 +90,7 @@ const PagHiperBoleto = ({
     } catch (e: any) {
       setError(e?.message || "Falha ao gerar o boleto.")
     } finally {
+      gerandoRef.current = false
       setLoading(false)
     }
   }

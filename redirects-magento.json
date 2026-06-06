@@ -237,7 +237,7 @@
  },
  {
   "source": "/fralda-geriatrica-pacotao-com-50-fraldas-g.html",
-  "destination": "/br/products/fralda-noturna-g-master-clean-c-50"
+  "destination": "/br/categories/fraldas-geriatricas"
  },
  {
   "source": "/fralda-geriatrica-adultcare-media-plus.html",
@@ -257,7 +257,7 @@
  },
  {
   "source": "/fralda-geriatrica-g-vitacare-com-50-unidades.html",
-  "destination": "/br/products/fralda-noturna-g-master-clean-c-50"
+  "destination": "/br/categories/fraldas-geriatricas"
  },
  {
   "source": "/fralda-geriatrica-vitacare-com-46-unidades-eg.html",
@@ -313,7 +313,7 @@
  },
  {
   "source": "/fralda-geriatrica-noturna-grande-master-clean.html",
-  "destination": "/br/products/fralda-noturna-g-master-clean-c-50"
+  "destination": "/br/categories/fraldas-geriatricas"
  },
  {
   "source": "/fralda-geriatrica-noturna-master-clean-com-46.html",
@@ -553,7 +553,7 @@
  },
  {
   "source": "/politica-de-privacidade",
-  "destination": "/br"
+  "destination": "/br/politica-de-privacidade"
  },
  {
   "source": "/quem-somos",

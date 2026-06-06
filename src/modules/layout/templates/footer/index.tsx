@@ -142,6 +142,12 @@ const Atendimento = () => (
       >
         Perguntas frequentes
       </LocalizedClientLink>
+      <LocalizedClientLink
+        href="/politica-de-privacidade"
+        className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
+      >
+        Política de Privacidade
+      </LocalizedClientLink>
     </div>
   </div>
 )

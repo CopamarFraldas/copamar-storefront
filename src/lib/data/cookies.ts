@@ -35,18 +35,33 @@ export const getCacheTag = async (tag: string): Promise<string> => {
 
 export const getCacheOptions = async (
   tag: string
-): Promise<{ tags: string[] } | {}> => {
+): Promise<{ tags: string[]; revalidate?: number } | {}> => {
   if (typeof window !== "undefined") {
     return {}
   }
 
   const cacheTag = await getCacheTag(tag)
 
+  // Tag BASE global (#46 anti-oversell): a sync de estoque do Bling invalida
+  // via /api/revalidate?tags=products — sem a tag base, as entradas só teriam
+  // a tag por-visitante (products-<cacheId>) e o site mostraria estoque velho.
+  // Também cobre visitante SEM cookie (bots/Google), que antes gerava cache
+  // sem tag nenhuma (= nunca invalidável).
+  // SÓ dados PÚBLICOS levam a tag base (review 06/06): colar tag global em
+  // carts/customers/orders seria footgun de invalidação cruzada de dados
+  // por-usuário.
+  const PUBLICAS = ["products", "regions", "collections", "categories"]
+  const base = PUBLICAS.includes(tag) ? [tag] : []
+  // teto de idade (review 06/06): com a tag base, o revalidateTag global
+  // derruba TUDO de uma vez; o revalidate por tempo vira SWR — serve stale e
+  // renova 1 por vez, amortecendo o pico no backend (thundering herd).
+  const revalidate = tag === "products" ? 300 : 3600
+
   if (!cacheTag) {
-    return {}
+    return base.length ? { tags: base, revalidate } : {}
   }
 
-  return { tags: [`${cacheTag}`] }
+  return { tags: [`${cacheTag}`, ...base], revalidate }
 }
 
 export const setAuthToken = async (token: string) => {

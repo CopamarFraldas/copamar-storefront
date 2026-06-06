@@ -16,6 +16,8 @@ import { useState } from "react"
 type ItemMobileProps = {
   item: HttpTypes.StoreCartLineItem
   currencyCode: string
+  /** saldo disponível da variant (#46 anti-oversell) — undefined = desconhecido */
+  disponivel?: number
 }
 
 /**
@@ -24,7 +26,7 @@ type ItemMobileProps = {
  * com 48px. Aqui: foto MAIOR (96px) à esquerda, nome em largura legível,
  * variação curta embaixo, e linha de quantidade + total clara.
  */
-const ItemMobile = ({ item, currencyCode }: ItemMobileProps) => {
+const ItemMobile = ({ item, currencyCode, disponivel }: ItemMobileProps) => {
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -36,7 +38,14 @@ const ItemMobile = ({ item, currencyCode }: ItemMobileProps) => {
       .finally(() => setUpdating(false))
   }
 
-  const maxQuantity = 10
+  // cap pelo SALDO REAL (#46 anti-oversell); nunca abaixo da quantity atual
+  // (pra dar pra REDUZIR)
+  const capSaldo =
+    item.variant?.manage_inventory && !item.variant?.allow_backorder && disponivel != null
+      ? Math.min(10, Math.max(0, disponivel))
+      : 10
+  const maxQuantity = Math.max(item.quantity, capSaldo)
+  const acimaDoSaldo = disponivel != null && item.quantity > Math.max(0, disponivel)
 
   return (
     <li
@@ -90,6 +99,11 @@ const ItemMobile = ({ item, currencyCode }: ItemMobileProps) => {
             <DeleteButton id={item.id} data-testid="product-delete-button" />
             {updating && <Spinner />}
           </div>
+          {acimaDoSaldo && (
+            <span className="text-xs text-rose-500" data-testid="stock-warning">
+              Só {Math.max(0, disponivel!)} em estoque
+            </span>
+          )}
           <div className="flex flex-col items-end">
             {/* unitário inline (LineItemUnitPrice é um bloco <div> — dentro de
                 <span> quebrava o "cada" pra linha de baixo; revisão 04/06) */}

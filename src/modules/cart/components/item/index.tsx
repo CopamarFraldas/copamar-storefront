@@ -18,9 +18,11 @@ type ItemProps = {
   item: HttpTypes.StoreCartLineItem
   type?: "full" | "preview"
   currencyCode: string
+  /** saldo disponível da variant (#46 anti-oversell) — undefined = desconhecido */
+  disponivel?: number
 }
 
-const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
+const Item = ({ item, type = "full", currencyCode, disponivel }: ItemProps) => {
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -40,9 +42,14 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       })
   }
 
-  // TODO: Update this to grab the actual max inventory
-  const maxQtyFromInventory = 10
-  const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+  // Quantidade máxima respeitando o SALDO REAL (#46 anti-oversell): cap em
+  // min(10, disponível); nunca abaixo da quantity atual (pra dar pra REDUZIR).
+  const capSaldo =
+    item.variant?.manage_inventory && !item.variant?.allow_backorder && disponivel != null
+      ? Math.min(10, Math.max(0, disponivel))
+      : 10
+  const maxQuantity = Math.max(item.quantity, capSaldo)
+  const acimaDoSaldo = disponivel != null && item.quantity > Math.max(0, disponivel)
 
   return (
     <Table.Row className="w-full" data-testid="product-row">
@@ -87,12 +94,11 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               className="w-14 h-10 p-4"
               data-testid="product-select-button"
             >
-              {/* TODO: Update this with the v2 way of managing inventory */}
               {/* (a <option value=1> extra do starter foi removida — duplicava
                   o "1" no dropdown de quantidade) */}
               {Array.from(
                 {
-                  length: Math.min(maxQuantity, 10),
+                  length: maxQuantity,
                 },
                 (_, i) => (
                   <option value={i + 1} key={i}>
@@ -103,6 +109,11 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             </CartItemSelect>
             {updating && <Spinner />}
           </div>
+          {acimaDoSaldo && (
+            <Text className="txt-small text-rose-500 mt-1" data-testid="stock-warning">
+              Só {Math.max(0, disponivel!)} em estoque — reduza a quantidade
+            </Text>
+          )}
           <ErrorMessage error={error} data-testid="product-error-message" />
         </Table.Cell>
       )}

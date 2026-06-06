@@ -179,7 +179,14 @@ const CookieConsent = () => {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
           <p className="text-xs leading-snug text-ui-fg-subtle sm:flex-1">
             🍃 Usamos cookies pra melhorar sua experiência. Você decide o que
-            aceitar — os essenciais são sempre necessários.
+            aceitar — os essenciais são sempre necessários. Saiba mais na nossa{" "}
+            <a
+              href="/br/politica-de-privacidade"
+              className="underline hover:text-ui-fg-base"
+            >
+              Política de Privacidade
+            </a>
+            .
           </p>
           {!detalhe && (
             <div className="flex shrink-0 gap-2">

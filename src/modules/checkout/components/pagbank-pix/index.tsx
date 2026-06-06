@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Button } from "@medusajs/ui"
 import { createPagbankPix, checkPagbankStatus } from "@lib/data/pagbank"
 import { placeOrder } from "@lib/data/cart"
+import { validarEstoqueCarrinho } from "@lib/data/estoque"
 import { isValidCpfOrCnpj, maskCpfCnpj } from "@lib/util/cpf"
 import ErrorMessage from "../error-message"
 
@@ -49,6 +50,7 @@ const PagBankPix = ({
   const [warn, setWarn] = useState<string | null>(null)
   const [finalizeError, setFinalizeError] = useState<string | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const gerandoRef = useRef(false) // trava síncrona anti double-submit
   const ticksRef = useRef(0)
   const failsRef = useRef(0)
 
@@ -74,8 +76,19 @@ const PagBankPix = ({
       setError("Informe um CPF ou CNPJ válido.")
       return
     }
+    // trava SÍNCRONA (review 06/06): `loading` é closure do render — 2 cliques
+    // no mesmo tick passariam ambos e gerariam 2 cobranças PIX
+    if (gerandoRef.current) return
+    gerandoRef.current = true
     setLoading(true)
     try {
+      // gate anti-oversell (#46): saldo FRESCO antes de gerar o QR — depois
+      // que o cliente paga o PIX, não dá mais pra voltar atrás
+      const estoque = await validarEstoqueCarrinho()
+      if (!estoque.ok) {
+        setError(estoque.mensagem)
+        return
+      }
       const r = await createPagbankPix(cartId, docToUse)
       if (!r.qr_text || !r.order_id) throw new Error("Não foi possível gerar o PIX. Tente novamente.")
       setQrText(r.qr_text)
@@ -85,6 +98,7 @@ const PagBankPix = ({
     } catch (e: any) {
       setError(e?.message || "Falha ao gerar o PIX.")
     } finally {
+      gerandoRef.current = false
       setLoading(false)
     }
   }

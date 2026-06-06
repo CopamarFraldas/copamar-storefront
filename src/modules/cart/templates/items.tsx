@@ -1,4 +1,5 @@
 import repeat from "@lib/util/repeat"
+import { saldosPorVariant } from "@lib/data/estoque"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Table } from "@medusajs/ui"
 
@@ -10,11 +11,17 @@ type ItemsTemplateProps = {
   cart?: HttpTypes.StoreCart
 }
 
-const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
+const ItemsTemplate = async ({ cart }: ItemsTemplateProps) => {
   const items = cart?.items
   const sorted = items
     ? [...items].sort((a, b) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1))
     : null
+
+  // saldo FRESCO por variant (#46 anti-oversell): limita o seletor de
+  // quantidade ao disponível real, em vez do 10 fixo do starter
+  const saldos = sorted
+    ? await saldosPorVariant(sorted.map((i) => i.product_id ?? "").filter(Boolean))
+    : {}
   return (
     <div>
       <div className="pb-3 flex items-center">
@@ -25,7 +32,12 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
       <ul className="small:hidden">
         {sorted
           ? sorted.map((item) => (
-              <ItemMobile key={item.id} item={item} currencyCode={cart!.currency_code} />
+              <ItemMobile
+                key={item.id}
+                item={item}
+                currencyCode={cart!.currency_code}
+                disponivel={item.variant_id ? saldos[item.variant_id] : undefined}
+              />
             ))
           : repeat(3).map((i) => (
               <li key={i} className="flex gap-x-4 border-b border-ui-border-base py-4">
@@ -56,7 +68,12 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
         <Table.Body>
           {sorted
             ? sorted.map((item) => (
-                <Item key={item.id} item={item} currencyCode={cart!.currency_code} />
+                <Item
+                  key={item.id}
+                  item={item}
+                  currencyCode={cart!.currency_code}
+                  disponivel={item.variant_id ? saldos[item.variant_id] : undefined}
+                />
               ))
             : repeat(5).map((i) => <SkeletonLineItem key={i} />)}
         </Table.Body>
