@@ -3,6 +3,7 @@ import { robotsMeta } from "@lib/util/seo"
 import { Metadata } from "next"
 import Script from "next/script"
 import CookieConsent from "@modules/common/components/cookie-consent"
+import GoogleAdsTag from "@modules/common/components/google-ads-tag"
 import IdentifyOnLogin from "@modules/common/components/identify-on-login"
 import StructuredData from "@modules/common/components/structured-data"
 import ThemeProvider from "@modules/common/components/theme-provider"
@@ -67,6 +68,8 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       <body className="bg-ui-bg-base text-ui-fg-base">
         <link rel="preconnect" href={R2_HOST} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={R2_HOST} />
+        {/* Google Ads gtag + Consent Mode v2 (#65) — todas as páginas */}
+        <GoogleAdsTag />
         <ThemeProvider>
           <StructuredData />
           <main className="relative">{props.children}</main>
