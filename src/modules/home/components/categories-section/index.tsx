@@ -7,7 +7,9 @@ const PK_HEADER = "x-publishable-api-key"
 // Pra cada handle de categoria pai, qual handle/título usar pra puxar o thumbnail.
 const REPRESENTATIVES: Record<string, string[]> = {
   "fraldas-geriatricas": ["Tena Confort", "Tena Slip Dermacare"],
-  "roupa-intima":         ["Tena Pants Confort"],
+  // c/32 explícito (Marco 06/06): o match genérico pegava o c/16, cuja foto
+  // fica pequena em comparação com os outros cards
+  "roupa-intima":         ["Tena Pants Confort P/M c/ 32", "Tena Pants Confort"],
   "absorvente-geriatrico":["Adultcare Premium", "Adultcare"],
   "absorvente-feminino":  ["Tena Lady Discreet"],
   "absorvente-masculino": ["Tena Men Level 3", "Tena Men"],
