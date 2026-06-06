@@ -88,4 +88,15 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+// Sentry (#67): wrap pro build instrumentado. Upload de SOURCE MAPS só
+// acontece quando SENTRY_AUTH_TOKEN estiver setado (server-side, fora do git)
+// — sem o token o build segue normal, apenas sem stack traces des-minificados.
+const { withSentryConfig } = require("@sentry/nextjs")
+module.exports = withSentryConfig(nextConfig, {
+  org: "copamar-distribuidora-e-atacad",
+  project: "javascript-nextjs",
+  silent: true,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  widenClientFileUpload: true,
+  disableLogger: true,
+})
