@@ -31,8 +31,19 @@ export default function PacLoader({ children }: { children: React.ReactNode }) {
   const tick = () => {
     const s = st.current
     if (!s.rodando) return
-    const passo = Math.max(0.004, (s.alvo - s.prog) * 0.06)
-    s.prog = Math.min(s.alvo, s.prog + passo)
+    // Curva HOMOGÊNEA (ajuste Marco 06/06): andamento quase constante, sem
+    // arrancada; perto do fim da carga ele RASTEJA (nunca para seco); o
+    // fechamento pós-load é suave (~1s), não um teleporte.
+    let passo: number
+    if (s.alvo >= 1) {
+      // página pronta → fecha a volta suave
+      passo = Math.min(0.008, 0.003 + (1 - s.prog) * 0.015)
+    } else {
+      // carregando → desacelera gradualmente, rastejo mínimo sempre
+      const dist = Math.max(0.05, 0.95 - s.prog)
+      passo = Math.max(0.0008, dist * 0.01)
+    }
+    s.prog = Math.min(s.alvo >= 1 ? 1 : 0.95, s.prog + passo)
     setProgresso(s.prog)
     if (s.prog >= 1) {
       // volta completa → fade (350ms) → some e reseta
@@ -53,7 +64,7 @@ export default function PacLoader({ children }: { children: React.ReactNode }) {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
     s.rodando = true
     s.prog = 0
-    s.alvo = 0.8 // espera o "pronto" pra fechar os últimos 20%
+    s.alvo = 0.95 // teto da fase de carga (com rastejo — nunca para seco)
     setCor((c) => (c + 1) % CORES.length)
     setProgresso(0)
     setAtivo(true)
