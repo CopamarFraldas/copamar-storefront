@@ -1,3 +1,4 @@
+import { buscarIdsPorFamilia } from "@lib/data/busca"
 import { listProducts } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -22,11 +23,16 @@ const TamanhosIrmaos = async ({
   const familia: string | undefined = meta.familia
   if (!familia || !meta.tamanho) return null
 
-  // busca textual ampla pela família e filtra pela familia EXATA
-  const termo = familia.replace(/-/g, " ")
+  // 1º: match EXATO por metadata.familia (06/06 — a busca textual por
+  // substring perdia famílias cujo slug pula palavras do título);
+  // fallback: busca textual ampla + filtro exato (comportamento antigo)
+  const idsFamilia = await buscarIdsPorFamilia(familia, 30)
+  const queryParams = idsFamilia?.length
+    ? ({ id: idsFamilia, limit: 30, fields: "id,title,handle,+metadata" } as any)
+    : ({ q: familia.replace(/-/g, " "), limit: 30, fields: "id,title,handle,+metadata" } as any)
   const { response } = await listProducts({
     countryCode,
-    queryParams: { q: termo, limit: 30, fields: "id,title,handle,+metadata" } as any,
+    queryParams,
   }).catch(() => ({ response: { products: [] as HttpTypes.StoreProduct[] } }))
 
   const irmaos = (response.products || [])
