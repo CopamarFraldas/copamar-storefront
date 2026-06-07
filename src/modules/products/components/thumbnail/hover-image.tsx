@@ -30,7 +30,10 @@ const HoverImage = ({ src }: { src: string }) => {
       draggable={false}
       quality={50}
       sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
-      className="absolute inset-0 object-contain object-center p-2 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100 will-change-[opacity]"
+      // bg-white: a 2ª imagem pode ser PNG TRANSPARENTE (galerias oficiais
+      // Tena) — sem fundo opaco a 1ª imagem "vaza" por baixo no hover
+      // (Marco viu na Slip Dermacare M/G/EG, 07/06)
+      className="absolute inset-0 bg-white object-contain object-center p-2 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100 will-change-[opacity]"
     />
   )
 }
