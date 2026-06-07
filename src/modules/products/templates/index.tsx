@@ -46,33 +46,25 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     <>
       {/* breadcrumb visível: caminho de volta pra categoria (#54 linking) */}
       <BreadcrumbPdp product={product} />
+      {/* ORDEM MOBILE (Marco 07/06, padrão Tena/Amazon) é a ORDEM DO DOM —
+          título → imagens → comprar/CEP → descrição colapsada — robusta a
+          qualquer CSS (nada de display:contents/order, que quebrava com CSS
+          cacheado no celular). Desktop (small:) vira GRID 3 colunas:
+          esquerda = título+descrição · centro = galeria · direita = ações. */}
       <div
-        className="content-container  flex flex-col small:flex-row small:items-start py-6 relative"
+        className="content-container py-6 relative small:grid small:grid-cols-[300px_1fr_300px] small:grid-rows-[auto_1fr] small:items-start small:gap-x-8"
         data-testid="product-container"
         data-track-sku={product.handle || undefined}
         data-track-categoria={trackCategoria || undefined}
         data-track-preco={trackPreco != null ? String(trackPreco) : undefined}
       >
-        {/* ORDEM MOBILE (Marco 07/06, padrão Tena/Amazon): título → imagens →
-            tamanhos/comprar/CEP → descrição COLAPSADA. No desktop nada muda:
-            `contents` no mobile promove os netos ao flex do container (cada um
-            com seu `order`); em small: vira a coluna esquerda de sempre. */}
-        <div className="contents small:flex small:flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] small:w-full small:gap-y-6">
-          <div className="order-1 small:order-none w-full pt-4 small:pt-0">
-            <ProductInfo product={product} parte="cabecalho" />
-          </div>
-          <div className="order-4 small:order-none w-full py-6 small:py-0 flex flex-col gap-y-6">
-            <DescricaoExpansivel>
-              <div className="flex flex-col gap-y-6">
-                <ProductInfo product={product} parte="descricao" />
-                {/* specs factuais em tabela (GEO/AEO #54) */}
-                <ProductSpecs product={product} />
-                <ProductTabs product={product} />
-              </div>
-            </DescricaoExpansivel>
-          </div>
+        {/* 1. título (mobile: topo · desktop: coluna esquerda, linha 1) */}
+        <div className="w-full pt-2 small:pt-0 small:col-start-1 small:row-start-1">
+          <ProductInfo product={product} parte="cabecalho" />
         </div>
-        <div className="order-2 small:order-none block w-full relative pt-4 small:pt-0">
+
+        {/* 2. galeria + 360 (mobile: logo após o título · desktop: centro) */}
+        <div className="block w-full relative pt-4 small:pt-0 small:col-start-2 small:row-start-1 small:row-span-2">
           <ImageGallery images={images} title={product.title} />
           {/* 🌀 giro 360° oficial (Marco 07/06) — produtos com metadata.spin360 */}
           {(product.metadata as any)?.spin360 && (
@@ -84,7 +76,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
             </div>
           )}
         </div>
-        <div className="order-3 small:order-none flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-12">
+
+        {/* 3. tamanhos → comprar → CEP (desktop: coluna direita, sticky) */}
+        <div className="flex flex-col w-full py-8 gap-y-12 small:py-0 small:col-start-3 small:row-start-1 small:row-span-2 small:sticky small:top-48 small:self-start">
           <ProductOnboardingCta />
           {/* tamanhos irmãos (P·M·G·EG) — religa os produtos da mesma família */}
           <TamanhosIrmaos product={product} countryCode={countryCode} />
@@ -102,6 +96,19 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           {/* consultor de frete por CEP (nº1 + parte do nº4 da PDP) — cotação
               real com o peso da variante; lista completa de modalidades. */}
           <FreteCep variantId={product.variants?.[0]?.id} />
+        </div>
+
+        {/* 4. descrição/specs/abas POR ÚLTIMO no mobile, colapsadas
+              (desktop: coluna esquerda, linha 2, sempre abertas) */}
+        <div className="w-full py-4 small:py-0 small:col-start-1 small:row-start-2 small:mt-6">
+          <DescricaoExpansivel>
+            <div className="flex flex-col gap-y-6">
+              <ProductInfo product={product} parte="descricao" />
+              {/* specs factuais em tabela (GEO/AEO #54) */}
+              <ProductSpecs product={product} />
+              <ProductTabs product={product} />
+            </div>
+          </DescricaoExpansivel>
         </div>
       </div>
       <div
