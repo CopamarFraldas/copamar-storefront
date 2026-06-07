@@ -5,38 +5,50 @@ import ReviewsBadge from "@modules/common/components/reviews-badge"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
+  /** "cabecalho" = só collection+título+badge; "descricao" = só o texto.
+   *  Permite à PDP mobile mostrar o título em cima e a descrição colapsada
+   *  embaixo (Marco 07/06). Sem a prop, renderiza tudo (compat). */
+  parte?: "cabecalho" | "descricao"
 }
 
-const ProductInfo = ({ product }: ProductInfoProps) => {
+const ProductInfo = ({ product, parte }: ProductInfoProps) => {
+  const mostraCabecalho = parte !== "descricao"
+  const mostraDescricao = parte !== "cabecalho"
   return (
-    <div id="product-info">
+    <div id={parte === "descricao" ? "product-info-desc" : "product-info"}>
       <div className="flex flex-col gap-y-4 lg:max-w-[500px] mx-auto">
-        {product.collection && (
-          <LocalizedClientLink
-            href={`/collections/${product.collection.handle}`}
-            className="text-medium text-ui-fg-subtle hover:text-ui-fg-subtle"
-          >
-            {product.collection.title}
-          </LocalizedClientLink>
+        {mostraCabecalho && (
+          <>
+            {product.collection && (
+              <LocalizedClientLink
+                href={`/collections/${product.collection.handle}`}
+                className="text-medium text-ui-fg-subtle hover:text-ui-fg-subtle"
+              >
+                {product.collection.title}
+              </LocalizedClientLink>
+            )}
+            {/* título = h1 da página (era h2, página ficava sem h1) */}
+            <Heading
+              level="h1"
+              className="text-3xl leading-10 text-ui-fg-base"
+              data-testid="product-title"
+            >
+              {product.title}
+            </Heading>
+
+            {/* prova social real da loja (C1) */}
+            <ReviewsBadge />
+          </>
         )}
-        {/* título = h1 da página (era h2, página ficava sem h1) */}
-        <Heading
-          level="h1"
-          className="text-3xl leading-10 text-ui-fg-base"
-          data-testid="product-title"
-        >
-          {product.title}
-        </Heading>
 
-        {/* prova social real da loja (C1) */}
-        <ReviewsBadge />
-
-        <Text
-          className="text-medium text-ui-fg-subtle whitespace-pre-line"
-          data-testid="product-description"
-        >
-          {product.description}
-        </Text>
+        {mostraDescricao && (
+          <Text
+            className="text-medium text-ui-fg-subtle whitespace-pre-line"
+            data-testid="product-description"
+          >
+            {product.description}
+          </Text>
+        )}
       </div>
     </div>
   )
