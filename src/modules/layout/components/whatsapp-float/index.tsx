@@ -17,7 +17,26 @@ const WAIcon = ({ className = "" }: { className?: string }) => (
 
 const WhatsAppFloat = () => {
   const [open, setOpen] = useState(false)
+  // drawer do carrinho aberto → o float é EMPURRADO pra esquerda do painel
+  // e volta pro cantinho com bounce ao fechar (Marco 07/06)
+  const [empurrado, setEmpurrado] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const onDrawer = (e: Event) => {
+      const aberto = Boolean((e as CustomEvent).detail?.aberto)
+      setEmpurrado(aberto)
+      if (aberto) setOpen(false) // recolhe as opções se estavam abertas
+    }
+    window.addEventListener("copamar-drawer", onDrawer)
+    return () => window.removeEventListener("copamar-drawer", onDrawer)
+  }, [])
+
+  // largura do painel do carrinho (max 420px; mobile = tela toda → o float
+  // desliza pra fora da tela junto com a página, e volta ao fechar)
+  const deslocamento = empurrado
+    ? `translateX(-${Math.min(420, typeof window !== "undefined" ? window.innerWidth : 420)}px)`
+    : "translateX(0)"
 
   // fecha ao clicar fora ou ESC
   useEffect(() => {
@@ -41,6 +60,12 @@ const WhatsAppFloat = () => {
       // subir não bastava — o painel "Gerenciar" é alto e o float (z-100)
       // cobria o toggle de Marketing. Ao decidir o consentimento, ele volta.
       className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3 [html.consent-bar-open_&]:hidden"
+      style={{
+        transform: deslocamento,
+        // bounce suave (overshoot) na ida e na volta — "animação cool"
+        transition: "transform 480ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+        willChange: "transform",
+      }}
     >
       {/* opções (aparecem quando aberto) */}
       {open && (

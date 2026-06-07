@@ -47,12 +47,56 @@ const CartDrawer = ({ cart: cartState }: { cart?: HttpTypes.StoreCart | null }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalItems])
 
-  // ESC fecha
+  // ESC fecha + GESTÃO DE FOCO (QA noturno): foco entra no painel ao abrir,
+  // Tab fica preso dentro (trap), e volta pro gatilho ao fechar — obrigações
+  // de um aria-modal de verdade
+  const painelRef = useRef<HTMLElement | null>(null)
+  const gatilhoRef = useRef<HTMLButtonElement | null>(null)
   useEffect(() => {
     if (!aberto) return
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setAberto(false)
+    const anterior = document.activeElement as HTMLElement | null
+    // foco inicial: botão fechar (1º focável do painel)
+    setTimeout(() => {
+      painelRef.current?.querySelector<HTMLElement>("button, a")?.focus()
+    }, 50)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") return setAberto(false)
+      if (e.key !== "Tab" || !painelRef.current) return
+      const focaveis = painelRef.current.querySelectorAll<HTMLElement>(
+        'button, a[href], input, [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focaveis.length) return
+      const primeiro = focaveis[0]
+      const ultimo = focaveis[focaveis.length - 1]
+      if (e.shiftKey && document.activeElement === primeiro) {
+        e.preventDefault()
+        ultimo.focus()
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault()
+        primeiro.focus()
+      }
+    }
     window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
+    return () => {
+      window.removeEventListener("keydown", onKey)
+      // devolve o foco pro gatilho (ou o que estava focado antes)
+      ;(gatilhoRef.current ?? anterior)?.focus?.()
+    }
+  }, [aberto])
+
+  // avisa o resto da UI (ex.: botão flutuante do WhatsApp) que o painel
+  // abriu/fechou — o float desliza junto e volta com bounce (Marco 07/06)
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("copamar-drawer", { detail: { aberto } })
+    )
+    return () => {
+      if (aberto) {
+        window.dispatchEvent(
+          new CustomEvent("copamar-drawer", { detail: { aberto: false } })
+        )
+      }
+    }
   }, [aberto])
 
   const itens = (cartState?.items || [])
@@ -64,6 +108,7 @@ const CartDrawer = ({ cart: cartState }: { cart?: HttpTypes.StoreCart | null }) 
       {/* ícone 🛒 + badge — clique ABRE o drawer */}
       <button
         type="button"
+        ref={gatilhoRef}
         onClick={() => setAberto(true)}
         className="flex h-full items-center gap-x-1.5 text-ui-fg-subtle hover:text-ui-fg-base"
         data-testid="nav-cart-link"
@@ -95,6 +140,7 @@ const CartDrawer = ({ cart: cartState }: { cart?: HttpTypes.StoreCart | null }) 
             onClick={() => setAberto(false)}
           />
           <aside
+            ref={painelRef as any}
             className="absolute right-0 top-0 flex h-full w-full max-w-[420px] flex-col bg-ui-bg-base shadow-2xl animate-in slide-in-from-right duration-200"
             data-testid="nav-cart-dropdown"
           >

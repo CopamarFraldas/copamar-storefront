@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
+import QuantityInput from "@modules/cart/components/quantity-input"
 import { isEqual } from "lodash"
 import { useParams, usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -38,6 +39,9 @@ export default function ProductActions({
 
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
+  // quantidade escolhida ANTES de adicionar (Marco 07/06) — vai direto pro
+  // carrinho na quantidade certa
+  const [quantidade, setQuantidade] = useState(1)
   const countryCode = useParams().countryCode as string
 
   // If there is only 1 variant, preselect the options
@@ -134,11 +138,14 @@ export default function ProductActions({
     const fardoVariant = meta.fardo_de_variant as string | undefined
     const fardoN = Number(meta.fardo_n) || 0
 
+    const qtd = Math.max(1, quantidade)
     await addToCart({
       variantId: fardoVariant && fardoN > 0 ? fardoVariant : selectedVariant.id,
-      quantity: fardoVariant && fardoN > 0 ? fardoN : 1,
+      // fardo: cada "1 fardo" = N unidades da UNIDADE → qtd fardos = N×qtd
+      quantity: (fardoVariant && fardoN > 0 ? fardoN : 1) * qtd,
       countryCode,
     })
+    setQuantidade(1)
 
     setIsAdding(false)
   }
@@ -200,6 +207,17 @@ export default function ProductActions({
           )
         })()}
 
+        {/* quantidade antes de adicionar (Marco 07/06) — estoque limita */}
+        {inStock && selectedVariant && (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-ui-fg-subtle">Quantidade</span>
+            <QuantityInput
+              value={quantidade}
+              max={(selectedVariant as any)?.inventory_quantity || undefined}
+              onChange={setQuantidade}
+            />
+          </div>
+        )}
         <Button
           onClick={handleAddToCart}
           disabled={
