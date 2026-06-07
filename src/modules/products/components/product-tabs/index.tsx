@@ -3,6 +3,7 @@
 import Back from "@modules/common/icons/back"
 import FastDelivery from "@modules/common/icons/fast-delivery"
 import Refresh from "@modules/common/icons/refresh"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 import Accordion from "./accordion"
 import { HttpTypes } from "@medusajs/types"
@@ -41,7 +42,7 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
   )
 }
 
-const ProductInfoTab = ({ product }: ProductTabsProps) => {
+export const ProductInfoTab = ({ product }: ProductTabsProps) => {
   return (
     <div className="text-small-regular py-8">
       <div className="grid grid-cols-2 gap-x-8">
@@ -78,7 +79,7 @@ const ProductInfoTab = ({ product }: ProductTabsProps) => {
   )
 }
 
-const ShippingInfoTab = () => {
+export const ShippingInfoTab = () => {
   return (
     <div className="text-small-regular py-8">
       <div className="grid grid-cols-1 gap-y-8">
@@ -88,7 +89,12 @@ const ShippingInfoTab = () => {
             <span className="font-semibold">Entrega rápida</span>
             <p className="max-w-sm">
               Seu pedido chega em 3 a 5 dias úteis no ponto de retirada ou
-              no conforto da sua casa.
+              no conforto da sua casa.*
+            </p>
+            <p className="max-w-sm mt-1 text-xs text-ui-fg-subtle">
+              *Prazo válido para as regiões atendidas pela nossa entrega
+              própria (as mesmas do frete grátis). Para as demais regiões,
+              o prazo aparece ao calcular o frete pelo CEP.
             </p>
           </div>
         </div>
@@ -98,7 +104,11 @@ const ShippingInfoTab = () => {
             <span className="font-semibold">Trocas simples</span>
             <p className="max-w-sm">
               Produto não atendeu? Sem problema — fazemos a troca por um
-              novo, rapidinho.
+              novo, rapidinho, conforme as regras do Código de Defesa do
+              Consumidor: até 7 dias após o recebimento e com a embalagem
+              lacrada (produto de higiene com pacote violado não pode ser
+              trocado). Defeito de fábrica? Troca em até 30 dias, mesmo
+              aberto.
             </p>
           </div>
         </div>
@@ -107,9 +117,16 @@ const ShippingInfoTab = () => {
           <div>
             <span className="font-semibold">Devolução fácil</span>
             <p className="max-w-sm">
-              É só devolver o produto que reembolsamos seu dinheiro. Sem
-              burocracia — cuidamos pra que a devolução seja simples e
-              tranquila.
+              É só devolver o produto que reembolsamos seu dinheiro,
+              conforme as regras do CDC. Sem burocracia — cuidamos pra que
+              a devolução seja simples e tranquila. Detalhes na nossa{" "}
+              <LocalizedClientLink
+                href="/trocas-e-devolucoes"
+                className="underline underline-offset-2 hover:text-ui-fg-base"
+              >
+                política de Trocas e Devoluções
+              </LocalizedClientLink>
+              .
             </p>
           </div>
         </div>
