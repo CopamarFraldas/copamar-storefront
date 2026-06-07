@@ -59,6 +59,8 @@ const nextConfig = {
       // Fotos dos produtos migrados (Bling→Medusa): referência direta às origens
       // externas até o cutover (~22/06), quando migram p/ R2. Ver imagens-magento-urls.log.
       { protocol: "https", hostname: "copamarfraldas.com.br" },
+      // fotos oficiais Tena/Essity (CDN VTEX) — refs externas até o cutover
+      { protocol: "https", hostname: "tenabr.vtexassets.com" },
       { protocol: "https", hostname: "http2.mlstatic.com" },
       { protocol: "https", hostname: "www.fraldasgeriatrica.com.br" },
       // Fotos migradas pro Cloudflare R2 (Fase S1.5) — destino definitivo das imagens
