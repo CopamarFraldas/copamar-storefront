@@ -64,3 +64,6 @@ dump.rdb
 # Lock files são regenerados pelo container — não versionar conflito
 package-lock.json
 .shots/
+
+# mídia oficial Tena (96MB — backup em gdrive:Medusa-Assets, não no git)
+public/produtos/tena/

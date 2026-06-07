@@ -4,8 +4,11 @@ import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
 import MobileCheckoutBar from "../components/mobile-checkout-bar"
 import AvisoRecompra from "../components/aviso-recompra"
+import FreeShippingBar from "../components/free-shipping-bar"
+import RecomendadosCart from "../components/recomendados-cart"
 import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
+import { Suspense } from "react"
 
 const CartTemplate = ({
   cart,
@@ -34,7 +37,13 @@ const CartTemplate = ({
               <div className="flex flex-col gap-y-8 sticky top-12">
                 {cart && cart.region && (
                   <>
-                    <div className="bg-ui-bg-base py-6">
+                    <div className="bg-ui-bg-base py-6 flex flex-col gap-y-4">
+                      {/* barra de frete grátis (Tena-style, 07/06) — só com CEP conhecido */}
+                      <FreeShippingBar
+                        subtotal={Number(cart.item_subtotal ?? cart.subtotal) || 0}
+                        currencyCode={cart.currency_code}
+                        cepConhecido={cart.shipping_address?.postal_code}
+                      />
                       <Summary cart={cart as any} />
                     </div>
                   </>
@@ -47,6 +56,12 @@ const CartTemplate = ({
             <EmptyCartMessage />
           </div>
         )}
+        {/* cross-sell estilo Tena (07/06): recomendados com base no carrinho */}
+        {cart?.items?.length ? (
+          <Suspense fallback={null}>
+            <RecomendadosCart cart={cart} />
+          </Suspense>
+        ) : null}
       </div>
       {cart?.items?.length ? <MobileCheckoutBar cart={cart as any} /> : null}
     </div>

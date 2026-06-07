@@ -14,6 +14,7 @@ import ProductActionsWrapper from "./product-actions-wrapper"
 import FreteCep from "@modules/shipping/components/frete-cep"
 import TamanhosIrmaos from "@modules/products/components/tamanhos-irmaos"
 import BreadcrumbPdp from "@modules/products/components/breadcrumb-pdp"
+import Spin360 from "@modules/products/components/spin-360"
 import ProductSpecs from "@modules/products/components/product-specs"
 import { getProductPrice } from "@lib/util/get-product-price"
 
@@ -59,6 +60,15 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         </div>
         <div className="block w-full relative">
           <ImageGallery images={images} title={product.title} />
+          {/* 🌀 giro 360° oficial (Marco 07/06) — produtos com metadata.spin360 */}
+          {(product.metadata as any)?.spin360 && (
+            <div className="mt-4">
+              <Spin360
+                basePath={String((product.metadata as any).spin360)}
+                alt={product.title}
+              />
+            </div>
+          )}
         </div>
         <div className="flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-12">
           <ProductOnboardingCta />
