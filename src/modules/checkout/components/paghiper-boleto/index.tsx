@@ -31,7 +31,10 @@ function formatVenc(v?: string | null): string | null {
 /**
  * Checkout BOLETO PagHiper (#52) — 3ª forma de pagamento.
  *
- * Fluxo: CPF/CNPJ (do faturamento) → "Gerar boleto" → mostra linha digitável
+ * Fluxo NOVO (Marco 07/06): CPF/CNPJ → "Concluir pedido" → gera o boleto E
+ * conclui na MESMA ação → a linha digitável aparece na CONFIRMAÇÃO (BoletoBox).
+ * Motivo (provado em teste real): mostrar o boleto antes de concluir fazia o
+ * cliente pagar sem finalizar o pedido — pagamento órfão.
  * (copiar), código de barras, PDF/imprimir e vencimento → "Concluir pedido"
  * cria o pedido ("aguardando pagamento", EMAIL 1 do #51). Boleto é pago depois
  * (banco/lotérica/app); a confirmação chega via webhook/cron → EMAIL 2.
@@ -85,9 +88,21 @@ const PagHiperBoleto = ({
       if (!r.linha_digitavel || !r.transaction_id) {
         throw new Error("Não foi possível gerar o boleto. Tente novamente.")
       }
-      setBoleto(r)
-      setStage("boleto")
+      // FLUXO NOVO (Marco 07/06, validado no teste real): o boleto NÃO é
+      // exibido aqui — primeiro CONCLUI o pedido e a linha digitável aparece
+      // na CONFIRMAÇÃO (BoletoBox). Evita o cliente pagar antes de concluir
+      // (aconteceu no teste!) — padrão Mercado Livre/Amazon.
+      await placeOrder()
+      // placeOrder redireciona pra /order/:id/confirmed; se voltar sem
+      // redirecionar, algo falhou:
+      throw new Error(
+        "O boleto foi gerado, mas não conseguimos concluir o pedido. Tente de novo — o mesmo boleto será aproveitado."
+      )
     } catch (e: any) {
+      // NEXT_REDIRECT = sucesso (o placeOrder navega via redirect do Next)
+      if (String(e?.message || "").includes("NEXT_REDIRECT") || e?.digest?.includes?.("NEXT_REDIRECT")) {
+        throw e
+      }
       setError(e?.message || "Falha ao gerar o boleto.")
     } finally {
       gerandoRef.current = false
@@ -203,7 +218,7 @@ const PagHiperBoleto = ({
         </p>
         <ErrorMessage error={error} />
         <Button onClick={gerarBoleto} isLoading={loading} className="mt-1 w-fit">
-          Gerar boleto
+          Concluir pedido — o boleto aparece na próxima tela
         </Button>
       </div>
     )

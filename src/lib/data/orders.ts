@@ -19,7 +19,9 @@ export const retrieveOrder = async (id: string) => {
       method: "GET",
       query: {
         fields:
-          "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product",
+          // *customer (07/06): a confirmação saúda QUEM COMPROU (não o
+          // destinatário da entrega)
+          "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product,*customer",
       },
       headers,
       next,

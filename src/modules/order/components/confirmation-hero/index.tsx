@@ -10,7 +10,15 @@ import BoletoBox from "@modules/order/components/boleto-box"
  * + número do pedido em DESTAQUE (é o que o cliente guarda).
  */
 const ConfirmationHero = ({ order }: { order: HttpTypes.StoreOrder }) => {
-  const nome = (order.shipping_address?.first_name || "").trim()
+  // nome de QUEM COMPROU (Marco 07/06: pedido do Marco com entrega pro Paulo
+  // dizia "confirmado, Paulo!" — shipping é o DESTINATÁRIO da entrega, não o
+  // comprador). Ordem: cliente logado → endereço de cobrança → entrega.
+  const nome = (
+    (order as any).customer?.first_name ||
+    order.billing_address?.first_name ||
+    order.shipping_address?.first_name ||
+    ""
+  ).trim()
   const saudacao = nome ? `, ${nome}` : ""
 
   // pagamento do boleto (provider paghiper) + estado
