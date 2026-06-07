@@ -79,6 +79,7 @@ const ConfirmationHero = ({ order }: { order: HttpTypes.StoreOrder }) => {
           pdfUrl={d.pdf_url ?? null}
           urlSlip={d.url_slip ?? null}
           vencimento={d.vencimento ?? null}
+          referencia={d.referencia_cliente ?? d.paghiper_order_id ?? null}
         />
       )}
 

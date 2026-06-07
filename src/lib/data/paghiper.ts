@@ -29,7 +29,15 @@ export async function createPagHiperBoleto(cartId: string, taxId: string) {
     cart as any,
     {
       provider_id: PAGHIPER_PROVIDER,
-      data: { tax_id: taxId, session_id: cartId, email: (cart as any)?.email },
+      data: {
+        tax_id: taxId,
+        session_id: cartId,
+        email: (cart as any)?.email,
+        // referência HUMANA estável pro boleto/e-mails da PagHiper (07/06):
+        // o session_id é sobrescrito pelo Medusa com o payses_ técnico — o
+        // cliente via isso como "número do pedido". CPM-<sufixo do cart>.
+        referencia: `CPM-${String(cartId).slice(-6).toUpperCase()}`,
+      },
     } as any,
     {},
     headers

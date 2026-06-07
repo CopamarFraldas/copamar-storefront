@@ -13,6 +13,8 @@ type BoletoBoxProps = {
   pdfUrl?: string | null
   urlSlip?: string | null
   vencimento?: string | null
+  /** referência humana mostrada no boleto/e-mails da PagHiper (CPM-XXXXXX) */
+  referencia?: string | null
 }
 
 function formatVenc(v?: string | null): string | null {
@@ -21,7 +23,7 @@ function formatVenc(v?: string | null): string | null {
   return m ? `${m[3]}/${m[2]}/${m[1]}` : v
 }
 
-const BoletoBox = ({ linhaDigitavel, pdfUrl, urlSlip, vencimento }: BoletoBoxProps) => {
+const BoletoBox = ({ linhaDigitavel, pdfUrl, urlSlip, vencimento, referencia }: BoletoBoxProps) => {
   const [copied, setCopied] = useState(false)
   const venc = formatVenc(vencimento)
 
@@ -41,7 +43,14 @@ const BoletoBox = ({ linhaDigitavel, pdfUrl, urlSlip, vencimento }: BoletoBoxPro
       data-testid="boleto-box"
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-ui-fg-base">Seu boleto</p>
+        <p className="text-sm font-semibold text-ui-fg-base">
+          Seu boleto
+          {referencia && (
+            <span className="ml-2 font-normal text-ui-fg-subtle">
+              ref. {referencia}
+            </span>
+          )}
+        </p>
         {venc && (
           <span className="text-xs font-medium text-copamar-primary">
             vence em {venc}
