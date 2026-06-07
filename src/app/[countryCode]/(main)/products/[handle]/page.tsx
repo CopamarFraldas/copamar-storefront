@@ -155,7 +155,12 @@ export default async function ProductPage(props: Props) {
   const ldProduto = productSchema({
     name: pricedProduct.title,
     description: pricedProduct.description || `${pricedProduct.title} — Copamar Fraldas`,
-    image: (pricedProduct.images || []).map((i) => i.url).filter(Boolean) as string[],
+    // URLs relativas (fotos hospedadas no nosso /public) absolutizadas pro
+    // JSON-LD (o Google exige URL completa)
+    image: (pricedProduct.images || [])
+      .map((i) => i.url)
+      .filter(Boolean)
+      .map((u) => (String(u).startsWith("http") ? String(u) : `${getSiteUrl()}${u}`)) as string[],
     sku: v0?.sku || undefined,
     gtin,
     brand: pricedProduct.collection?.title || undefined,
