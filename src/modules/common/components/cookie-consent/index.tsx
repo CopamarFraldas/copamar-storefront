@@ -111,14 +111,25 @@ const CookieConsent = () => {
     return () => window.removeEventListener("open-cookie-consent", abrir)
   }, [])
 
-  // enquanto a barra está aberta, marca o <html> pra o WhatsApp flutuante subir
-  // e não cobrir o link "Personalizar" (necessário pra LGPD — o usuário precisa
-  // alcançar a customização de consentimento).
+  // enquanto o modal está aberto: marca o <html> (esconde o WhatsApp flutuante)
+  // e TRAVA o scroll do fundo — o visitante precisa decidir antes de navegar
+  // (Marco 07/06: o banner discreto era ignorado; agora exige uma escolha).
   useEffect(() => {
     const el = document.documentElement
-    if (visivel) el.classList.add("consent-bar-open")
-    else el.classList.remove("consent-bar-open")
-    return () => el.classList.remove("consent-bar-open")
+    if (visivel) {
+      el.classList.add("consent-bar-open")
+      el.style.overflow = "hidden"
+      document.body.style.overflow = "hidden"
+    } else {
+      el.classList.remove("consent-bar-open")
+      el.style.overflow = ""
+      document.body.style.overflow = ""
+    }
+    return () => {
+      el.classList.remove("consent-bar-open")
+      el.style.overflow = ""
+      document.body.style.overflow = ""
+    }
   }, [visivel])
 
   const salvar = (a: boolean, m: boolean) => {
@@ -166,52 +177,71 @@ const CookieConsent = () => {
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-[60] border-t border-ui-border-base bg-ui-bg-base shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+      className="fixed inset-0 z-[90] flex items-end justify-center bg-black/55 p-0 backdrop-blur-[2px] motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300 sm:items-center sm:p-4"
       role="dialog"
-      aria-live="polite"
+      aria-modal="true"
       aria-label="Aviso de cookies e privacidade"
     >
-      <div className="content-container mx-auto max-w-4xl px-4 py-3">
-        {/* 1ª TELA enxuta (Marco 05/06): "Aceitar todos" (primário) + "Gerenciar"
-            (secundário). O recusar continua a 1 passo: dentro do Gerenciar, o
-            "Só o necessário" é botão de rodapé bem visível — LGPD ok (recusa
-            fácil, não enterrada; 1 clique a mais que o aceite). */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-          <p className="text-xs leading-snug text-ui-fg-subtle sm:flex-1">
-            🍃 Usamos cookies pra melhorar sua experiência. Você decide o que
-            aceitar — os essenciais são sempre necessários. Saiba mais na nossa{" "}
-            <a
-              href="/br/politica-de-privacidade"
-              className="underline hover:text-ui-fg-base"
-            >
-              Política de Privacidade
-            </a>
-            .
-          </p>
-          {!detalhe && (
-            <div className="flex shrink-0 gap-2">
-              <Button
-                variant="secondary"
-                size="small"
-                onClick={() => setDetalhe(true)}
-                data-testid="consent-customize"
+      {/* MODAL (Marco 07/06): card centralizado com fundo escurecido que
+          bloqueia a navegação até a pessoa escolher — o banner-faixa antigo
+          era ignorado. O backdrop NÃO fecha (escolha obrigatória); a recusa
+          ("Só essenciais") tem o MESMO destaque do aceite na 1ª tela, então
+          continua LGPD-ok (não é cookie wall: recusar é tão fácil quanto
+          aceitar, 1 clique cada). */}
+      <div className="w-full max-w-md rounded-t-2xl border border-ui-border-base bg-ui-bg-base p-5 shadow-2xl motion-safe:animate-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-300 sm:rounded-2xl sm:p-6">
+        {!detalhe ? (
+          <>
+            <div className="mb-3 flex items-center gap-2">
+              <span className="text-2xl" aria-hidden>
+                🍃
+              </span>
+              <h2 className="text-base font-semibold text-ui-fg-base">
+                Sua privacidade importa
+              </h2>
+            </div>
+            <p className="text-sm leading-relaxed text-ui-fg-subtle">
+              Usamos cookies pra melhorar sua experiência, lembrar seu carrinho
+              e entender o que mais ajuda você. Você decide o que aceitar — os
+              essenciais são sempre necessários. Saiba mais na nossa{" "}
+              <a
+                href="/br/politica-de-privacidade"
+                className="font-medium text-copamar-primary underline underline-offset-2 hover:text-ui-fg-base"
               >
-                Gerenciar
-              </Button>
+                Política de Privacidade
+              </a>
+              .
+            </p>
+            <div className="mt-5 flex flex-col gap-2">
               <Button
                 variant="primary"
-                size="small"
+                size="large"
                 onClick={() => salvar(true, true)}
                 data-testid="consent-accept-all"
+                className="w-full"
               >
                 Aceitar todos
               </Button>
+              <Button
+                variant="secondary"
+                size="large"
+                onClick={() => salvar(false, false)}
+                data-testid="consent-essential-only"
+                className="w-full"
+              >
+                Só essenciais
+              </Button>
+              <button
+                type="button"
+                onClick={() => setDetalhe(true)}
+                data-testid="consent-customize"
+                className="mt-1 text-center text-xs font-medium text-ui-fg-subtle underline underline-offset-2 hover:text-ui-fg-base"
+              >
+                Personalizar preferências
+              </button>
             </div>
-          )}
-        </div>
-
-        {detalhe && (
-          <div className="mt-3 flex flex-col gap-3 border-t border-ui-border-base pt-3">
+          </>
+        ) : (
+          <div className="flex flex-col gap-3">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-small-semi text-ui-fg-base">Essenciais</p>
@@ -253,7 +283,7 @@ const CookieConsent = () => {
                 variant="secondary"
                 size="base"
                 onClick={() => salvar(false, false)}
-                data-testid="consent-essential-only"
+                data-testid="consent-essential-only-detalhe"
                 className="sm:min-w-[170px]"
               >
                 Só o necessário

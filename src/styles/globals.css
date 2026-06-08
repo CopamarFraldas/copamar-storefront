@@ -133,3 +133,11 @@ iframe[src*="gstatic.com/shopping"] {
   background: transparent !important;
   border: 0;
 }
+
+/* Modal de consentimento (LGPD) aberto: esconde o badge flutuante do Google
+   (z-index máximo, injetado pelo Google) pra não cobrir os botões do modal
+   (Marco 07/06). Volta assim que a pessoa escolhe. O WhatsApp já some via
+   classe utilitária no próprio componente. */
+html.consent-bar-open #google-merchantwidget-iframe-wrapper {
+  display: none !important;
+}
