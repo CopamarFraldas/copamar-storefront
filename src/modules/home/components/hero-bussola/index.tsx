@@ -65,6 +65,14 @@ const PERGUNTAS: Record<
       { valor: "nao_sei", rotulo: "Não parei pra contar" },
     ],
   },
+  discricao: {
+    titulo:
+      "O que pesa mais pra vocês: máxima discrição (algo fininho que some por baixo da roupa) ou mais cobertura e praticidade pra vestir?",
+    opcoes: [
+      { valor: "discreto", rotulo: "Discrição — que ninguém perceba (absorvente na roupa de baixo)" },
+      { valor: "pratico", rotulo: "Cobertura e praticidade (veste como cueca/calcinha)" },
+    ],
+  },
   genero: {
     titulo: "Pra acertar o corte da peça, me diz: a proteção é pra uma mulher ou pra um homem?",
     opcoes: [
@@ -92,6 +100,7 @@ const inicial: Respostas = {
   mobilidade: null,
   escape: null,
   trocas: null,
+  discricao: null,
   genero: null,
   porte: null,
 }
@@ -102,7 +111,7 @@ function reducer(s: Respostas, a: Acao): Respostas {
   const s2 = { ...s, [a.campo]: a.valor } as Respostas
   // mantém o fluxo consistente: zera respostas que deixaram de ser ativas
   const ativas = new Set(perguntasAtivas(s2))
-  for (const campo of ["mobilidade", "escape", "trocas", "genero", "porte"]) {
+  for (const campo of ["mobilidade", "escape", "trocas", "discricao", "genero", "porte"]) {
     if (!ativas.has(campo)) (s2 as any)[campo] = null
   }
   return s2
@@ -149,6 +158,41 @@ function BussolaFundo() {
       <path d="M100 18 L112 100 L100 182 L88 100 Z" fill="currentColor" stroke="none" />
       <path d="M18 100 L100 88 L182 100 L100 112 Z" fill="currentColor" stroke="none" />
     </svg>
+  )
+}
+
+/* guia de medida — aparece quando a pessoa diz "não sei o tamanho, me ajuda"
+   (Marco 08/06: antes só despejava fraldas). Faixas aproximadas de cintura/
+   quadril; varia por marca, então a gente sempre confere junto. */
+function GuiaTamanho() {
+  const faixas = [
+    { t: "P", cm: "até ~85 cm" },
+    { t: "M", cm: "~80 a 105 cm" },
+    { t: "G", cm: "~100 a 130 cm" },
+    { t: "EG", cm: "~120 a 150 cm" },
+    { t: "XXG", cm: "acima de ~150 cm" },
+  ]
+  return (
+    <div className="rounded-large border border-copamar-primary/20 bg-copamar-primary/[0.04] p-3">
+      <p className="text-sm font-medium text-copamar-primary">
+        Vamos achar o tamanho juntos 🧭
+      </p>
+      <p className="mt-1 text-xs text-copamar-text">
+        Mede a cintura/quadril com uma fita (ou olha a etiqueta da roupa) e
+        compara — varia um pouco por marca, então a gente confere com você:
+      </p>
+      <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs xsmall:grid-cols-3">
+        {faixas.map((f) => (
+          <div key={f.t} className="flex items-baseline gap-1.5">
+            <span className="font-semibold text-copamar-primary">{f.t}</span>
+            <span className="text-copamar-primary/55">{f.cm}</span>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-copamar-primary/55">
+        Abaixo deixei um ponto de partida no tamanho M — é o mais comum.
+      </p>
+    </div>
   )
 }
 
@@ -415,6 +459,8 @@ export default function HeroBussola() {
                     ? "Atacado · CNPJ"
                     : res.dual
                     ? "Quase lá — pra quem é?"
+                    : res.precisaAjudaTamanho
+                    ? "Primeiro o tamanho"
                     : "Faz sentido começar por"}
                 </div>
                 <div className="flex flex-col gap-3 p-4">
@@ -428,6 +474,7 @@ export default function HeroBussola() {
                     </>
                   ) : (
                     <>
+                      {res.precisaAjudaTamanho && <GuiaTamanho />}
                       {res.ancora && <LinhaProduto p={res.ancora} destaque />}
                       {res.nota && (
                         <p className="text-xs text-copamar-primary/60">{res.nota}</p>

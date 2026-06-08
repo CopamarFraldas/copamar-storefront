@@ -817,7 +817,7 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "moderado",
+  "nivel": "intenso",
   "fardo": false,
   "preco": 38.3,
   "spin360": null,
@@ -877,7 +877,7 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "moderado",
+  "nivel": "intenso",
   "fardo": false,
   "preco": 38.9,
   "spin360": "/produtos/tena/lady-dianoite/360",
@@ -937,7 +937,7 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "leve",
+  "nivel": "moderado",
   "fardo": false,
   "preco": 31,
   "spin360": "/produtos/tena/men/360",
@@ -952,7 +952,7 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "leve",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 164.2,
   "spin360": "/produtos/tena/men/360",

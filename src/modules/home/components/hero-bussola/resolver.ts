@@ -37,6 +37,7 @@ export type Contexto = "pessoa" | "atacado"
 export type Mobilidade = "anda" | "ajuda" | "deitada" | "nao_sei"
 export type Escape = "gotinhas" | "as_vezes" | "bastante" | "noite" | "nao_sei"
 export type Trocas = "poucas" | "varias" | "nao_sei"
+export type Discricao = "discreto" | "pratico"
 export type GeneroResp = "mulher" | "homem" | "nao_sei"
 export type Porte = "P" | "M" | "G" | "EG" | "XXG" | "nao_sei"
 export type Nivel = "leve" | "moderado" | "intenso" | "noturno"
@@ -46,6 +47,7 @@ export type Respostas = {
   mobilidade: Mobilidade | null
   escape: Escape | null
   trocas: Trocas | null
+  discricao: Discricao | null
   genero: GeneroResp | null
   porte: Porte | null
 }
@@ -62,10 +64,18 @@ export function deduzNivel(escape: Escape | null, trocas: Trocas | null): Nivel 
   if (escape === "as_vezes") return trocas === "varias" ? "intenso" : "moderado"
   return "moderado"
 }
-export function deduzTipo(mob: Mobilidade | null, nivel: Nivel): TipoDed {
+export function deduzTipo(
+  mob: Mobilidade | null,
+  nivel: Nivel,
+  discricao: Discricao | null
+): TipoDed {
   if (mob === "deitada") return "fralda_fita"
-  if (mob === "anda" && nivel === "leve") return "absorvente"
-  return "pants" // anda (>leve), ajuda, nao_sei
+  if (mob === "anda" && nivel === "leve") return "absorvente" // gotinhas → pad
+  // pessoa ativa que prioriza DISCRIÇÃO → absorvente (escada Lady/Men), mesmo
+  // em nível moderado/intenso/noturno (Marco 08/06 + pesquisa): pad some na
+  // roupa, pants dá cobertura mas faz volume
+  if (mob === "anda" && discricao === "discreto") return "absorvente"
+  return "pants" // anda+prático, ajuda, nao_sei
 }
 export function generoRelevante(tipoDed: TipoDed, nivel: Nivel): boolean {
   return tipoDed === "absorvente" || (tipoDed === "pants" && nivel === "moderado")
@@ -77,21 +87,25 @@ export function tipoTemTamanho(tipoDed: TipoDed): boolean {
 /* ───────── fluxo de perguntas (condicional) ───────── */
 export function perguntasAtivas(r: Respostas): string[] {
   const ativas = ["contexto"]
-  if (r.contexto === "atacado") return ativas
-  if (r.contexto === "pessoa") {
-    ativas.push("mobilidade", "escape")
-    if (r.escape === "as_vezes" || r.escape === "bastante") ativas.push("trocas")
-    const prereqOk =
-      r.mobilidade != null &&
-      r.escape != null &&
-      (!(r.escape === "as_vezes" || r.escape === "bastante") || r.trocas != null)
-    if (prereqOk) {
-      const nivel = deduzNivel(r.escape, r.trocas)
-      const tipoDed = deduzTipo(r.mobilidade, nivel)
-      if (generoRelevante(tipoDed, nivel)) ativas.push("genero")
-      if (tipoTemTamanho(tipoDed)) ativas.push("porte")
-    }
+  if (r.contexto !== "pessoa") return ativas
+  ativas.push("mobilidade", "escape")
+  const precisaTrocas = r.escape === "as_vezes" || r.escape === "bastante"
+  if (precisaTrocas) ativas.push("trocas")
+  const baseOk =
+    r.mobilidade != null && r.escape != null && (!precisaTrocas || r.trocas != null)
+  if (!baseOk) return ativas
+
+  const nivel = deduzNivel(r.escape, r.trocas)
+  // discrição: pra quem ANDA e tem mais que gotinhas — escolher entre pad
+  // discreto e roupa íntima (pants). Em gotinhas já é pad; deitado já é fralda.
+  const perguntaDiscricao = r.mobilidade === "anda" && nivel !== "leve"
+  if (perguntaDiscricao) {
+    ativas.push("discricao")
+    if (r.discricao == null) return ativas
   }
+  const tipoDed = deduzTipo(r.mobilidade, nivel, r.discricao)
+  if (generoRelevante(tipoDed, nivel)) ativas.push("genero")
+  if (tipoTemTamanho(tipoDed)) ativas.push("porte")
   return ativas
 }
 export function proximaPergunta(r: Respostas): string | null {
@@ -147,10 +161,13 @@ function buscaLista(
     if (!cand.length) continue
     if (nv !== nivel)
       nota = `Nessa combinação a gente trabalha com proteção ${nv} — segura bem, e a gente confere com você.`
-    if (tipoTemTamanho(tipoDed) && porte && porte !== "nao_sei") {
-      const comTam = cand.filter((p) => p.tamanhos.includes(porte))
+    if (tipoTemTamanho(tipoDed) && porte) {
+      // "não sei" → ponto de partida M (o mais comum), casando com o guia de
+      // medida que aparece no resultado
+      const alvo = porte === "nao_sei" ? "M" : porte
+      const comTam = cand.filter((p) => p.tamanhos.includes(alvo))
       if (comTam.length) cand = comTam
-      else
+      else if (porte !== "nao_sei")
         nota =
           "Nesse porte a gente confere com você o tamanho certo antes de fechar."
     }
@@ -180,6 +197,9 @@ export type Resultado = {
   dual: { feminino: Produto; masculino: Produto } | null
   nota: string | null
   cta: "comprar" | "whatsapp"
+  /** porte = "não sei" num produto com tamanho → mostra guia de medida (em vez
+   *  de só despejar fraldas) — bug do Marco 08/06 */
+  precisaAjudaTamanho: boolean
 }
 
 export function resolver(r: Respostas): Resultado {
@@ -195,11 +215,12 @@ export function resolver(r: Respostas): Resultado {
       dual: null,
       nota: "Pra um lugar que cuida de várias pessoas, a gente fecha por fardo com nota fiscal — chama a gente que monta o pedido junto.",
       cta: "whatsapp",
+      precisaAjudaTamanho: false,
     }
   }
 
   const nivel = deduzNivel(r.escape, r.trocas)
-  const tipoDed = deduzTipo(r.mobilidade, nivel)
+  const tipoDed = deduzTipo(r.mobilidade, nivel, r.discricao)
   const genRel = generoRelevante(tipoDed, nivel)
   const generoConhecido = r.genero === "mulher" || r.genero === "homem"
 
@@ -217,6 +238,7 @@ export function resolver(r: Respostas): Resultado {
         dual: { feminino: fem, masculino: masc },
         nota: null,
         cta: "comprar",
+        precisaAjudaTamanho: false,
       }
     }
   }
@@ -268,7 +290,18 @@ export function resolver(r: Respostas): Resultado {
       ? achaForro()
       : null
 
-  return { tipoDed, nivel, ancora, alternativas: alts, addon, dual: null, nota, cta: "comprar" }
+  const precisaAjudaTamanho = tipoTemTamanho(tipoDed) && r.porte === "nao_sei"
+  return {
+    tipoDed,
+    nivel,
+    ancora,
+    alternativas: alts,
+    addon,
+    dual: null,
+    nota,
+    cta: "comprar",
+    precisaAjudaTamanho,
+  }
 }
 
 /* ───────── régua visual (5 gotas) ───────── */
