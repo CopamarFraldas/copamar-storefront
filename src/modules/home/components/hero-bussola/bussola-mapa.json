@@ -1,0 +1,86 @@
+{
+  "_leiame": "TABELA CURADA À MÃO (MVP) — Marco/Paulo podem editar. Cada NÍVEL de gota tem 1 produto-âncora (precisa ter 360 em /public/produtos/tena/<slug>/360) + as marcas que 'acendem' naquele nível + o porquê em 1 linha. A lógica que escolhe o nível a partir das respostas está em resolver.ts (não aqui). 'urina' sempre, nunca 'xixi'.",
+  "_versao": "mvp-2026-06-07",
+  "niveis": [
+    {
+      "chave": "leve",
+      "rotulo": "Leve",
+      "aria": "Absorção leve, para perdas pequenas",
+      "produto": {
+        "handle": "tena-lady-discreet-normal-com-16-unidades",
+        "titulo": "Tena Lady Discreet Normal",
+        "marca": "Tena",
+        "preco": 24.5,
+        "spin360": "/produtos/tena/lady-normal/360",
+        "poster": "/produtos/tena/lady-normal/g01.png"
+      },
+      "marcas": ["Tena", "DryLady", "Plena"],
+      "porque": "perdas pequenas e discrição no dia a dia",
+      "fraseFragmento": "uma proteção leve e discreta resolve bem"
+    },
+    {
+      "chave": "moderado",
+      "rotulo": "Moderado",
+      "aria": "Absorção moderada, para quem se movimenta",
+      "produto": {
+        "handle": "tena-pants-dermacare-c-32-p-m",
+        "titulo": "Tena Pants Dermacare",
+        "marca": "Tena",
+        "preco": 128.0,
+        "spin360": "/produtos/tena/pants-dermacare/360",
+        "poster": "/produtos/tena/pants-dermacare/g01.png"
+      },
+      "marcas": ["Tena", "Abena", "Plena", "Maxi Care"],
+      "porque": "veste como roupa íntima e acompanha quem sai de casa",
+      "fraseFragmento": "uma roupa íntima absorvente dá liberdade sem abrir mão da segurança"
+    },
+    {
+      "chave": "forte",
+      "rotulo": "Forte",
+      "aria": "Absorção forte, proteção firme durante o dia",
+      "produto": {
+        "handle": "fralda-tena-slip-dermacare-media-c-32",
+        "titulo": "Tena Slip Dermacare",
+        "marca": "Tena",
+        "preco": 134.99,
+        "spin360": "/produtos/tena/slip-dermacare/360",
+        "poster": "/produtos/tena/slip-dermacare/g01.png"
+      },
+      "marcas": ["Tena", "Biofral", "Abena"],
+      "porque": "proteção firme e barreira contra vazamento, com cuidado com a pele",
+      "fraseFragmento": "uma fralda de absorção forte com cuidado dermatológico costuma ser o caminho"
+    },
+    {
+      "chave": "intenso",
+      "rotulo": "Intenso",
+      "aria": "Absorção intensa, para muitas horas deitado",
+      "produto": {
+        "handle": "fralda-geriatrica-tena-confort-m-26-unidades",
+        "titulo": "Tena Confort",
+        "marca": "Tena",
+        "preco": 67.4,
+        "spin360": "/produtos/tena/confort/360",
+        "poster": "/produtos/tena/confort/g01.png"
+      },
+      "marcas": ["Tena", "Biofral", "AdultCare", "Vita Plus"],
+      "porque": "muitas horas deitado pedem alta capacidade e menos trocas",
+      "fraseFragmento": "uma fralda de absorção intensa segura mais horas e reduz as trocas"
+    },
+    {
+      "chave": "noturno",
+      "rotulo": "Noturno",
+      "aria": "Absorção noturna, para a noite inteira sem vazar",
+      "produto": {
+        "handle": "fralda-slip-noturna-grande-c-32-unidades",
+        "titulo": "Tena Slip Noturna",
+        "marca": "Tena",
+        "preco": 141.99,
+        "spin360": "/produtos/tena/slip-noturna/360",
+        "poster": "/produtos/tena/slip-noturna/g01.png"
+      },
+      "marcas": ["Tena", "Biofral", "AdultCare"],
+      "porque": "atravessar a noite sem trocas e sem vazar pede a maior absorção",
+      "fraseFragmento": "uma proteção noturna de alta absorção é o que segura a noite inteira"
+    }
+  ]
+}

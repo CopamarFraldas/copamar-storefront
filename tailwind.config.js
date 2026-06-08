@@ -43,6 +43,11 @@ module.exports = {
           success: "#10b981",
           text: "#525252",
           "bg-light": "#f4f4f5",
+          // base creme/areia quente (Hero "Bússola que Respira", 07/06) —
+          // off-white acolhedor, NÃO branco clínico
+          cream: "#faf6ef",
+          "cream-deep": "#f3ecdf",
+          sand: "#e9dfcc",
         },
       },
       borderRadius: {
@@ -78,6 +83,16 @@ module.exports = {
           "Helvetica Neue",
           "Ubuntu",
           "sans-serif",
+        ],
+        // serif HUMANISTA pras perguntas do Hero (07/06) — stack do sistema,
+        // sem web-font (zero asset novo, SSR, LCP cai no H1 real)
+        serif: [
+          "Iowan Old Style",
+          "Charter",
+          "Palatino",
+          "Cambria",
+          "Georgia",
+          "serif",
         ],
       },
       keyframes: {
