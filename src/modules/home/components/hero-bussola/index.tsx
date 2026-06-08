@@ -221,7 +221,7 @@ function LinhaProduto({ p, destaque }: { p: Produto; destaque?: boolean }) {
   )
 }
 
-export default function HeroBussola() {
+export default function HeroBussola({ embed = false }: { embed?: boolean }) {
   const reduzir = !!useReducedMotion()
   const [st, dispatch] = useReducer(reducer, inicial)
   const [tiltDir, setTiltDir] = useState(0)
@@ -270,30 +270,35 @@ export default function HeroBussola() {
       aria-label="Escolha guiada de produtos"
       className="relative overflow-hidden bg-gradient-to-b from-[#eaf1fc] via-[#f4f8ff] to-white"
     >
-      {/* barra de topo */}
-      <div className="w-full border-b border-copamar-primary/10 bg-copamar-primary">
-        <div className="content-container py-2">
-          <p className="hidden text-center text-xs font-medium text-white/90 small:block">
-            Nota {RATING} em {COUNT} avaliações &nbsp;·&nbsp; 20 anos cuidando de
-            famílias &nbsp;·&nbsp;{" "}
-            <span className="font-semibold text-emerald-300">Frete grátis acima de R$50</span>{" "}
-            &nbsp;·&nbsp; Embalagem 100% discreta
-          </p>
-          <p className="text-center text-xs font-medium text-white/90 small:hidden">
-            {RATING} ★ · 20 anos · entrega 100% discreta
-          </p>
+      {/* barra de topo (só no modo herói; no modo EMBED o cartão acima já tem
+          os selos, então não repete) */}
+      {!embed && (
+        <div className="w-full border-b border-copamar-primary/10 bg-copamar-primary">
+          <div className="content-container py-2">
+            <p className="hidden text-center text-xs font-medium text-white/90 small:block">
+              Nota {RATING} em {COUNT} avaliações &nbsp;·&nbsp; 20 anos cuidando de
+              famílias &nbsp;·&nbsp;{" "}
+              <span className="font-semibold text-emerald-300">Frete grátis acima de R$50</span>{" "}
+              &nbsp;·&nbsp; Embalagem 100% discreta
+            </p>
+            <p className="text-center text-xs font-medium text-white/90 small:hidden">
+              {RATING} ★ · 20 anos · entrega 100% discreta
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       <BussolaFundo />
 
       <div className="content-container relative grid grid-cols-1 gap-8 py-9 small:grid-cols-[47fr_53fr] small:items-center small:gap-12 small:py-16">
         {/* ── conversa ── */}
         <div className="flex flex-col gap-4">
-          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-copamar-primary/70">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-copamar-cta" />
-            Loja especializada há 20 anos · todas as marcas num lugar só
-          </p>
+          {!embed && (
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-copamar-primary/70">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-copamar-cta" />
+              Loja especializada há 20 anos · todas as marcas num lugar só
+            </p>
+          )}
 
           <motion.p
             initial={reduzir ? false : { opacity: 0, y: 6 }}
@@ -304,9 +309,17 @@ export default function HeroBussola() {
             Cuidar de alguém tem dias difíceis. A gente fica do seu lado.
           </motion.p>
 
-          <h1 className="font-serif text-[2rem] font-semibold leading-[1.1] text-copamar-primary small:text-[2.75rem]">
-            Pra quem você está cuidando hoje?
-          </h1>
+          {/* no modo herói é o H1 da página; no modo EMBED vira H2 (o cartão
+              acima já tem o H1 — evita 2 H1 e mantém o SEO) */}
+          {embed ? (
+            <h2 className="font-serif text-[1.7rem] font-semibold leading-[1.1] text-copamar-primary small:text-[2.25rem]">
+              Pra quem você está cuidando hoje?
+            </h2>
+          ) : (
+            <h1 className="font-serif text-[2rem] font-semibold leading-[1.1] text-copamar-primary small:text-[2.75rem]">
+              Pra quem você está cuidando hoje?
+            </h1>
+          )}
 
           <p className="max-w-prose text-sm leading-relaxed text-copamar-text small:text-base">
             Responda no seu tempo. A gente cruza todas as marcas — TENA, Abena,
@@ -516,8 +529,9 @@ export default function HeroBussola() {
         </div>
       </div>
 
-      {/* CTA sticky mobile */}
-      <div className="sticky bottom-0 z-40 border-t border-copamar-primary/10 bg-white/95 px-4 py-3 backdrop-blur small:hidden">
+      {/* CTA sticky mobile (só no modo herói — no modo seção/embed seria uma
+          barra fixa estranha no meio da home) */}
+      <div className={`sticky bottom-0 z-40 border-t border-copamar-primary/10 bg-white/95 px-4 py-3 backdrop-blur small:hidden ${embed ? "hidden" : ""}`}>
         <div className="flex items-center gap-2">
           {ctaWhats ? (
             <a href={WA} target="_blank" rel="noopener" className="inline-flex h-12 flex-1 items-center justify-center rounded-circle bg-emerald-500 text-base font-semibold text-white">

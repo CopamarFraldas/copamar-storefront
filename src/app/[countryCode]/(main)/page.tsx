@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 import Hero from "@modules/home/components/hero"
-import HeroBussola from "@modules/home/components/hero-bussola"
+import BussolaSection from "@modules/home/components/hero-bussola/bussola-section"
 import FreteCep from "@modules/shipping/components/frete-cep"
 import GuiaEscolha from "@modules/home/components/guia-escolha"
 import TrustStrip from "@modules/home/components/trust-strip"
@@ -50,13 +50,16 @@ export default async function Home(props: {
   // (produto sobe, logo após o hero) → confiança → categorias → prova social →
   // B2B → FAQ. Busca, barra de aviso e a régua de categorias são site-wide
   // (moram no Nav/header agora).
-  // Hero "A Bússola que Respira" (07/06) atrás de flag — staging only, sem
-  // tocar o Hero antigo (fallback). Liga com NEXT_PUBLIC_HERO_BUSSOLA=true.
+  // Opção C (painel multi-agente 08/06): hero "cartão de visitas" (Hero,
+  // server-rendered) + a Bússola atrás de um botão chamativo "Me ajude a
+  // escolher" (BussolaSection). Flag NEXT_PUBLIC_HERO_BUSSOLA controla a
+  // entrada da Bússola; o cartão é sempre o herói.
   const heroBussola = process.env.NEXT_PUBLIC_HERO_BUSSOLA === "true"
 
   return (
     <>
-      {heroBussola ? <HeroBussola /> : <Hero />}
+      <Hero />
+      {heroBussola && <BussolaSection />}
       {/* dois "ajudantes" cedo na página: consultor de frete (nº1) + guia de
           escolha (nº3). Lado a lado no desktop (aproveita a largura, mais
           parecido com o conceito mobile); empilhados no mobile. */}
