@@ -6,6 +6,7 @@
       "chave": "leve",
       "rotulo": "Leve",
       "aria": "Absorção leve, para perdas pequenas",
+      "genero": "gendered",
       "produto": {
         "handle": "tena-lady-discreet-normal-com-16-unidades",
         "titulo": "Tena Lady Discreet Normal",
@@ -14,7 +15,16 @@
         "spin360": "/produtos/tena/lady-normal/360",
         "poster": "/produtos/tena/lady-normal/g01.png"
       },
+      "masculino": {
+        "handle": "tena-men-level-2-active-fit-c-10-unidades",
+        "titulo": "Tena Men Level 2 Active Fit",
+        "marca": "Tena",
+        "preco": 31.0,
+        "spin360": "/produtos/tena/men/360",
+        "poster": "/produtos/tena/men/g01.png"
+      },
       "marcas": ["Tena", "DryLady", "Plena"],
+      "marcasMasculino": ["Tena", "DryMan"],
       "porque": "perdas pequenas e discrição no dia a dia",
       "fraseFragmento": "uma proteção leve e discreta resolve bem"
     },

@@ -12,19 +12,26 @@ export type Dia = "ativa" | "casa" | "acamado" | "nao_sei"
 export type Pesa = "noite" | "pele" | "discricao" | "trocar_menos"
 export type NivelChave = "leve" | "moderado" | "forte" | "intenso" | "noturno"
 
+export type Produto = {
+  handle: string
+  titulo: string
+  marca: string
+  preco: number
+  spin360: string
+  poster: string
+}
+
 export type Nivel = {
   chave: NivelChave
   rotulo: string
   aria: string
-  produto: {
-    handle: string
-    titulo: string
-    marca: string
-    preco: number
-    spin360: string
-    poster: string
-  }
+  /** "gendered" = produto muda entre homem/mulher (ex.: absorvente leve);
+   *  ausente = unissex (fralda/slip geriátrico serve pros dois). */
+  genero?: "gendered" | "unissex"
+  produto: Produto // feminino quando gendered; o único quando unissex
+  masculino?: Produto // alternativa masculina (só nos níveis gendered)
   marcas: string[]
+  marcasMasculino?: string[]
   porque: string
   fraseFragmento: string
 }

@@ -140,6 +140,10 @@ export default function HeroBussola() {
   const [st, dispatch] = useReducer(reducer, inicial)
   const [tiltDir, setTiltDir] = useState(0)
   const [nivelManual, setNivelManual] = useState<number | null>(null)
+  // gênero escolhido NO RESULTADO (só pros níveis "gendered", ex.: absorvente
+  // leve — Lady ≠ Men). Marco 07/06: o site não sabe o sexo, então PERGUNTA
+  // em vez de chutar (oferecia Lady pra homem).
+  const [genero, setGenero] = useState<"f" | "m" | null>(null)
 
   const respondidas = [st.quem, st.dia, st.pesa].filter(Boolean).length
 
@@ -154,25 +158,45 @@ export default function HeroBussola() {
   const comecou = nivelIndex != null
   const nivelView = NIVEIS[nivelIndex ?? indicePorChave(nivelChave)]
 
+  // resolução de gênero do nível exibido
+  const ehGendered = nivelView.genero === "gendered" && !!nivelView.masculino
+  const precisaGenero = ehGendered && genero === null
+  const usaMasc = ehGendered && genero === "m"
+  const produtoView = usaMasc ? nivelView.masculino! : nivelView.produto
+  const marcasView =
+    usaMasc && nivelView.marcasMasculino
+      ? nivelView.marcasMasculino
+      : nivelView.marcas
+
   const responder = (campo: Campo, valor: string) => {
     setNivelManual(null)
+    setGenero(null) // novo nível → pergunta o gênero de novo se precisar
     dispatch({ tipo: "responde", campo, valor })
+  }
+
+  const selecionarNivel = (i: number) => {
+    setNivelManual(i)
+    setGenero(null)
   }
 
   const fraseViva = !comecou
     ? "Responda no seu tempo — a cada resposta, a régua de absorção se ajusta. No fim, a gente confere com você."
+    : st.concluido && precisaGenero
+    ? `Pelo que você me contou, ${nivel.fraseFragmento}. Pra acertar o modelo, me diz: é pra um homem ou uma mulher? A gente confere com você.`
     : st.concluido
     ? `Pelo que você me contou, eu apontaria proteção ${nivel.rotulo.toLowerCase()}: ${nivel.fraseFragmento}. No fim, a gente confere com você.`
     : `Por enquanto a régua aponta pra absorção ${nivelView.rotulo.toLowerCase()} — e a gente confere com você no fim.`
 
-  // CTA primário: flag → quiz; no fim → PDP do produto-âncora (REAL); senão loja.
-  // (corrige o link que caía numa busca vazia "fralda forte" — Marco 07/06)
+  // CTA primário: flag → quiz; no fim → PDP do produto-âncora REAL (já com o
+  // gênero certo); se ainda falta o gênero, não linka produto — leva à loja.
+  // (corrige o link que caía em busca vazia E o Lady ofertado pra homem)
   const hrefPrimario = QUIZ_COMPLETO
     ? "/quiz"
-    : st.concluido
-    ? `/products/${nivel.produto.handle}`
+    : st.concluido && !precisaGenero
+    ? `/products/${produtoView.handle}`
     : "/store"
-  const rotuloPrimario = st.concluido ? "Ver o que faz sentido" : "Me ajude a escolher"
+  const rotuloPrimario =
+    st.concluido && !precisaGenero ? "Ver o que faz sentido" : "Me ajude a escolher"
 
   const perguntaAtual = PERGUNTAS[st.passo]
 
@@ -238,7 +262,7 @@ export default function HeroBussola() {
             <div className="flex-1">
               <div className="h-1.5 w-full max-w-[160px] overflow-hidden rounded-full bg-copamar-primary/10">
                 <motion.div
-                  className="h-full rounded-full bg-copamar-cta"
+                  className="h-full rounded-full bg-copamar-primary"
                   initial={false}
                   animate={{ width: `${(respondidas / 3) * 100}%` }}
                   transition={{ duration: 0.4 }}
@@ -296,7 +320,7 @@ export default function HeroBussola() {
           <div className="mt-1 flex flex-col gap-2.5">
             <LocalizedClientLink
               href={hrefPrimario}
-              className="group inline-flex h-12 items-center justify-center gap-2 rounded-circle bg-copamar-cta px-6 text-base font-semibold text-white shadow-[0_6px_18px_rgba(239,126,26,0.32)] transition-all hover:bg-copamar-cta-dark hover:shadow-[0_8px_22px_rgba(239,126,26,0.4)]"
+              className="group inline-flex h-12 items-center justify-center gap-2 rounded-circle bg-copamar-primary px-6 text-base font-semibold text-white shadow-[0_6px_18px_rgba(18,81,184,0.3)] transition-all hover:bg-copamar-primary-dark hover:shadow-[0_8px_22px_rgba(18,81,184,0.4)]"
               data-testid="hero-cta-primario"
             >
               {rotuloPrimario}
@@ -340,9 +364,9 @@ export default function HeroBussola() {
             <div className="grid grid-cols-[1fr_auto] items-center gap-3 small:gap-5">
               <div className="relative">
                 <Palco360
-                  basePath={nivelView.produto.spin360}
-                  poster={nivelView.produto.poster}
-                  alt={`${nivelView.produto.titulo} — ${nivelView.produto.marca}`}
+                  basePath={produtoView.spin360}
+                  poster={produtoView.poster}
+                  alt={`${produtoView.titulo} — ${produtoView.marca}`}
                   tilt={tiltDir}
                 />
                 <span className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 rounded-circle bg-copamar-primary/85 px-3 py-1 text-[11px] font-medium text-white">
@@ -353,7 +377,7 @@ export default function HeroBussola() {
                 <ReguaGotas
                   niveis={NIVEIS}
                   ativoIndex={nivelIndex}
-                  onSelect={setNivelManual}
+                  onSelect={selecionarNivel}
                   orientacao="vertical"
                 />
               </div>
@@ -364,7 +388,7 @@ export default function HeroBussola() {
               <ReguaGotas
                 niveis={NIVEIS}
                 ativoIndex={nivelIndex}
-                onSelect={setNivelManual}
+                onSelect={selecionarNivel}
                 orientacao="horizontal"
               />
             </div>
@@ -390,48 +414,75 @@ export default function HeroBussola() {
                 data-testid="hero-resultado"
               >
                 <div className="bg-copamar-primary px-4 py-2 text-xs font-medium uppercase tracking-wide text-white/90">
-                  Faz sentido começar por
+                  {precisaGenero ? "Quase lá — uma última pergunta" : "Faz sentido começar por"}
                 </div>
-                <div className="p-4">
-                  <p className="font-serif text-lg text-copamar-primary">
-                    {nivel.produto.titulo}{" "}
-                    <span className="text-sm font-normal text-copamar-primary/55">
-                      · {nivel.produto.marca}
-                    </span>
-                  </p>
-                  <p className="mt-1 text-sm text-copamar-text">
-                    Por que esse: {nivel.porque}.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {nivel.marcas.map((m, i) => (
-                      <motion.span
-                        key={m}
-                        initial={reduzir ? false : { opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: reduzir ? 0 : 0.1 + i * 0.08 }}
-                        className="rounded-circle border border-copamar-primary/25 bg-copamar-primary/[0.04] px-2.5 py-0.5 text-xs font-medium text-copamar-primary"
+                {precisaGenero ? (
+                  /* nível gendered (ex.: absorvente leve): o site não sabe o
+                     sexo, então PERGUNTA — nada de oferecer Lady pra homem */
+                  <div className="p-4">
+                    <p className="text-sm text-copamar-text">
+                      Pra acertar o modelo certo, me diz: a proteção é para um
+                      homem ou uma mulher?
+                    </p>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setGenero("f")}
+                        className="inline-flex h-11 flex-1 items-center justify-center rounded-circle border border-copamar-primary/30 px-4 text-sm font-medium text-copamar-primary transition-colors hover:border-copamar-primary hover:bg-copamar-primary/[0.04]"
                       >
-                        {m}
-                      </motion.span>
-                    ))}
+                        Para uma mulher
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setGenero("m")}
+                        className="inline-flex h-11 flex-1 items-center justify-center rounded-circle border border-copamar-primary/30 px-4 text-sm font-medium text-copamar-primary transition-colors hover:border-copamar-primary hover:bg-copamar-primary/[0.04]"
+                      >
+                        Para um homem
+                      </button>
+                    </div>
                   </div>
-                  <div className="mt-4 flex flex-col gap-2 small:flex-row">
-                    <LocalizedClientLink
-                      href={`/products/${nivel.produto.handle}`}
-                      className="inline-flex h-11 flex-1 items-center justify-center rounded-circle bg-copamar-cta px-4 text-sm font-semibold text-white transition-colors hover:bg-copamar-cta-dark"
-                    >
-                      Ver opções
-                    </LocalizedClientLink>
-                    <a
-                      href={WA}
-                      target="_blank"
-                      rel="noopener"
-                      className="inline-flex h-11 flex-1 items-center justify-center rounded-circle border border-copamar-primary/30 px-4 text-sm font-medium text-copamar-primary transition-colors hover:border-copamar-primary hover:bg-copamar-primary/[0.04]"
-                    >
-                      Ainda em dúvida? Fale com a gente
-                    </a>
+                ) : (
+                  <div className="p-4">
+                    <p className="font-serif text-lg text-copamar-primary">
+                      {produtoView.titulo}{" "}
+                      <span className="text-sm font-normal text-copamar-primary/55">
+                        · {produtoView.marca}
+                      </span>
+                    </p>
+                    <p className="mt-1 text-sm text-copamar-text">
+                      Por que esse: {nivel.porque}.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {marcasView.map((m, i) => (
+                        <motion.span
+                          key={m}
+                          initial={reduzir ? false : { opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: reduzir ? 0 : 0.1 + i * 0.08 }}
+                          className="rounded-circle border border-copamar-primary/25 bg-copamar-primary/[0.04] px-2.5 py-0.5 text-xs font-medium text-copamar-primary"
+                        >
+                          {m}
+                        </motion.span>
+                      ))}
+                    </div>
+                    <div className="mt-4 flex flex-col gap-2 small:flex-row">
+                      <LocalizedClientLink
+                        href={`/products/${produtoView.handle}`}
+                        className="inline-flex h-11 flex-1 items-center justify-center rounded-circle bg-copamar-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-copamar-primary-dark"
+                      >
+                        Ver opções
+                      </LocalizedClientLink>
+                      <a
+                        href={WA}
+                        target="_blank"
+                        rel="noopener"
+                        className="inline-flex h-11 flex-1 items-center justify-center rounded-circle border border-copamar-primary/30 px-4 text-sm font-medium text-copamar-primary transition-colors hover:border-copamar-primary hover:bg-copamar-primary/[0.04]"
+                      >
+                        Ainda em dúvida? Fale com a gente
+                      </a>
+                    </div>
                   </div>
-                </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -443,7 +494,7 @@ export default function HeroBussola() {
         <div className="flex items-center gap-2">
           <LocalizedClientLink
             href={hrefPrimario}
-            className="inline-flex h-12 flex-1 items-center justify-center rounded-circle bg-copamar-cta text-base font-semibold text-white shadow-sm"
+            className="inline-flex h-12 flex-1 items-center justify-center rounded-circle bg-copamar-primary text-base font-semibold text-white shadow-sm"
           >
             {rotuloPrimario}
           </LocalizedClientLink>
