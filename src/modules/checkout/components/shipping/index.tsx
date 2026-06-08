@@ -8,6 +8,7 @@ import { CheckCircleSolid, Loader } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { Button, clx, Heading, Text } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
+import EscolhaEmbalagem from "@modules/checkout/components/escolha-embalagem"
 import Divider from "@modules/common/components/divider"
 import MedusaRadio from "@modules/common/components/radio"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -461,6 +462,9 @@ const Shipping: React.FC<ShippingProps> = ({
               </div>
             </div>
           )}
+
+          {/* escolha de embalagem (Marco 08/06) — após o frete, antes de pagar */}
+          <EscolhaEmbalagem inicial={(cart.metadata as any)?.embalagem} />
 
           <div>
             <ErrorMessage

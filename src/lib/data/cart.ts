@@ -115,6 +115,20 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
     .catch(medusaError)
 }
 
+/**
+ * Embalagem do pedido (Marco 08/06): "discreta" (padrão — caixa neutra, sem
+ * indicar o conteúdo) ou "transparente" (R$0 de acréscimo). Guardado em
+ * cart.metadata.embalagem; flui pro order.metadata e vira observação no Bling.
+ */
+export async function setEmbalagem(valor: "discreta" | "transparente") {
+  const cartId = await getCartId()
+  if (!cartId) return
+  const existing = await retrieveCart(cartId).catch(() => null)
+  await updateCart({
+    metadata: { ...(existing?.metadata || {}), embalagem: valor },
+  } as HttpTypes.StoreUpdateCart)
+}
+
 export async function addToCart({
   variantId,
   quantity,
