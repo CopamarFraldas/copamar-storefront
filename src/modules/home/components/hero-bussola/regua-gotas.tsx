@@ -12,7 +12,7 @@ import { Nivel } from "./resolver"
  * acende instantâneo, sem pulso/stagger.
  */
 
-const CINZA = "#d6d3cd"
+const CINZA = "#cdd8ec" // cinza-azulado (combina com a paleta Copamar)
 const AZUL = "#1251b8"
 const AMBAR = "#ef7e1a"
 
