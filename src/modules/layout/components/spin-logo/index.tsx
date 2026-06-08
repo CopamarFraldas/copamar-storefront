@@ -4,16 +4,15 @@ import Image from "next/image"
 import { useEffect, useRef } from "react"
 
 /**
- * Logo do header com DUAS rotações combinadas:
- *  1. Rotação contínua de fundo — "respiração" da marca, 180° a cada 7s.
- *     Como o símbolo Copamar é simétrico a 180° (dois "C" espelhados),
- *     a cada meia-volta ele parece voltar à mesma posição.
- *  2. Rotação por scroll — somada à contínua; ao rolar, o termo do scroll
- *     muda rápido e domina o movimento. Ao parar, sobra só a contínua (suave).
+ * Logo do header que gira SOMENTE com o scroll (Marco 07/06: removida a
+ * rotação contínua de "respiração" — ela girava sozinha mesmo com a página
+ * parada). O ângulo acompanha a posição do scroll: rolou → girou; parou →
+ * ficou parado. Como o símbolo Copamar é simétrico a 180°, voltar ao topo
+ * realinha naturalmente.
  *
- * Um único requestAnimationFrame lê o scrollY a cada frame e acumula o tempo,
- * então não há "judder" na transição scroll→parado. Respeita prefers-reduced-motion
- * e pausa quando a aba não está visível.
+ * Sem loop perpétuo de rAF: o transform só é recalculado enquanto há scroll
+ * (1 frame throttle), então NADA roda com a página em repouso. Respeita
+ * prefers-reduced-motion.
  */
 const SpinLogo = ({ className = "h-11" }: { className?: string }) => {
   const ref = useRef<HTMLImageElement>(null)
@@ -21,26 +20,25 @@ const SpinLogo = ({ className = "h-11" }: { className?: string }) => {
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
 
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
     const SCROLL_FATOR = 0.4 // graus por pixel de scroll
-    const CONT_SPEED = reduce ? 0 : 180 / 7000 // graus por ms (180° em 7s; 0 = sem rotação contínua)
-
     let raf = 0
-    let last = performance.now()
-    let continua = 0
 
-    const tick = (now: number) => {
-      const dt = now - last
-      last = now
-      if (!document.hidden) continua += dt * CONT_SPEED
-      const deg = continua + window.scrollY * SCROLL_FATOR
-      el.style.transform = `rotate(${deg}deg)`
-      raf = window.requestAnimationFrame(tick)
+    const aplicar = () => {
+      raf = 0
+      el.style.transform = `rotate(${window.scrollY * SCROLL_FATOR}deg)`
     }
-    raf = window.requestAnimationFrame(tick)
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(aplicar)
+    }
 
-    return () => { if (raf) window.cancelAnimationFrame(raf) }
+    aplicar() // alinha à posição atual (caso a página abra já rolada)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      if (raf) window.cancelAnimationFrame(raf)
+    }
   }, [])
 
   return (
