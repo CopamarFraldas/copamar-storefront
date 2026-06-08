@@ -1,7 +1,9 @@
 "use client"
 
 import { motion, useReducedMotion } from "framer-motion"
-import { Nivel } from "./resolver"
+/** nível visual da régua (desacoplado do tipo Nivel do resolver, que agora é
+ *  string). Só precisa do rótulo/aria pra desenhar e anunciar. */
+type Nivel = { chave: string; rotulo: string; aria: string }
 
 /**
  * Régua de gotas (SVG inline) — o "medidor de absorção" do Hero.
