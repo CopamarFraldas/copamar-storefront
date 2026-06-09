@@ -3,7 +3,6 @@ import React, { Suspense } from "react"
 import ImageGallery from "@modules/products/components/image-gallery"
 import ProductActions from "@modules/products/components/product-actions"
 import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
-import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
@@ -14,9 +13,8 @@ import ProductActionsWrapper from "./product-actions-wrapper"
 import FreteCep from "@modules/shipping/components/frete-cep"
 import TamanhosIrmaos from "@modules/products/components/tamanhos-irmaos"
 import BreadcrumbPdp from "@modules/products/components/breadcrumb-pdp"
-import DescricaoExpansivel from "@modules/products/components/descricao-expansivel"
+import SecoesProduto from "@modules/products/components/secoes-produto"
 import Spin360 from "@modules/products/components/spin-360"
-import ProductSpecs from "@modules/products/components/product-specs"
 import { getProductPrice } from "@lib/util/get-product-price"
 
 type ProductTemplateProps = {
@@ -46,25 +44,27 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     <>
       {/* breadcrumb visível: caminho de volta pra categoria (#54 linking) */}
       <BreadcrumbPdp product={product} />
-      {/* ORDEM MOBILE (Marco 07/06, padrão Tena/Amazon) é a ORDEM DO DOM —
-          título → imagens → comprar/CEP → descrição colapsada — robusta a
-          qualquer CSS (nada de display:contents/order, que quebrava com CSS
-          cacheado no celular). Desktop (small:) vira GRID 3 colunas:
-          esquerda = título+descrição · centro = galeria · direita = ações. */}
+      {/* ORDEM MOBILE (Marco 07/06) = ORDEM DO DOM via flex-col + order:
+          título → imagens → comprar/CEP → descrição. DESKTOP (small:) = layout
+          Mercado Livre (Marco 09/06, fim do "buraco vazio abaixo da foto"):
+          coluna ESQUERDA ampla = galeria + descrição logo abaixo dela (preenche
+          o espaço que antes ficava vazio); coluna DIREITA estreita = box de
+          compra, STICKY (acompanha o scroll). A descrição flui sob a foto em vez
+          de ficar numa coluna estreita forçando a galeria a esticar. */}
       <div
-        className="content-container py-6 relative small:grid small:grid-cols-[300px_1fr_300px] small:grid-rows-[auto_1fr] small:items-start small:gap-x-8"
+        className="content-container flex flex-col py-6 small:grid small:grid-cols-[minmax(0,1fr)_360px] small:items-start small:gap-x-10"
         data-testid="product-container"
         data-track-sku={product.handle || undefined}
         data-track-categoria={trackCategoria || undefined}
         data-track-preco={trackPreco != null ? String(trackPreco) : undefined}
       >
-        {/* 1. título (mobile: topo · desktop: coluna esquerda, linha 1) */}
-        <div className="w-full pt-2 small:pt-0 small:col-start-1 small:row-start-1">
+        {/* 1. título — mobile: topo · desktop: full-width no topo */}
+        <div className="order-1 w-full pt-2 small:order-none small:col-span-2 small:pt-0">
           <ProductInfo product={product} parte="cabecalho" />
         </div>
 
-        {/* 2. galeria + 360 (mobile: logo após o título · desktop: centro) */}
-        <div className="block w-full relative pt-4 small:pt-0 small:col-start-2 small:row-start-1 small:row-span-2">
+        {/* 2. galeria + 360 — coluna ampla esquerda (a descrição vem logo abaixo) */}
+        <div className="order-2 block w-full relative pt-4 small:order-none small:col-start-1 small:row-start-2 small:max-w-[560px] small:pt-0">
           <ImageGallery images={images} title={product.title} />
           {/* 🌀 giro 360° oficial (Marco 07/06) — produtos com metadata.spin360 */}
           {(product.metadata as any)?.spin360 && (
@@ -77,8 +77,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           )}
         </div>
 
-        {/* 3. tamanhos → comprar → CEP (desktop: coluna direita, sticky) */}
-        <div className="flex flex-col w-full py-8 gap-y-12 small:py-0 small:col-start-3 small:row-start-1 small:row-span-2 small:sticky small:top-48 small:self-start">
+        {/* 3. tamanhos → comprar → CEP — coluna estreita direita, STICKY */}
+        <div className="order-3 flex w-full flex-col gap-y-12 py-8 small:order-none small:col-start-2 small:row-start-2 small:row-span-2 small:self-start small:py-0 small:sticky small:top-24">
           <ProductOnboardingCta />
           {/* tamanhos irmãos (P·M·G·EG) — religa os produtos da mesma família */}
           <TamanhosIrmaos product={product} countryCode={countryCode} />
@@ -98,17 +98,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <FreteCep variantId={product.variants?.[0]?.id} />
         </div>
 
-        {/* 4. descrição/specs/abas POR ÚLTIMO no mobile, colapsadas
-              (desktop: coluna esquerda, linha 2, sempre abertas) */}
-        <div className="w-full py-4 small:py-0 small:col-start-1 small:row-start-2 small:mt-6">
-          <DescricaoExpansivel>
-            <div className="flex flex-col gap-y-6">
-              <ProductInfo product={product} parte="descricao" />
-              {/* specs factuais em tabela (GEO/AEO #54) */}
-              <ProductSpecs product={product} />
-              <ProductTabs product={product} />
-            </div>
-          </DescricaoExpansivel>
+        {/* 4. seções em BARRAS NIVELADAS — coluna ampla esquerda, LOGO ABAIXO da
+              galeria (preenche o antigo vazio). Descrição/Especificações/Entrega */}
+        <div className="order-4 w-full py-4 small:order-none small:col-start-1 small:row-start-3 small:py-0 small:mt-8">
+          <SecoesProduto product={product} />
         </div>
       </div>
       <div
