@@ -29,6 +29,11 @@ type Resultado = {
 }
 
 const CEP_KEY = "copamar_cep"
+const WHATS_FRETE =
+  "https://wa.me/551149903013?text=" +
+  encodeURIComponent(
+    "Olá! Não sei meu frete. Pode me ajudar a calcular o frete e o prazo?"
+  )
 const brl = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v)
 const maskCep = (v: string) =>
@@ -91,7 +96,11 @@ const FreteCep = ({
   const temLista = opcoes.length > 0
 
   return (
-    <div className="rounded-large border border-ui-border-base bg-ui-bg-subtle p-4">
+    <div
+      className={`rounded-large border border-ui-border-base bg-ui-bg-subtle ${
+        compact ? "flex h-full flex-col p-5" : "p-4"
+      }`}
+    >
       <div className="flex items-center gap-x-2">
         <span aria-hidden>🚚</span>
         <span className="text-sm font-semibold text-ui-fg-base">
@@ -104,7 +113,7 @@ const FreteCep = ({
           e.preventDefault()
           consultar(cep)
         }}
-        className="mt-2 flex gap-2"
+        className="mt-3 flex gap-2"
       >
         <label htmlFor="frete-cep" className="sr-only">
           Seu CEP
@@ -129,15 +138,17 @@ const FreteCep = ({
         >
           {loading ? "…" : "Calcular"}
         </button>
-        <a
-          href="https://buscacepinter.correios.com.br/app/endereco/index.php"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden self-center text-xs text-ui-fg-subtle underline sm:inline"
-        >
-          não sei
-        </a>
       </form>
+
+      {/* atalho logo abaixo do campo de CEP pra quem não sabe o próprio frete */}
+      <a
+        href={WHATS_FRETE}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-2 inline-block text-xs font-semibold text-copamar-primary underline"
+      >
+        Não sei meu frete
+      </a>
 
       {/* resultado */}
       {res && !loading && (

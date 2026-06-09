@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
-import { useTheme } from "next-themes"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import type { NavCat } from "@lib/data/nav-categories"
 
@@ -14,11 +13,6 @@ type Props = { categories: NavCat[] }
  * só o link antigo de "Fraldas Geriátricas".
  */
 const MegaMenuClient = ({ categories }: Props) => {
-  // tema no DRAWER mobile (o toggle saiu do topo — Marco 04/06). O drawer só
-  // renderiza após interação (client-side), então não há risco de hydration.
-  const { theme, resolvedTheme, setTheme } = useTheme()
-  const isDark = (theme === "system" ? resolvedTheme : theme) === "dark"
-
   // ── DESKTOP: painel com hover-intent + clique + ESC ──
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -308,28 +302,8 @@ const MegaMenuClient = ({ categories }: Props) => {
                   <li><LocalizedClientLink href="/blog" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Blog</LocalizedClientLink></li>
                   <li><LocalizedClientLink href="/sobre" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Quem somos</LocalizedClientLink></li>
                   <li><LocalizedClientLink href="/account" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-ui-fg-subtle">Minha conta</LocalizedClientLink></li>
-                  {/* tema claro/escuro — morava no topo do header; aqui fica
-                      acessível sem disputar espaço com o logo (Marco 04/06) */}
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => setTheme(isDark ? "light" : "dark")}
-                      className="flex w-full items-center gap-x-2 py-2 text-left text-sm text-ui-fg-subtle"
-                      aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
-                    >
-                      {isDark ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                          <circle cx="12" cy="12" r="4" />
-                          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-                        </svg>
-                      ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                        </svg>
-                      )}
-                      {isDark ? "Tema claro" : "Tema escuro"}
-                    </button>
-                  </li>
+                  {/* o toggle de tema saiu do drawer: agora fica ao lado do
+                      hambúrguer no topo do header (Marco) */}
                 </ul>
               </div>
             </nav>

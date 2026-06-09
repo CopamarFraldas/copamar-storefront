@@ -13,7 +13,7 @@ const Hero = () => {
                 fábricas das marcas e repassam preço de atacado — sem afirmar ser
                 fabricante (a empresa é distribuidora/atacadista). */}
             <span className="inline-flex items-center gap-x-1.5 rounded-full bg-copamar-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-copamar-primary">
-              🏭 Direto das fábricas · Atacado
+              🏭 Direto das fábricas · Atacado e varejo
             </span>
             <h1 className="mt-3 text-[1.7rem] leading-tight small:text-5xl font-bold text-copamar-primary dark:text-ui-fg-base">
               Fraldas geriátricas

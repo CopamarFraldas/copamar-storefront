@@ -7,13 +7,15 @@ import { extrairSpecs } from "@lib/util/specs"
  * de tabela — IAs e o Google extraem dados estruturados de tabela com muito
  * mais precisão que de prosa. Espelha o additionalProperty do Product JSON-LD.
  */
-const ProductSpecs = ({ product }: { product: HttpTypes.StoreProduct }) => {
+const ProductSpecs = ({ product, semTitulo }: { product: HttpTypes.StoreProduct; semTitulo?: boolean }) => {
   const specs = extrairSpecs(product)
   if (specs.length < 2) return null
 
   return (
     <div className="flex flex-col gap-y-2">
-      <span className="text-sm font-medium text-ui-fg-base">Especificações</span>
+      {!semTitulo && (
+        <span className="text-sm font-medium text-ui-fg-base">Especificações</span>
+      )}
       <table className="w-full text-sm">
         <tbody>
           {specs.map((s) => (

@@ -53,9 +53,6 @@ const FeaturedRail = async ({ region }: { region: HttpTypes.StoreRegion }) => {
           >
             Mais procurados
           </h2>
-          <p className="mt-1 text-sm text-ui-fg-subtle">
-            Modelos principais de fralda geriátrica e roupa íntima.
-          </p>
         </div>
         <LocalizedClientLink
           href="/store"

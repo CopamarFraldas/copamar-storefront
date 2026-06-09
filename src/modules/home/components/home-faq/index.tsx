@@ -8,15 +8,15 @@ import { JsonLd } from "@modules/common/components/structured-data"
 const FAQS = [
   {
     q: "Como sei qual tamanho de fralda geriátrica escolher?",
-    a: "O tamanho vai pela medida da cintura/quadril, não pelo peso. Cada produto traz a tabela de medidas na descrição. Na dúvida, chame a gente no WhatsApp que ajudamos a escolher.",
+    a: "Para encontrar o tamanho ideal, use a medida da cintura ou do quadril, não pelo peso. Você encontra a tabela completa na descrição do produto. Se preferir, chame a gente no WhatsApp que escolhemos juntos!",
   },
   {
     q: "Vocês entregam para todo o Brasil?",
-    a: "Sim. O frete é calculado pelo seu CEP no checkout, com entrega para todo o Brasil. Na Grande São Paulo há opções mais rápidas.",
+    a: "Sim. Calcule o frete digitando seu CEP na finalização da compra. Para a Grande São Paulo, temos opções de entrega expressa.",
   },
   {
     q: "Quais as formas de pagamento?",
-    a: "Cartão em até 3x sem juros, PIX com 5% de desconto à vista e boleto. O pagamento é processado com segurança.",
+    a: "Escolha como pagar com total segurança: Garanta 5% de desconto no PIX ou parcele em até 3x sem juros no cartão. Também aceitamos boleto.",
   },
   {
     q: "Tem preço de atacado para revenda?",
@@ -24,9 +24,33 @@ const FAQS = [
   },
   {
     q: "Posso comprar uma unidade avulsa ou só fardo fechado?",
-    a: "Os dois. Você compra avulso para experimentar ou o fardo fechado, com preço melhor por unidade.",
+    a: "As duas opções estão disponíveis. Você pode levar pacotes avulsos para testar o modelo ou garantir o fardo fechado, que oferece o melhor preço por unidade (mais economia).",
   },
 ]
+
+// Renderiza a resposta linkando a palavra "WhatsApp" (visível). O JSON-LD
+// continua usando f.a puro (texto), preservando o FAQPage limpo.
+const WPP = "https://wa.me/5511952050000"
+function renderResposta(a: string) {
+  const partes = a.split("WhatsApp")
+  if (partes.length === 1) return a
+  return partes.flatMap((parte, i) =>
+    i === 0
+      ? [parte]
+      : [
+          <a
+            key={i}
+            href={WPP}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-copamar-primary underline underline-offset-2"
+          >
+            WhatsApp
+          </a>,
+          parte,
+        ]
+  )
+}
 
 const HomeFaq = () => {
   const schema = {
@@ -70,7 +94,7 @@ const HomeFaq = () => {
               </span>
             </summary>
             <p className="mt-3 text-sm leading-relaxed text-ui-fg-subtle">
-              {f.a}
+              {renderResposta(f.a)}
             </p>
           </details>
         ))}

@@ -164,7 +164,7 @@ const SearchBar = ({ className = "" }: { className?: string }) => {
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder="Buscar fralda, marca ou tamanho…"
+          placeholder="Buscar por tipo de fralda, marca ou tamanho…"
           className="h-10 w-full rounded-full border border-ui-border-base bg-ui-bg-subtle pl-10 pr-20 text-base small:text-sm text-ui-fg-base outline-none transition focus:border-copamar-primary focus:bg-ui-bg-base focus:ring-1 focus:ring-copamar-primary"
         />
         <button

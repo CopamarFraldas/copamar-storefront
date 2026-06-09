@@ -29,32 +29,22 @@ const DICAS = [
 const GuiaEscolha = () => (
   <section aria-labelledby="guia-h" className="h-full">
     <div className="flex h-full flex-col rounded-large border border-ui-border-base bg-copamar-bg-light dark:bg-ui-bg-subtle p-5">
-      <div className="flex flex-col gap-4 small:flex-row small:items-center small:justify-between">
-        <div className="flex items-start gap-x-3">
-          <span aria-hidden className="text-2xl">
-            💬
-          </span>
-          <div>
-            <h2
-              id="guia-h"
-              className="text-base font-bold text-copamar-primary dark:text-ui-fg-base"
-            >
-              Não sabe qual escolher?
-            </h2>
-            <p className="mt-0.5 text-sm text-ui-fg-subtle">
-              A gente te ajuda a achar o tamanho e o modelo certo — sem
-              complicação.
-            </p>
-          </div>
+      <div className="flex items-start gap-x-3">
+        <span aria-hidden className="text-2xl">
+          💬
+        </span>
+        <div>
+          <h2
+            id="guia-h"
+            className="text-base font-bold text-copamar-primary dark:text-ui-fg-base"
+          >
+            Não sabe qual escolher?
+          </h2>
+          <p className="mt-0.5 text-sm text-ui-fg-subtle">
+            Não sabe qual a melhor opção? Nós te ajudamos a achar o modelo e o
+            tamanho certo - sem complicações.
+          </p>
         </div>
-        <a
-          href={WHATS_MAPA}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex shrink-0 items-center justify-center gap-x-2 rounded-large bg-copamar-cta px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-copamar-cta-dark"
-        >
-          💬 Tirar dúvida no WhatsApp
-        </a>
       </div>
 
       <details className="group mt-3">
@@ -90,6 +80,16 @@ const GuiaEscolha = () => (
           </LocalizedClientLink>
         </p>
       </details>
+
+      {/* CTA no FINAL do bloco (mt-auto pinça no rodapé do flex-col) */}
+      <a
+        href={WHATS_MAPA}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-auto inline-flex w-full items-center justify-center rounded-large bg-copamar-cta px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-copamar-cta-dark"
+      >
+        Falar com especialista
+      </a>
     </div>
   </section>
 )

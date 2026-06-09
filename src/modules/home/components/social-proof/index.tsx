@@ -26,7 +26,7 @@ const SocialProof = () => (
             20 anos
           </span>
           <p className="text-sm text-ui-fg-subtle">
-            de especialização em fraldas geriátricas, desde 2006
+            Desde 2006, a sua escolha especialista em fraldas geriátricas.
           </p>
         </div>
         <div className="flex flex-col items-center gap-y-1">

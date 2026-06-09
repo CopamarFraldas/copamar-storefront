@@ -1,5 +1,6 @@
 import { getNavCategories } from "@lib/data/nav-categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ChipsScroller from "./chips-scroller"
 
 /**
  * Régua de chips de categoria. Dois modos:
@@ -31,8 +32,10 @@ const CategoryChips = async ({ inline = false }: { inline?: boolean }) => {
   const Lista = (
     <ul
       className={
-        "flex snap-x gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden " +
-        (inline ? "min-w-0 flex-1 py-0.5" : "content-container py-3 small:flex-wrap small:overflow-visible")
+        "flex snap-x gap-2 " +
+        (inline
+          ? "w-max py-0.5"
+          : "content-container overflow-x-auto py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden small:flex-wrap small:overflow-visible")
       }
     >
       {/* chip de atacado/CNPJ — destacado, primeiro */}
@@ -59,7 +62,7 @@ const CategoryChips = async ({ inline = false }: { inline?: boolean }) => {
     </ul>
   )
 
-  if (inline) return Lista
+  if (inline) return <ChipsScroller>{Lista}</ChipsScroller>
 
   return (
     <nav aria-label="Categorias" className="border-b border-ui-border-base bg-ui-bg-base">

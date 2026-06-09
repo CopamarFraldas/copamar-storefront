@@ -36,6 +36,11 @@ export default async function Nav() {
                 <div className="small:hidden">
                   <MegaMenu />
                 </div>
+                {/* tema no MOBILE: ao lado do hambúrguer (Marco). Só no celular —
+                    no desktop o toggle fica ao lado de "Quem somos". */}
+                <span className="small:hidden">
+                  <ThemeToggle />
+                </span>
                 {/* links institucionais no DESKTOP */}
                 <div className="hidden small:flex items-center gap-x-5 text-ui-fg-subtle">
                   <LocalizedClientLink className="hover:text-ui-fg-base" href="/blog" data-testid="nav-blog-link">
@@ -44,6 +49,8 @@ export default async function Nav() {
                   <LocalizedClientLink className="hover:text-ui-fg-base" href="/sobre" data-testid="nav-sobre-link">
                     Quem somos
                   </LocalizedClientLink>
+                  {/* tema no DESKTOP: ao lado de "Quem somos" (Marco) */}
+                  <ThemeToggle />
                 </div>
               </div>
 
@@ -62,14 +69,11 @@ export default async function Nav() {
                 </PacLoader>
               </LocalizedClientLink>
 
-              {/* direita: conta · carrinho no MOBILE (tema foi pro hambúrguer);
-                  conta · tema · carrinho no desktop. flex-1 espelha o lado
-                  esquerdo → logo central de verdade. */}
+              {/* direita: conta · carrinho. O tema saiu daqui — agora fica ao
+                  lado do hambúrguer (mobile) e de "Quem somos" (desktop). flex-1
+                  espelha o lado esquerdo → logo central de verdade. */}
               <div className="flex flex-1 min-w-0 items-center justify-end gap-x-5">
                 <AccountButton nome={customer?.first_name} />
-                <span className="hidden small:flex">
-                  <ThemeToggle />
-                </span>
                 <Suspense
                   fallback={
                     <LocalizedClientLink

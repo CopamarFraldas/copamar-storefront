@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 
-import Hero from "@modules/home/components/hero"
+import HeroConversao from "@modules/home/components/hero-conversao"
 import BussolaSection from "@modules/home/components/hero-bussola/bussola-section"
 import FreteCep from "@modules/shipping/components/frete-cep"
 import GuiaEscolha from "@modules/home/components/guia-escolha"
@@ -58,13 +58,15 @@ export default async function Home(props: {
 
   return (
     <>
-      <Hero />
+      <HeroConversao />
       {heroBussola && <BussolaSection />}
       {/* dois "ajudantes" cedo na página: consultor de frete (nº1) + guia de
           escolha (nº3). Lado a lado no desktop (aproveita a largura, mais
           parecido com o conceito mobile); empilhados no mobile. */}
       <div className="content-container py-5">
-        <div className="mx-auto grid max-w-5xl items-stretch gap-4 small:grid-cols-2">
+        {/* mesma largura do Hero acima (content-container cheio, sem max-w-5xl)
+            e altura equiparada via items-stretch + h-full nos dois blocos */}
+        <div className="grid items-stretch gap-4 small:grid-cols-2">
           <FreteCep compact />
           <GuiaEscolha />
         </div>
