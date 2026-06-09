@@ -37,8 +37,9 @@ const ProductInfo = ({ product, parte }: ProductInfoProps) => {
               {product.title}
             </Heading>
 
-            {/* prova social real da loja (C1) */}
-            <ReviewsBadge />
+            {/* prova social real da LOJA (C1). escopo="loja" deixa claro que a
+                nota 4,9/600 é da Copamar no Google, não daquela fralda (Marco 09/06) */}
+            <ReviewsBadge escopo="loja" />
           </>
         )}
 

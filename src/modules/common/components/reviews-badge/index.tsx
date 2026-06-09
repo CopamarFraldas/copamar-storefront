@@ -37,20 +37,39 @@ function Estrelas({ nota }: { nota: number }) {
   )
 }
 
-const ReviewsBadge = ({ className = "" }: { className?: string }) => {
+const ReviewsBadge = ({
+  className = "",
+  escopo = "geral",
+}: {
+  className?: string
+  /**
+   * "loja" deixa EXPLÍCITO que a nota é da Copamar (LOJA) no Google, não do
+   * produto — usar na PDP, onde o selo fica embaixo do título da fralda e
+   * poderia dar a impressão de ser avaliação daquela fralda (Marco 09/06).
+   */
+  escopo?: "geral" | "loja"
+}) => {
   const nota = parseFloat(RATING.replace(",", ".")) || 4.9
+  const notaBr = RATING.replace(".", ",")
   return (
     <a
       href={RATINGS_URL}
       target="_blank"
       rel="noopener noreferrer"
       className={`inline-flex items-center gap-x-1.5 text-sm transition-opacity hover:opacity-80 ${className}`}
-      aria-label={`Nota ${RATING.replace(".", ",")} de 5 — ${COUNT} avaliações de clientes no Google. Abrir o perfil de avaliações.`}
+      aria-label={`Loja Copamar: nota ${notaBr} de 5 no Google, com ${COUNT} avaliações de clientes. Abrir o perfil de avaliações da loja.`}
       data-testid="reviews-badge"
     >
       <Estrelas nota={nota} />
-      <strong className="text-ui-fg-base">{RATING.replace(".", ",")}</strong>
-      <span className="text-ui-fg-subtle">· {COUNT} avaliações · Google</span>
+      <strong className="text-ui-fg-base">{notaBr}</strong>
+      {escopo === "loja" ? (
+        <span className="text-ui-fg-subtle">
+          · <span className="font-medium">Loja Copamar</span> no Google ·{" "}
+          {COUNT} avaliações
+        </span>
+      ) : (
+        <span className="text-ui-fg-subtle">· {COUNT} avaliações · Google</span>
+      )}
     </a>
   )
 }
