@@ -27,10 +27,11 @@ const ProductInfo = ({ product, parte }: ProductInfoProps) => {
                 {product.collection.title}
               </LocalizedClientLink>
             )}
-            {/* título = h1 da página (era h2, página ficava sem h1) */}
+            {/* título = h1 da página (era h2, página ficava sem h1). Maior no
+                PC (Marco 09/06) pra não "boiar" na largura. */}
             <Heading
               level="h1"
-              className="text-3xl leading-10 text-ui-fg-base"
+              className="text-3xl leading-tight text-ui-fg-base small:text-[2.5rem] small:leading-[1.1]"
               data-testid="product-title"
             >
               {product.title}

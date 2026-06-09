@@ -42,9 +42,9 @@ const ImageGallery = ({ images, title }: ImageGalleryProps) => {
   return (
     // a ALTURA vem daqui (aspect-ratio em bloco). Os slides são h-full —
     // evita o colapso de altura que o aspect-ratio sofre dentro de flex-row.
-    // aspect-[1/1] + max-w/max-h 400px: galeria enxuta (Marco 28/05).
-    // Iterações: 29/34 (colossal ~930px) → 600 → 500 → 400 (parou).
-    <div className="relative w-full mx-auto aspect-[1/1] max-w-[400px] max-h-[400px]">
+    // aspect-[1/1] + max-w/max-h: galeria enxuta no mobile (400px, Marco 28/05),
+    // MAIOR no PC (460px, Marco 09/06 — foto estava pequena no desktop).
+    <div className="relative w-full mx-auto aspect-[1/1] max-w-[400px] max-h-[400px] small:max-w-[460px] small:max-h-[460px]">
       {/* trilho com scroll-snap: 1 foto por vez */}
       <div
         ref={trackRef}
