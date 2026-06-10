@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { brl, rotuloPagamento, type Parada, type StatusParada } from "../_lib/dados"
 import { sair } from "../_lib/sessao"
-import { registrarStatus } from "../_lib/acoes"
+import { registrarStatus, avisarRotaSaiHoje } from "../_lib/acoes"
 
 /**
  * Lista da rota do dia (Marco 10/06). Cada parada: nome, endereço (abrir no
@@ -50,6 +50,18 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
     }).catch(() => {})
   }
 
+  const [aviso, setAviso] = useState("")
+  const avisarRota = async () => {
+    if (aviso === "enviando…") return
+    setAviso("enviando…")
+    try {
+      const r = await avisarRotaSaiHoje()
+      setAviso(`✓ ${r.total} clientes avisados`)
+    } catch {
+      setAviso("erro ao avisar")
+    }
+  }
+
   const LABEL: Record<StatusParada, string> = {
     pendente: "",
     entregue: "Entregue ✅",
@@ -87,6 +99,12 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
         <p className="mt-2 text-xs opacity-80">
           A receber na rua: <strong>{brl(aCobrar)}</strong>
         </p>
+        <button
+          onClick={avisarRota}
+          className="mt-3 w-full rounded-lg bg-white/15 py-2 text-xs font-semibold active:scale-[0.99]"
+        >
+          {aviso || '📣 Avisar a rota: "sai hoje"'}
+        </button>
       </header>
 
       <ul className="flex flex-col gap-3 px-4 pt-4">
