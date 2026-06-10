@@ -44,6 +44,11 @@ export default async function ComprasAnteriores() {
         </p>
       </div>
 
+      {pedidos.length >= 500 && (
+        <p className="mb-3 text-xs text-ui-fg-subtle">
+          Mostrando suas 500 compras mais recentes.
+        </p>
+      )}
       {pedidos.length === 0 ? (
         <p className="rounded-large border border-ui-border-base bg-ui-bg-subtle p-5 text-ui-fg-subtle">
           Não encontramos compras anteriores vinculadas à sua conta. Se você

@@ -204,7 +204,11 @@ export async function login(_currentState: unknown, formData: FormData) {
       )
       if (r?.migrado) return LOGIN_MIGRADO
     } catch {}
-    return error.toString()
+    const msg = String(error?.message || error)
+    if (/invalid email or password/i.test(msg)) {
+      return "E-mail ou senha incorretos — confira e tente de novo."
+    }
+    return msg.replace(/^Error:\s*/i, "")
   }
 
   // login OK → se era conta migrada, marca como reivindicada (sai do fluxo de
