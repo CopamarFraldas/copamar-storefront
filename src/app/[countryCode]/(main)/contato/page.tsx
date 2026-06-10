@@ -31,25 +31,20 @@ function mapsUrl(query: string) {
 }
 
 /**
- * NAP das 3 unidades — extraído do site oficial antigo
- * (copamarfraldas.com.br/contacts, garimpo #8 em 10/06/2026), textos VERBATIM:
+ * A Copamar tem UMA unidade: a matriz da Rua Iugoslávia, em Santo André/SP.
+ * (Confirmado pelo Marco em 10/06: o site velho listava "Araras" e "Vila
+ * Bastos", mas Araras é uma loja do PAI dele — não tem relação com a Copamar —
+ * e a "unidade 3" on-line não existe. NÃO re-adicionar essas no futuro.)
  *
- * - Unidade 1 (Matriz): "Rua Iugoslávia, 167 / Parque das Nações. Santo André/SP"
+ * Matriz: "Rua Iugoslávia, 167 / Parque das Nações. Santo André/SP"
  *   Fones (11) 2989-6895 / (11) 3565-1880 / (11) 4119-0201
- *   HORÁRIO CONFIRMADO pelo Marco (10/06): Seg a Sex 08:00–17:00,
- *   Sáb 09:00–12:00. Fecha em feriados, mas atende em emendas/pontes.
- * - Unidade 2 (Araras): "Rua Treze de Maio, 716 / Centro. Araras/SP"
- *   (só existe no site velho — não estava no storefront novo)
- * - Unidade 3: "Rua Edu Chaves 250 sl11 / Vila Basto. Santo André/SP"
- *   ("Vila Basto" sic no site velho; bairro real é Vila Bastos) —
- *   "Loja On-line Sem atendimento" (sem atendimento presencial)
- *
- * WhatsApp das 3 unidades no site velho: (11) 95205-0000 / (11) 4119-0201.
+ *   Horário (confirmado Marco 10/06): Seg a Sex 08:00–17:00, Sáb 09:00–12:00.
+ *   Fecha em feriados, mas atende em emendas/pontes.
  */
 const UNIDADES = [
   {
     id: "unidade-matriz",
-    nome: "Unidade 1 — Matriz · Santo André",
+    nome: "Matriz · Santo André",
     rua: "Rua Iugoslávia, 167",
     bairroCidade: "Parque das Nações · Santo André/SP",
     telefones: ["(11) 2989-6895", "(11) 3565-1880", "(11) 4119-0201"],
@@ -86,56 +81,13 @@ const UNIDADES = [
       },
     },
   },
-  {
-    id: "unidade-araras",
-    nome: "Unidade 2 — Araras",
-    rua: "Rua Treze de Maio, 716",
-    bairroCidade: "Centro · Araras/SP",
-    telefones: ["(11) 2989-6895", "(11) 3565-1880", "(11) 4119-0201"],
-    horario: ["Segunda a Sexta: 09:00–18:00", "Sábado: 08:00–12:00"],
-    mapsQuery: "Rua Treze de Maio, 716 - Centro, Araras - SP",
-    schema: {
-      streetAddress: "Rua Treze de Maio, 716 - Centro",
-      addressLocality: "Araras",
-      openingHours: [
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          opens: "09:00",
-          closes: "18:00",
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: "Saturday",
-          opens: "08:00",
-          closes: "12:00",
-        },
-      ],
-    },
-  },
-  {
-    id: "unidade-vila-bastos",
-    nome: "Unidade 3 — Vila Bastos · Santo André",
-    rua: "Rua Edu Chaves, 250 — sala 11",
-    bairroCidade: "Vila Bastos · Santo André/SP",
-    telefones: ["(11) 2989-6895", "(11) 3565-1880"],
-    // texto do site velho: "Loja On-line Sem atendimento"
-    horario: ["Loja on-line — sem atendimento presencial"],
-    mapsQuery: "Rua Edu Chaves, 250 - Vila Bastos, Santo André - SP",
-    schema: {
-      streetAddress: "Rua Edu Chaves, 250, sala 11 - Vila Bastos",
-      addressLocality: "Santo André",
-      // sem openingHours: unidade on-line, sem atendimento presencial
-      openingHours: undefined,
-    },
-  },
 ] as const
 
 /**
- * JSON-LD LocalBusiness por unidade. O layout raiz já injeta o
- * #localbusiness global (matriz) — aqui cada unidade ganha @id próprio
- * (#unidade-*) ligado à Organization, detalhando a rede de lojas pro
- * Google/IAs (SEO local / GEO).
+ * JSON-LD LocalBusiness da matriz. O layout raiz já injeta o #localbusiness
+ * global — aqui a matriz ganha @id próprio (#unidade-matriz) ligado à
+ * Organization, reforçando o SEO local / GEO. (Estrutura em map() mantida
+ * caso a Copamar abra outra loja própria no futuro.)
  */
 function unidadesJsonLd() {
   return UNIDADES.map((u) => ({
@@ -180,8 +132,8 @@ export default function ContatoPage() {
       <h1 className="text-3xl font-bold text-ui-fg-base mb-2">Fale com a gente</h1>
       <p className="text-ui-fg-subtle mb-8">
         Empresa familiar de Santo André/SP, especialista em fraldas geriátricas
-        desde 2006. Atendemos de verdade — por WhatsApp, telefone, e-mail ou em
-        uma das nossas unidades.
+        desde 2006. Atendemos de verdade — por WhatsApp, telefone, e-mail ou na
+        nossa loja.
       </p>
 
       {/* Canais diretos */}
@@ -238,9 +190,9 @@ export default function ContatoPage() {
         </a>
       </div>
 
-      {/* Unidades */}
+      {/* Loja física */}
       <h2 className="mt-10 text-lg font-semibold text-ui-fg-base mb-3">
-        Nossas unidades
+        Onde estamos
       </h2>
       <div className="grid grid-cols-1 gap-4">
         {UNIDADES.map((u) => (
