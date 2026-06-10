@@ -1,4 +1,5 @@
 import { retrieveOrder } from "@lib/data/orders"
+import GcrOptin from "@modules/order/components/gcr-optin"
 import GoogleAdsConversion from "@modules/order/components/google-ads-conversion"
 import OrderCompletedTemplate from "@modules/order/templates/order-completed-template"
 import { Metadata } from "next"
@@ -54,6 +55,13 @@ export default async function OrderConfirmedPage(props: Props) {
         value={Number(order.total) || 0}
         transactionId={String(order.display_id ?? order.id)}
         newCustomer={novo}
+      />
+      {/* opt-in do Google Customer Reviews (garimpo #7): mantém a coleta de
+          seller ratings viva pós-cutover. Gate: NEXT_PUBLIC_GCR_OPTIN */}
+      <GcrOptin
+        orderId={String(order.display_id ?? order.id)}
+        email={order.email ?? ""}
+        createdAt={String(order.created_at ?? "")}
       />
       <OrderCompletedTemplate order={order} />
     </>

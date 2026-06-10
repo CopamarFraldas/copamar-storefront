@@ -19,16 +19,35 @@ const nextConfig = {
   // não conflita com nada) — no cutover o mesmo código atende o domínio real.
   async redirects() {
     const mapa = require("./redirects-magento.json")
+    // statusCode: 301 explícito (não `permanent:true`, que emite 308). Pro
+    // Google 308≡301 desde 2016, mas ferramentas de auditoria e bots antigos
+    // reconhecem melhor o 301 — e é o que o runbook do cutover documenta.
+    // OBS: os sources do mapa NÃO têm trailing slash — o Next normaliza /x/ → /x
+    // ANTES de aplicar redirects, então regra com barra nunca casaria (bug
+    // pego no teste: /blog/slug/ caía no wildcard → índice em vez do artigo).
     return [
+      // host www → apex (garimpo #4): sem isso, até os 301 morrem sob www.
+      // PRIMEIRA da lista — vale pra qualquer path, preservando-o.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.copamarfraldas.com.br" }],
+        destination: "https://copamarfraldas.com.br/:path*",
+        statusCode: 301,
+      },
       ...mapa.map((r) => ({
         source: r.source,
         destination: r.destination,
-        permanent: true, // 301
+        statusCode: 301,
       })),
-      // redes de segurança pro cutover: NENHUMA URL antiga vira 404.
-      // (nenhuma rota nova usa .html; /blog/<slug> antigo não-mapeado → índice)
-      { source: "/blog/:path*", destination: "/br/blog", permanent: true },
-      { source: "/:path*.html", destination: "/br", permanent: true },
+      // redes de segurança pro cutover (garimpo #2/#5): NENHUMA URL antiga vira
+      // 404 seco. Query strings (?p=, ?dir=, ?q=...) são ignoradas no match e
+      // preservadas no destino por padrão do Next (garimpo #3). Estas wildcard
+      // vêm DEPOIS do mapa: as regras 1-pra-1 (ex.: blog) têm precedência.
+      { source: "/index.php/:path*", destination: "/:path*", statusCode: 301 },
+      { source: "/catalogsearch/:path*", destination: "/br/search", statusCode: 301 },
+      { source: "/marcas/:path*", destination: "/br", statusCode: 301 },
+      { source: "/blog/:path*", destination: "/br/blog", statusCode: 301 },
+      { source: "/:path*.html", destination: "/br", statusCode: 301 },
     ]
   },
 

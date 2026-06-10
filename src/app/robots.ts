@@ -17,9 +17,14 @@ export default function robots(): MetadataRoute.Robots {
     }
   }
 
+  // Resultados de busca interna não devem ser indexados (padrão).
+  // /catalogsearch = busca legada do Magento (vai virar 301, mas não custa);
+  // /br/search + /*/search = busca nova (rota com countryCode dinâmico).
+  const SEARCH_DISALLOW = ["/catalogsearch", "/br/search", "/*/search"]
+
   return {
     rules: [
-      { userAgent: "*", allow: "/" },
+      { userAgent: "*", allow: "/", disallow: SEARCH_DISALLOW },
       { userAgent: "GPTBot", allow: "/" },
       { userAgent: "ClaudeBot", allow: "/" },
       { userAgent: "PerplexityBot", allow: "/" },

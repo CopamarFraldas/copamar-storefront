@@ -75,19 +75,29 @@ export default async function SobrePage({ params }: Props) {
           A loja que começou no Tucuruvi
         </h2>
         <p className="text-base-regular leading-7">
-          Foi a{" "}
+          A Copamar foi{" "}
+          <strong className="font-semibold text-ui-fg-base">
+            fundada em 2005 por um casal de biólogos
+          </strong>{" "}
+          — Seu Francisco, nosso pai, e nossa mãe — e nasceu unindo ciência e
+          cuidado. Foi a{" "}
           <strong className="font-semibold text-ui-fg-base">
             visão estratégica do Seu Francisco
           </strong>{" "}
-          — nosso pai — que deu origem à Copamar. Em{" "}
+          que deu o rumo ao negócio: em{" "}
           <strong className="font-semibold text-ui-fg-base">
             16 de maio de 2006
           </strong>
-          , ele abriu a primeira loja no{" "}
+          , a primeira loja abriu as portas no{" "}
           <strong className="font-semibold text-ui-fg-base">
             Tucuruvi, zona norte de São Paulo
           </strong>
           .
+        </p>
+        <p className="text-base-regular leading-7">
+          Nossa mãe, também bióloga, esteve ao lado dele desde o primeiro dia.
+          Ela já não está entre nós — mas o cuidado que ajudou a construir
+          permanece em tudo o que fazemos.
         </p>
         <p className="text-base-regular leading-7">
           No começo, ainda não era a distribuidora especializada que somos hoje.
@@ -196,7 +206,7 @@ export default async function SobrePage({ params }: Props) {
           </li>
         </ul>
         <p className="text-base-regular leading-7">
-          Quando Seu Francisco escolheu esse nome em 2006, ele já tinha um plano.
+          Quando Seu Francisco escolheu esse nome, ele já tinha um plano.
           Pensava em passar a empresa pros dois filhos — antes mesmo da loja
           vender a primeira fralda.{" "}
           <strong className="font-semibold text-ui-fg-base">
@@ -224,11 +234,16 @@ export default async function SobrePage({ params }: Props) {
           .
         </p>
         <p className="text-base-regular leading-7">
-          Ele segue conosco como{" "}
+          Ele segue na gestão, como{" "}
           <strong className="font-semibold text-ui-fg-base">
             consultor honorário
           </strong>
-          . Sempre presente, sempre lembrando que o que diferencia a Copamar é a
+          .{" "}
+          <strong className="font-semibold text-ui-fg-base">
+            Microbiologista
+          </strong>
+          , trata higiene e saúde com o rigor de quem entende do assunto —
+          sempre presente, sempre lembrando que o que diferencia a Copamar é a
           forma como cada cuidador é tratado, e não o produto em si. A
           experiência de quem construiu o negócio do zero não se aposenta.
         </p>
