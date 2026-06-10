@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { brl, rotuloPagamento, type Parada, type StatusParada } from "../_lib/dados"
 import { sair } from "../_lib/sessao"
 import { registrarStatus, avisarRotaSaiHoje } from "../_lib/acoes"
+import ComprovanteEntrega from "./comprovante"
 
 /**
  * Lista da rota do dia (Marco 10/06). Cada parada: nome, endereço (abrir no
@@ -192,7 +193,16 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
 
               {/* ações com TRAVA DE SEGURANÇA: seleciona → Confirmar (evita
                   toque errado disparar a mensagem errada pro cliente) */}
-              {sel ? (
+              {sel === "entregue" ? (
+                <ComprovanteEntrega
+                  parada={p}
+                  onFeito={() => {
+                    setStatus((s) => ({ ...s, [p.numero_pedido]: "entregue" }))
+                    setSelecao((s) => ({ ...s, [p.numero_pedido]: undefined }))
+                  }}
+                  onCancelar={() => cancelar(p.numero_pedido)}
+                />
+              ) : sel ? (
                 <div className="mt-3 rounded-xl border border-[#1251b8]/20 bg-[#1251b8]/5 p-3">
                   <p className="text-center text-sm text-slate-700">
                     Marcar como <strong>{LABEL[sel]}</strong>?

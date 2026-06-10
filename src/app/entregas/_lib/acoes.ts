@@ -40,6 +40,72 @@ async function enviarWhatsApp(celularCliente: string | null | undefined, texto: 
 }
 
 /**
+ * COMPROVANTE de entrega (Fase 2, Marco 10/06): sobe a foto pro Supabase Storage,
+ * grava recebedor (nome/CPF) + GPS + hora, marca ENTREGUE e avisa o cliente. É o
+ * "seguro" contra chargeback. Recebe FormData (tem a foto). Tudo é best-effort:
+ * o que o Dedé conseguir capturar entra; o que faltar, fica null.
+ */
+export async function registrarEntrega(
+  formData: FormData
+): Promise<{ ok: boolean; erro?: string }> {
+  if (!SUPA || !KEY) return { ok: false, erro: "Banco não configurado." }
+  const numero_pedido = String(formData.get("numero_pedido") || "")
+  if (!numero_pedido) return { ok: false, erro: "Pedido não informado." }
+  const nome = String(formData.get("recebedor_nome") || "").trim()
+  const cpf = String(formData.get("recebedor_cpf") || "").replace(/\D/g, "")
+  const gps_lat = formData.get("gps_lat") ? Number(formData.get("gps_lat")) : null
+  const gps_long = formData.get("gps_long") ? Number(formData.get("gps_long")) : null
+  const celular = String(formData.get("celular") || "")
+  const nome_cliente = String(formData.get("nome_cliente") || "")
+  const foto = formData.get("foto") as File | null
+
+  // sobe a foto pro Storage (bucket comprovantes)
+  let foto_url: string | null = null
+  if (foto && foto.size > 0) {
+    try {
+      const ext = foto.type.includes("png") ? "png" : foto.type.includes("webp") ? "webp" : "jpg"
+      const path = `${hojeBR()}/${numero_pedido}-${Date.now()}.${ext}`
+      const up = await fetch(`${SUPA}/storage/v1/object/comprovantes/${path}`, {
+        method: "POST",
+        headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": foto.type || "image/jpeg" },
+        body: Buffer.from(await foto.arrayBuffer()),
+      })
+      if (up.ok) foto_url = `${SUPA}/storage/v1/object/public/comprovantes/${path}`
+    } catch {
+      /* segue sem foto */
+    }
+  }
+
+  const agora = new Date().toISOString()
+  const patch: Record<string, any> = {
+    status: "entregue",
+    entregue_em: agora,
+    comprovante_em: agora,
+    atualizado_em: agora,
+    ultima_tentativa_em: agora,
+    recebedor_nome: nome || null,
+    recebedor_cpf: cpf || null,
+    gps_lat,
+    gps_long,
+    foto_url,
+  }
+  try {
+    const r = await fetch(
+      `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&numero_pedido=eq.${encodeURIComponent(numero_pedido)}`,
+      {
+        method: "PATCH",
+        headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify(patch),
+      }
+    )
+    await enviarWhatsApp(celular, mensagemCliente("entregue", nome_cliente))
+    return { ok: r.ok }
+  } catch {
+    return { ok: false, erro: "Falha ao gravar. Tente de novo." }
+  }
+}
+
+/**
  * Grava o status da entrega no Supabase (entregas_frota de hoje) — é o que faz a
  * MAPA saber o progresso real — e dispara o WhatsApp ao cliente (shadow/live).
  * Chamado pelo "Confirmar".
