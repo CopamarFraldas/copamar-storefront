@@ -1,6 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import { LOGIN_MIGRADO, SENHA_REDEFINIDA } from "@lib/util/migracao-constants"
 import medusaError from "@lib/util/medusa-error"
 import { isValidCpf, isValidCnpj } from "@lib/util/cpf"
 import { HttpTypes } from "@medusajs/types"
@@ -192,14 +193,78 @@ export async function login(_currentState: unknown, formData: FormData) {
         revalidateTag(customerCacheTag)
       })
   } catch (error: any) {
+    // MIGRAÇÃO (Marco 09/06): se a conta veio do site antigo e ainda não tem
+    // senha definida, o backend dispara o e-mail de redefinição e a UI mostra
+    // "trocamos de site" em vez de "senha inválida". Contas normais seguem o
+    // fluxo de erro comum (a rota responde migrado:false).
+    try {
+      const r = await sdk.client.fetch<{ migrado: boolean }>(
+        "/store/migracao/login-check",
+        { method: "POST", body: { email } }
+      )
+      if (r?.migrado) return LOGIN_MIGRADO
+    } catch {}
     return error.toString()
   }
+
+  // login OK → se era conta migrada, marca como reivindicada (sai do fluxo de
+  // migração; erros de senha futuros voltam a ser erros normais)
+  try {
+    const headers = await getAuthHeaders()
+    await sdk.client.fetch("/store/migracao/claimed", {
+      method: "POST",
+      headers,
+    })
+  } catch {}
 
   try {
     await transferCart()
   } catch (error: any) {
     return error.toString()
   }
+}
+
+/**
+ * Conclui a redefinição de senha (migração/esqueci a senha): consome o token
+ * do e-mail no endpoint core do Medusa. Retorna SENHA_REDEFINIDA ou mensagem
+ * de erro em PT.
+ */
+export async function redefinirSenha(_state: unknown, formData: FormData) {
+  const token = String(formData.get("token") || "")
+  const email = String(formData.get("email") || "").trim().toLowerCase()
+  const password = String(formData.get("password") || "")
+  const confirma = String(formData.get("password_confirm") || "")
+  if (!token) return "Link inválido — abra o link mais recente do e-mail."
+  if (password.length < 8) return "A senha precisa ter pelo menos 8 caracteres."
+  if (password !== confirma) return "As senhas não conferem — digite a mesma senha nos dois campos."
+  try {
+    await sdk.client.fetch("/auth/customer/emailpass/update", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: { email, password },
+    })
+    return SENHA_REDEFINIDA
+  } catch (e: any) {
+    const m = String(e?.message || e)
+    if (/expired|invalid|unauthorized|401|jwt/i.test(m)) {
+      return "Este link expirou. Volte ao login, digite seu e-mail e enviaremos um novo."
+    }
+    return "Não foi possível redefinir agora — tente novamente em instantes."
+  }
+}
+
+/** "Esqueci minha senha" manual (qualquer conta): dispara o e-mail de reset. */
+export async function solicitarResetSenha(_state: unknown, formData: FormData) {
+  const email = String(formData.get("email") || "").trim().toLowerCase()
+  if (!email.includes("@")) return "Digite um e-mail válido."
+  try {
+    await sdk.client.fetch("/auth/customer/emailpass/reset-password", {
+      method: "POST",
+      body: { identifier: email },
+    })
+  } catch {}
+  // resposta neutra de propósito (não revela se o e-mail tem cadastro)
+  return "Se este e-mail tiver cadastro, você receberá o link de redefinição em instantes."
 }
 
 export async function signout(countryCode: string) {
