@@ -6,6 +6,7 @@ import rotaJson from "../_data/rota.json"
 export type StatusParada = "pendente" | "entregue" | "ausente" | "adiado"
 
 export type Parada = {
+  id?: number
   ordem: number
   numero_pedido: string
   nome_cliente: string | null
@@ -20,28 +21,53 @@ export type Parada = {
   tentativas: number
 }
 
+const SUPA = process.env.SUPABASE_URL
+const KEY = process.env.SUPABASE_SERVICE_KEY
+
+/** data de hoje no fuso BR (UTC-3) — a rota é por dia (data_rota) */
+export function hojeBR(): string {
+  return new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10)
+}
+
+function normaliza(p: any): Parada {
+  return {
+    id: p.id,
+    ordem: p.ordem,
+    numero_pedido: String(p.numero_pedido),
+    nome_cliente: p.nome_cliente ?? null,
+    endereco: p.endereco ?? null,
+    cep: p.cep ?? null,
+    celular: p.celular ?? null,
+    maps_query: p.maps_query ?? null,
+    valor_total: Number(p.valor_total) || 0,
+    forma_pagamento: p.forma_pagamento || "",
+    ja_pago: !!p.ja_pago,
+    status: (p.status as StatusParada) || "pendente",
+    tentativas: p.tentativas || 0,
+  }
+}
+
 /**
- * Camada de dados do app de entregas — AGNÓSTICA DE BANCO (Marco 10/06).
- * Hoje lê do JSON da rota cruzada com o Bling. Quando o Marco decidir onde fica
- * o banco (Supabase OU Postgres no Hetzner), SÓ esta função muda — a UI não.
+ * Rota do dia. Lê do Supabase (entregas_frota de HOJE) — a fonte real, populada
+ * pelo cruzamento com o Bling. Fallback: JSON anonimizado (dev/sem banco). O git
+ * não guarda dado real de cliente; eles vivem no Supabase (Marco 10/06).
  */
 export async function getRota(): Promise<Parada[]> {
-  return (rotaJson as any[])
-    .map((p) => ({
-      ordem: p.ordem,
-      numero_pedido: String(p.numero_pedido),
-      nome_cliente: p.nome_cliente ?? null,
-      endereco: p.endereco ?? null,
-      cep: p.cep ?? null,
-      celular: p.celular ?? null,
-      maps_query: p.maps_query ?? null,
-      valor_total: Number(p.valor_total) || 0,
-      forma_pagamento: p.forma_pagamento || "",
-      ja_pago: !!p.ja_pago,
-      status: (p.status as StatusParada) || "pendente",
-      tentativas: p.tentativas || 0,
-    }))
-    .sort((a, b) => a.ordem - b.ordem)
+  if (SUPA && KEY) {
+    try {
+      const r = await fetch(
+        `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&order=ordem`,
+        { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }, cache: "no-store" }
+      )
+      if (r.ok) {
+        const rows = await r.json()
+        if (Array.isArray(rows) && rows.length) return rows.map(normaliza)
+      }
+    } catch {
+      /* cai no fallback */
+    }
+  }
+  return (rotaJson as any[]).map(normaliza).sort((a, b) => a.ordem - b.ordem)
 }
 
 export const brl = (n: number) =>
@@ -51,4 +77,27 @@ export const brl = (n: number) =>
 export function rotuloPagamento(p: Parada): string {
   if (p.ja_pago) return p.forma_pagamento.toLowerCase().includes("pac") ? "Pago no site" : "Já pago"
   return p.forma_pagamento
+}
+
+/**
+ * Templates das mensagens ao cliente (Marco 10/06 — ideias 1 e 2). Aqui (módulo
+ * normal), não em acoes.ts ("use server", que só exporta funções async).
+ * - sai_hoje: aviso de manhã ("sua entrega sai hoje") → reduz ausência.
+ * - entregue: confirmação na hora.  - ausente: ninguém em casa (nova tentativa).
+ * - adiado: imprevisto NOSSO → pede desculpa, NÃO conta como tentativa.
+ */
+export function mensagemCliente(status: string, nome?: string | null): string {
+  const oi = nome ? `Oi, ${nome.split(" ")[0]}! ` : "Oi! "
+  switch (status) {
+    case "sai_hoje":
+      return `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros. Se puder, deixe alguém em casa pra receber. 💙`
+    case "entregue":
+      return `${oi}Seu pedido da Copamar foi *entregue* agora 💙 Obrigado pela confiança! Qualquer coisa, é só chamar.`
+    case "ausente":
+      return `${oi}Passamos para entregar seu pedido da Copamar, mas não encontramos ninguém em casa 🚪 Vamos tentar de novo em breve. Se quiser combinar um horário melhor, é só responder aqui!`
+    case "adiado":
+      return `${oi}Tivemos um imprevisto na nossa rota de hoje e infelizmente seu pedido da Copamar *não vai sair hoje* 😔 Já remarcamos e ele é prioridade. Desculpe pelo transtorno — qualquer coisa, fale com a gente! 💙`
+    default:
+      return ""
+  }
 }

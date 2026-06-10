@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react"
 import { brl, rotuloPagamento, type Parada, type StatusParada } from "../_lib/dados"
 import { sair } from "../_lib/sessao"
+import { registrarStatus } from "../_lib/acoes"
 
 /**
  * Lista da rota do dia (Marco 10/06). Cada parada: nome, endereço (abrir no
@@ -34,11 +35,19 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
     setSelecao((s) => ({ ...s, [pedido]: undefined }))
   const confirmar = (pedido: string) => {
     const novo = selecao[pedido]
-    if (!novo) return
+    if (!novo || novo === "pendente") return
+    // otimista: atualiza a tela na hora e grava no Supabase em seguida. Gravar
+    // o status é o que faz a MAPA saber o progresso real ("estamos na nº X") e
+    // (com a flag ligada) dispara o WhatsApp ao cliente.
     setStatus((s) => ({ ...s, [pedido]: novo }))
     setSelecao((s) => ({ ...s, [pedido]: undefined }))
-    // FASE 1B: aqui grava no banco (o que o Marco escolher) + dispara o
-    // WhatsApp (entregue / ausente+próxima data / adiado "imprevisto nosso").
+    const p = paradas.find((x) => x.numero_pedido === pedido)
+    registrarStatus({
+      numero_pedido: pedido,
+      status: novo,
+      nome_cliente: p?.nome_cliente,
+      celular: p?.celular,
+    }).catch(() => {})
   }
 
   const LABEL: Record<StatusParada, string> = {
