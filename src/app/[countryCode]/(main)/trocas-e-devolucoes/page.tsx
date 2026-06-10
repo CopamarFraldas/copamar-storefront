@@ -1,25 +1,24 @@
 import { Metadata } from "next"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
-// RASCUNHO em revisão (Marco + pai) → noindex EXPLÍCITO nesta página, mesmo
-// após o go-live do site (gotcha: robots de página SOBRESCREVE o do layout —
-// aqui é proposital). Quando aprovarem, remover o robots + o banner.
+// PUBLICADA — aprovada pelo Marco em 10/06. robots = robotsMeta() segue o env
+// (noindex em staging, index em produção). NÃO usar undefined: vaza indexação.
 export async function generateMetadata(props: {
   params: Promise<{ countryCode: string }>
 }): Promise<Metadata> {
   const { countryCode } = await props.params
-  const { getSiteUrl } = await import("@lib/util/seo")
+  const { getSiteUrl, robotsMeta } = await import("@lib/util/seo")
   return {
     title: "Trocas e Devoluções",
     description:
       "Política de trocas e devoluções da Copamar Fraldas: arrependimento em até 7 dias (CDC) e troca por defeito de fábrica.",
     alternates: { canonical: `${getSiteUrl()}/${countryCode}/trocas-e-devolucoes` },
-    robots: { index: false, follow: false }, // RASCUNHO — tirar na aprovação
+    robots: robotsMeta(),
   }
 }
 
 /**
- * Política de Trocas e Devoluções — RASCUNHO (Marco 04/06).
+ * Política de Trocas e Devoluções (Marco 04/06) — PUBLICADA 10/06.
  * Base: CDC art. 49 (arrependimento, 7 dias) + art. 18 (vício/defeito) +
  * regra sanitária da loja: produto de higiene pessoal só volta LACRADO.
  * Regra explícita pedida pelo Marco: pacote aberto/avariado NÃO troca por
@@ -28,12 +27,6 @@ export async function generateMetadata(props: {
 export default function TrocasDevolucoesPage() {
   return (
     <div className="content-container max-w-3xl py-10 small:py-16">
-      {/* banner de rascunho — remover quando o Marco e o pai aprovarem */}
-      <div className="mb-6 rounded-lg border border-amber-400 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-600 dark:bg-amber-900/20 dark:text-amber-200">
-        📝 <strong>RASCUNHO em revisão</strong> — este texto ainda será validado
-        pela Copamar antes de valer oficialmente.
-      </div>
-
       <h1 className="text-3xl font-bold text-ui-fg-base mb-2">
         Trocas e Devoluções
       </h1>

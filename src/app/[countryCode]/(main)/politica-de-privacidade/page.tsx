@@ -1,38 +1,30 @@
 import { Metadata } from "next"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
-// RASCUNHO em revisão (Marco + pai) → noindex EXPLÍCITO até a aprovação
-// (gotcha: robots de página SOBRESCREVE o do layout — aqui é proposital).
-// Quando aprovarem: remover o robots + o banner.
+// PUBLICADA — aprovada pelo Marco em 10/06. robots = robotsMeta() segue o env
+// (noindex em staging, index em produção). NÃO usar undefined: vaza indexação.
 export async function generateMetadata(props: {
   params: Promise<{ countryCode: string }>
 }): Promise<Metadata> {
   const { countryCode } = await props.params
-  const { getSiteUrl } = await import("@lib/util/seo")
+  const { getSiteUrl, robotsMeta } = await import("@lib/util/seo")
   return {
     title: "Política de Privacidade",
     description:
       "Como a Copamar Fraldas coleta, usa e protege seus dados pessoais (LGPD): cadastro, pedidos, cookies, compartilhamento com parceiros e seus direitos como titular.",
     alternates: { canonical: `${getSiteUrl()}/${countryCode}/politica-de-privacidade` },
-    robots: { index: false, follow: false }, // RASCUNHO — tirar na aprovação
+    robots: robotsMeta(),
   }
 }
 
 /**
- * Política de Privacidade — RASCUNHO (Marco 06/06, exigência LGPD).
+ * Política de Privacidade (Marco 06/06, exigência LGPD) — PUBLICADA 10/06.
  * Reflete o que o site REALMENTE faz: cookies só com consentimento (banner),
  * pagamento via PagBank/PagHiper, NF via Bling, entrega por transportadora.
- * Mesmo fluxo de revisão do /trocas-e-devolucoes.
  */
 export default function PoliticaPrivacidadePage() {
   return (
     <div className="content-container max-w-3xl py-10 small:py-16">
-      {/* banner de rascunho — remover quando o Marco e o pai aprovarem */}
-      <div className="mb-6 rounded-lg border border-amber-400 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-600 dark:bg-amber-900/20 dark:text-amber-200">
-        📝 <strong>RASCUNHO em revisão</strong> — este texto ainda será validado
-        pela Copamar antes de valer oficialmente.
-      </div>
-
       <h1 className="text-3xl font-bold text-ui-fg-base mb-2">
         Política de Privacidade
       </h1>
