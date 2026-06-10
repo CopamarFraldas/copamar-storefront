@@ -150,6 +150,18 @@ const AccountNav = ({
                   Pedidos
                 </AccountNavLink>
               </li>
+              {/* histórico do site antigo — só pra contas migradas (Marco 10/06) */}
+              {(customer?.metadata as any)?.migrado && (
+                <li>
+                  <AccountNavLink
+                    href="/account/compras-anteriores"
+                    route={route!}
+                    data-testid="compras-anteriores-link"
+                  >
+                    Compras anteriores
+                  </AccountNavLink>
+                </li>
+              )}
               <li className="text-grey-700">
                 <button
                   type="button"
