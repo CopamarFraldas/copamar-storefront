@@ -1,7 +1,7 @@
 "use client"
 
-import { redefinirSenha } from "@lib/data/customer"
-import { SENHA_REDEFINIDA } from "@lib/util/migracao-constants"
+import { redefinirSenha, solicitarResetSenha } from "@lib/data/customer"
+import { SENHA_REDEFINIDA, TOKEN_EXPIRADO } from "@lib/util/migracao-constants"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -19,6 +19,41 @@ export default function RedefinirSenhaForm({
   email: string
 }) {
   const [message, formAction] = useActionState(redefinirSenha, null)
+  const [reenvioMsg, reenviarAction] = useActionState(solicitarResetSenha, null)
+
+  // Link vencido (o token do core dura só 15min): auto-recuperação em 1 clique
+  if (message === TOKEN_EXPIRADO) {
+    return (
+      <div className="w-full max-w-sm text-center" data-testid="token-expirado">
+        <h1 className="text-2xl font-bold text-copamar-primary">
+          Esse link já venceu ⏰
+        </h1>
+        <p className="mt-3 text-sm text-ui-fg-base">
+          Por segurança, o link do e-mail vale por pouco tempo. Sem problema —
+          é só pedir um novo:
+        </p>
+        {reenvioMsg ? (
+          <p className="mt-5 rounded-large bg-emerald-50 p-3 text-sm text-emerald-700" data-testid="reenvio-ok">
+            📬 {reenvioMsg} Abra o e-mail mais recente e conclua por ele.
+          </p>
+        ) : (
+          <form action={reenviarAction} className="mt-5">
+            <input type="hidden" name="email" value={email} />
+            <SubmitButton className="w-full" data-testid="reenviar-link-button">
+              Me envie um novo link
+            </SubmitButton>
+          </form>
+        )}
+        {!email && (
+          <p className="mt-4 text-sm text-ui-fg-subtle">
+            <LocalizedClientLink href="/esqueci-senha" className="underline">
+              Pedir o link informando meu e-mail
+            </LocalizedClientLink>
+          </p>
+        )}
+      </div>
+    )
+  }
 
   if (message === SENHA_REDEFINIDA) {
     return (

@@ -1,7 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
-import { LOGIN_MIGRADO, SENHA_REDEFINIDA } from "@lib/util/migracao-constants"
+import { LOGIN_MIGRADO, SENHA_REDEFINIDA, TOKEN_EXPIRADO } from "@lib/util/migracao-constants"
 import medusaError from "@lib/util/medusa-error"
 import { isValidCpf, isValidCnpj } from "@lib/util/cpf"
 import { HttpTypes } from "@medusajs/types"
@@ -247,7 +247,8 @@ export async function redefinirSenha(_state: unknown, formData: FormData) {
   } catch (e: any) {
     const m = String(e?.message || e)
     if (/expired|invalid|unauthorized|401|jwt/i.test(m)) {
-      return "Este link expirou. Volte ao login, digite seu e-mail e enviaremos um novo."
+      // o core fixa o token em 15min — a UI oferece reenvio em 1 clique
+      return TOKEN_EXPIRADO
     }
     return "Não foi possível redefinir agora — tente novamente em instantes."
   }
