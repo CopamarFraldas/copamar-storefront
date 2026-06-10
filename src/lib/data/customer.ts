@@ -36,7 +36,9 @@ export const retrieveCustomer =
       .fetch<{ customer: HttpTypes.StoreCustomer }>(`/store/customers/me`, {
         method: "GET",
         query: {
-          fields: "*orders",
+          // metadata+phone: detecta migrado/celular_confirmado e mostra o número
+          // atual na tela "Confirme seu WhatsApp" (migração, Marco 10/06)
+          fields: "*orders,metadata,phone",
         },
         headers,
         next,
@@ -247,6 +249,17 @@ export async function redefinirSenha(_state: unknown, formData: FormData) {
       headers: { Authorization: `Bearer ${token}` },
       body: { email, password },
     })
+    // COSTURADO (Marco 10/06): loga automático com a senha recém-criada, pra
+    // emendar direto na tela "Confirme seu WhatsApp" sem novo login manual.
+    // Best-effort: se falhar, a pessoa só faz login normal (a tela aparece lá).
+    try {
+      const loginToken = await sdk.auth.login("customer", "emailpass", { email, password })
+      await setAuthToken(loginToken as string)
+      const tag = await getCacheTag("customers")
+      revalidateTag(tag)
+      const headers = await getAuthHeaders()
+      await sdk.client.fetch("/store/migracao/claimed", { method: "POST", headers })
+    } catch {}
     return SENHA_REDEFINIDA
   } catch (e: any) {
     const m = String(e?.message || e)
@@ -270,6 +283,30 @@ export async function solicitarResetSenha(_state: unknown, formData: FormData) {
   } catch {}
   // resposta neutra de propósito (não revela se o e-mail tem cadastro)
   return "Se este e-mail tiver cadastro, você receberá o link de redefinição em instantes."
+}
+
+/**
+ * Confirma/corrige o WhatsApp do cliente migrado (tela do 1º acesso, Marco
+ * 10/06 — bug do autocomplete que "comia o último dígito" no site antigo).
+ * O backend valida (11 díg com o 9) e propaga pro Bling. Retorna "OK" no
+ * sucesso ou a mensagem de erro em PT.
+ */
+export async function confirmarCelular(_state: unknown, formData: FormData) {
+  const phone = String(formData.get("phone") || "")
+  try {
+    const headers = await getAuthHeaders()
+    const r = await sdk.client.fetch<{ ok: boolean; erro?: string }>(
+      "/store/migracao/confirmar-celular",
+      { method: "POST", headers, body: { phone } }
+    )
+    if (!r?.ok) return r?.erro || "Não foi possível salvar o número — confira e tente de novo."
+  } catch (e: any) {
+    return String(e?.message || e).replace(/^Error:\s*/i, "") ||
+      "Não foi possível salvar o número agora."
+  }
+  const tag = await getCacheTag("customers")
+  revalidateTag(tag)
+  return "OK"
 }
 
 export async function signout(countryCode: string) {
