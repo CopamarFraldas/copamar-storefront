@@ -90,11 +90,11 @@ export function mensagemCliente(status: string, nome?: string | null): string {
   const oi = nome ? `Oi, ${nome.split(" ")[0]}! ` : "Oi! "
   switch (status) {
     case "sai_hoje":
-      return `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros. Se puder, deixe alguém em casa pra receber. 💙`
+      return `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros. Pode receber em casa ou deixar na portaria, como for melhor pra você 👍`
     case "entregue":
       return `${oi}Seu pedido da Copamar foi *entregue* agora 💙 Obrigado pela confiança! Qualquer coisa, é só chamar.`
     case "ausente":
-      return `${oi}Passamos para entregar seu pedido da Copamar, mas não encontramos ninguém em casa 🚪 Vamos tentar de novo em breve. Se quiser combinar um horário melhor, é só responder aqui!`
+      return `${oi}Passamos para entregar seu pedido da Copamar, mas não encontramos ninguém pra receber 🚪 Vamos tentar de novo em breve. Se quiser combinar um horário melhor, é só responder aqui!`
     case "adiado":
       return `${oi}Tivemos um imprevisto na nossa rota de hoje e infelizmente seu pedido da Copamar *não vai sair hoje* 😔 Já remarcamos e ele é prioridade. Desculpe pelo transtorno — qualquer coisa, fale com a gente! 💙`
     default:
