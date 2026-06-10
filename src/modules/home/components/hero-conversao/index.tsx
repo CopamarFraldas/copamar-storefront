@@ -13,9 +13,9 @@ import BannerEsteira from "@modules/home/components/banner-esteira"
 const MARCAS: { nome: string; logo: string | null }[] = [
   { nome: "TENA", logo: "/logos/tena.png" },
   { nome: "Abena", logo: "/logos/abena.png" },
-  { nome: "Adultcare", logo: "/logos/adultcare.png" },
+  { nome: "Adultcare (Incofral)", logo: "/logos/adultcare.png" },
   { nome: "Biofral", logo: "/logos/biofral.png" },
-  { nome: "DryMan", logo: "/logos/dryman.png" },
+  { nome: "DryMan (Dry Brasil)", logo: "/logos/dryman.png" },
   { nome: "Plena", logo: "/logos/plena.png" },
 ]
 

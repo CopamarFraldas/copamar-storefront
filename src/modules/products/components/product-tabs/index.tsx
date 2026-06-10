@@ -88,7 +88,7 @@ export const ShippingInfoTab = () => {
           <div>
             <span className="font-semibold">Entrega rápida</span>
             <p className="max-w-sm">
-              Seu pedido chega em 3 a 5 dias úteis no ponto de retirada ou
+              Seu pedido chega em até 3 dias úteis no ponto de retirada ou
               no conforto da sua casa.*
             </p>
             <p className="max-w-sm mt-1 text-xs text-ui-fg-subtle">

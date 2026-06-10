@@ -80,6 +80,12 @@ export default function ProductActions({
   }, [product.variants, options])
 
   useEffect(() => {
+    // only sync v_id to the URL for multi-variant products (avoids polluting
+    // the URL/history when there's a single variant)
+    if ((product.variants?.length ?? 0) <= 1) {
+      return
+    }
+
     const params = new URLSearchParams(searchParams.toString())
     const value = isValidVariant ? selectedVariant?.id : null
 

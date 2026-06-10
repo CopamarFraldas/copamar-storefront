@@ -12,11 +12,11 @@ const FAQS = [
   },
   {
     q: "Vocês entregam para todo o Brasil?",
-    a: "Sim. Calcule o frete digitando seu CEP na finalização da compra. Para a Grande São Paulo, temos opções de entrega expressa.",
+    a: "Sim. Calcule o frete digitando seu CEP na finalização da compra. Para a Grande São Paulo, temos opções mais rápidas de entrega.",
   },
   {
     q: "Quais as formas de pagamento?",
-    a: "Escolha como pagar com total segurança: Garanta 5% de desconto no PIX ou parcele em até 3x sem juros no cartão. Também aceitamos boleto.",
+    a: "Escolha como pagar com total segurança: Garanta 5% de desconto no PIX ou no boleto, ou parcele em até 3x sem juros no cartão.",
   },
   {
     q: "Tem preço de atacado para revenda?",

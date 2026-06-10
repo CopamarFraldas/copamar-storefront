@@ -293,6 +293,25 @@ export async function applyPromotions(codes: string[]) {
     .catch(medusaError)
 }
 
+/**
+ * 5% PIX de VERDADE (Marco 09/06): aplica/remove a promoção PIX5 conforme o
+ * método de pagamento escolhido. Por ser promoção do Medusa, o desconto entra
+ * no TOTAL do carrinho → QR PIX, resumo, pedido, e-mails e Bling ficam todos
+ * consistentes (nada de desconto "só no marketing").
+ */
+export async function setDescontoPix(ativo: boolean) {
+  const cartId = await getCartId()
+  if (!cartId) return
+  const cart = await retrieveCart(cartId, "id,*promotions")
+  const codes: string[] = ((cart as any)?.promotions || [])
+    .map((p: any) => p?.code)
+    .filter((c: any): c is string => typeof c === "string" && !!c)
+  const tem = codes.includes("PIX5")
+  if (ativo === tem) return
+  const novos = ativo ? [...codes, "PIX5"] : codes.filter((c) => c !== "PIX5")
+  await applyPromotions(novos)
+}
+
 export async function applyGiftCard(code: string) {
   //   const cartId = getCartId()
   //   if (!cartId) return "No cartId cookie found"
@@ -349,6 +368,21 @@ export async function submitPromotionForm(
 }
 
 // TODO: Pass a POJO instead of a form entity here
+/** Erros do passo de endereço em PT-BR (sem prefixo técnico em inglês). */
+function traduzErroEndereco(msg: string): string {
+  const m = (msg || "").toLowerCase()
+  if (/cep|postal|fulfillment|shipping|frete|atende/.test(m)) {
+    return "Não conseguimos calcular o frete para este CEP. Confira o CEP digitado e tente novamente."
+  }
+  if (/fetch failed|econnrefused|network|timeout|socket/.test(m)) {
+    return "Falha de conexão ao salvar o endereço — tente novamente em instantes."
+  }
+  return (msg || "Não foi possível salvar o endereço — tente novamente.").replace(
+    /^Error setting up the request:\s*/i,
+    ""
+  )
+}
+
 export async function setAddresses(currentState: unknown, formData: FormData) {
   try {
     if (!formData) {
@@ -443,9 +477,24 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     const existing = await retrieveCart(cartId, "id,metadata")
     data.metadata = { ...(existing?.metadata || {}), ...fiscalMeta }
 
-    await updateCart(data)
+    try {
+      await updateCart(data)
+    } catch (err: any) {
+      // Trocar o CEP com um método de frete JÁ escolhido pode estourar o
+      // recálculo (CEP fora da cobertura do método antigo) e travar o checkout
+      // (Marco 09/06). Desgruda o método e tenta UMA vez de novo — a etapa de
+      // entrega recalcula as opções válidas pro CEP novo.
+      try {
+        await sdk.client.fetch(`/store/carts/${cartId}/reset-shipping`, {
+          method: "POST",
+        })
+        await updateCart(data)
+      } catch (err2: any) {
+        return traduzErroEndereco(err2?.message || err?.message || String(err))
+      }
+    }
   } catch (e: any) {
-    return e.message
+    return traduzErroEndereco(e.message)
   }
 
   redirect(

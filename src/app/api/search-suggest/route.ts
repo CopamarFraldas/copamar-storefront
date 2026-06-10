@@ -41,20 +41,24 @@ export async function GET(req: NextRequest) {
     `${base}/store/products?q=${encodeURIComponent(q)}&limit=6` +
     `&region_id=${region.id}` +
     `&fields=handle,title,thumbnail,*variants.calculated_price`
-  let countUnaccent: number | null = null
   try {
-    const rb = await fetch(`${base}/store/busca?q=${encodeURIComponent(q)}&limit=6`, {
+    // limit=48 = MESMO da página /search: a contagem do dropdown sai do
+    // /store/products (que filtra canal de venda/publishable key), não do count
+    // bruto do SQL — senão diverge da página (ex.: 31 × 30 pra "tena" quando um
+    // produto publicado está fora do canal).
+    const rb = await fetch(`${base}/store/busca?q=${encodeURIComponent(q)}&limit=48`, {
       headers: { "x-publishable-api-key": pk },
       next: { revalidate: 60 },
     })
     if (rb.ok) {
       const db = await rb.json()
       if (Array.isArray(db.ids)) {
-        countUnaccent = db.count ?? db.ids.length
         if (db.ids.length === 0) return NextResponse.json({ produtos: [], count: 0 })
+        // todos os ids no filtro (count = visíveis, igual à página) + limit=6
+        // só pra hidratar o dropdown; order=title preserva os 6 primeiros A→Z.
         url =
           `${base}/store/products?${db.ids.map((i: string) => `id[]=${i}`).join("&")}` +
-          `&limit=6&region_id=${region.id}` +
+          `&limit=6&order=title&region_id=${region.id}` +
           `&fields=handle,title,thumbnail,*variants.calculated_price`
       }
     }
@@ -73,7 +77,8 @@ export async function GET(req: NextRequest) {
       thumbnail: p.thumbnail || null,
       preco: menorPreco(p.variants),
     }))
-    return NextResponse.json({ produtos, count: countUnaccent ?? (d.count || 0) })
+    // count SEMPRE do /store/products — mesma fonte da página /search.
+    return NextResponse.json({ produtos, count: d.count || 0 })
   } catch {
     return NextResponse.json({ produtos: [], count: 0 })
   }

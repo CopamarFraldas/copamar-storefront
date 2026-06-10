@@ -55,7 +55,7 @@ const ITENS: { icone: React.ReactNode; titulo: string; detalhe: string }[] = [
       </svg>
     ),
     titulo: "Pagamento seguro",
-    detalhe: "cartão, PIX e boleto via PagBank",
+    detalhe: "cartão, PIX e boleto — pagamento processado com segurança",
   },
 ]
 

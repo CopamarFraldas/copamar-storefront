@@ -32,7 +32,7 @@ const NoticeBar = () => {
         <span aria-hidden>🚚</span>
         <span>
           Entrega para <strong>todo o Brasil</strong> · 3x sem juros ou{" "}
-          <strong>5% de desconto no PIX</strong>
+          <strong>5% de desconto no PIX e no boleto</strong>
         </span>
       </div>
       <button

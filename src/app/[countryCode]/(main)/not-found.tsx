@@ -3,8 +3,10 @@ import { Metadata } from "next"
 import InteractiveLink from "@modules/common/components/interactive-link"
 
 export const metadata: Metadata = {
-  title: "404",
-  description: "Algo deu errado",
+  // absolute: o template do layout anexaria "| Copamar" de novo.
+  title: { absolute: "Página não encontrada | Copamar Fraldas" },
+  description:
+    "A página que você procura não existe ou foi movida. Volte para a página inicial ou veja todos os produtos da Copamar Fraldas.",
 }
 
 export default function NotFound() {
@@ -15,6 +17,7 @@ export default function NotFound() {
         A página que você tentou acessar não existe.
       </p>
       <InteractiveLink href="/">Ir para a página inicial</InteractiveLink>
+      <InteractiveLink href="/store">Ver todos os produtos</InteractiveLink>
     </div>
   )
 }

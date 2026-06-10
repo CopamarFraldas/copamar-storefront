@@ -2,13 +2,13 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 /**
  * "Não sabe qual escolher?" (nº3) — atalho cedo pro cuidador NOVO, que trava na
- * dúvida (slip vs pants, tamanho) e abandona. Mini-guia curto + atalho pra Mapa
- * (assistente IA 24h no WhatsApp) que tira a dúvida na hora. Sem claim médico.
+ * dúvida (slip vs pants, tamanho) e abandona. Mini-guia curto + atalho pro time
+ * humano no WhatsApp ("especialista" = humano no site todo). Sem claim médico.
  */
-const WHATS_MAPA =
-  "https://wa.me/551149903013?text=" +
+const WHATS_ESPECIALISTA =
+  "https://wa.me/5511952050000?text=" +
   encodeURIComponent(
-    "Olá Mapa! Não sei qual fralda escolher (modelo/tamanho). Pode me ajudar?"
+    "Olá! Não sei qual fralda escolher — pode me ajudar?"
   )
 
 const DICAS = [
@@ -83,7 +83,7 @@ const GuiaEscolha = () => (
 
       {/* CTA no FINAL do bloco (mt-auto pinça no rodapé do flex-col) */}
       <a
-        href={WHATS_MAPA}
+        href={WHATS_ESPECIALISTA}
         target="_blank"
         rel="noopener noreferrer"
         className="mt-auto inline-flex w-full items-center justify-center rounded-large bg-copamar-cta px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-copamar-cta-dark"

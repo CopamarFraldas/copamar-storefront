@@ -2,7 +2,7 @@
 
 import { RadioGroup } from "@headlessui/react"
 import { isStripeLike, isPagBank, isPagHiperBoleto, paymentInfoMap } from "@lib/constants"
-import { initiatePaymentSession } from "@lib/data/cart"
+import { initiatePaymentSession, setDescontoPix } from "@lib/data/cart"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import { Button, Container, Heading, Text, clx } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -109,6 +109,18 @@ const Payment = ({
     setError(null)
   }, [isOpen])
 
+  // 5% à vista de verdade (Marco 09/06): a promoção PIX5 entra no PIX e no
+  // BOLETO e sai no cartão. Como é promoção do Medusa, o desconto vale no
+  // TOTAL (QR/boleto, resumo, pedido, NF) — não é só texto de marketing.
+  useEffect(() => {
+    if (!isOpen) return
+    const querDesconto = Boolean(
+      (isPagBank(selectedPaymentMethod) && pagbankMethod === "pix") ||
+        isPagHiperBoleto(selectedPaymentMethod)
+    )
+    setDescontoPix(querDesconto).catch(() => {})
+  }, [isOpen, selectedPaymentMethod, pagbankMethod])
+
   return (
     <div className="bg-ui-bg-base">
       <div className="flex flex-row items-center justify-between mb-6">
@@ -214,10 +226,15 @@ const Payment = ({
                 ))}
               </div>
               {pagbankMethod === "pix" ? (
-                <PagBankPix
-                  cartId={cart.id}
-                  fiscalDoc={cart?.metadata?.fiscal_documento as string}
-                />
+                <>
+                  <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    ✅ 5% de desconto no PIX aplicado no total
+                  </p>
+                  <PagBankPix
+                    cartId={cart.id}
+                    fiscalDoc={cart?.metadata?.fiscal_documento as string}
+                  />
+                </>
               ) : (
                 <PagBankCard
                   cartId={cart.id}
@@ -235,6 +252,9 @@ const Payment = ({
             // Boleto PagHiper (#52): painel próprio (linha digitável/PDF) que
             // conduz até a confirmação — não usa o botão de revisão, igual ao PagBank.
             <div className="mt-6">
+              <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                ✅ 5% de desconto no boleto aplicado no total
+              </p>
               <PagHiperBoleto
                 cartId={cart.id}
                 fiscalDoc={cart?.metadata?.fiscal_documento as string}

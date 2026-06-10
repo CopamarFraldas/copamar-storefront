@@ -86,7 +86,7 @@ export default function ContatoPage() {
       </div>
 
       <p className="mt-8 text-xs text-ui-fg-subtle">
-        Copamar Fraldas · CNPJ 08.140.992/0001-64 · Há quase 20 anos cuidando de
+        Copamar Fraldas · CNPJ 08.140.992/0001-64 · Há 20 anos cuidando de
         quem você ama.
       </p>
     </div>

@@ -18,9 +18,13 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { q } = await searchParams
   const termo = (q || "").trim()
   return {
-    title: termo
-      ? `Busca: ${termo} | Copamar Fraldas`
-      : "Buscar produtos | Copamar Fraldas",
+    // absolute: senão o template do layout anexa "| Copamar" de novo e a
+    // marca duplica no <title>.
+    title: {
+      absolute: termo
+        ? `Busca: ${termo} | Copamar Fraldas`
+        : "Buscar produtos | Copamar Fraldas",
+    },
     // páginas de busca não são indexáveis (parametrizadas) — e em staging tudo
     // é noindex de qualquer forma.
     robots: { index: false, follow: true },

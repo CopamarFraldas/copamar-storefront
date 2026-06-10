@@ -6,7 +6,7 @@
 const ITENS = [
   { icone: "🏭", titulo: "Direto das fábricas", sub: "Atacado e varejo" },
   { icone: "📦", titulo: "Entrega em todo Brasil", sub: "Frete calculado no CEP" },
-  { icone: "💳", titulo: "3x sem juros no crédito", sub: "ou 5% de desconto no PIX" },
+  { icone: "💳", titulo: "3x sem juros no crédito", sub: "ou 5% no PIX e no boleto" },
   { icone: "🛡️", titulo: "Especialistas desde 2006", sub: "em fraldas geriátricas" },
 ]
 

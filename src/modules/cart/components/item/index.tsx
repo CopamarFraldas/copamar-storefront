@@ -86,7 +86,10 @@ const Item = ({ item, type = "full", currencyCode, disponivel }: ItemProps) => {
 
       {type === "full" && (
         <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
+          {/* w-fit (era w-28=112px): o conteúdo (lixeira + −/input/+) ocupa
+              ~155px — com w-28 o "+" vazava pra célula do preço unitário, que
+              interceptava o clique (botão inclicável no desktop; fix 09/06) */}
+          <div className="flex gap-2 items-center w-fit">
             <DeleteButton id={item.id} data-testid="product-delete-button" />
             <QuantityInput
               value={item.quantity}
