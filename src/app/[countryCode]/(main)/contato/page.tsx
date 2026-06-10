@@ -36,10 +36,8 @@ function mapsUrl(query: string) {
  *
  * - Unidade 1 (Matriz): "Rua Iugoslávia, 167 / Parque das Nações. Santo André/SP"
  *   Fones (11) 2989-6895 / (11) 3565-1880 / (11) 4119-0201
- *   ⚠️ HORÁRIO DIVERGENTE no site velho: a página /contacts diz
- *   "Segunda-Sexta: 08:00-17:00", mas o RODAPÉ do mesmo site diz
- *   "Segunda-Sexta: 09:00-17:00". Usamos o da /contacts (08h) — Marco vai
- *   confirmar qual é o real.
+ *   HORÁRIO CONFIRMADO pelo Marco (10/06): Seg a Sex 08:00–17:00,
+ *   Sáb 09:00–12:00. Fecha em feriados, mas atende em emendas/pontes.
  * - Unidade 2 (Araras): "Rua Treze de Maio, 716 / Centro. Araras/SP"
  *   (só existe no site velho — não estava no storefront novo)
  * - Unidade 3: "Rua Edu Chaves 250 sl11 / Vila Basto. Santo André/SP"
@@ -55,8 +53,11 @@ const UNIDADES = [
     rua: "Rua Iugoslávia, 167",
     bairroCidade: "Parque das Nações · Santo André/SP",
     telefones: ["(11) 2989-6895", "(11) 3565-1880", "(11) 4119-0201"],
-    // /contacts diz 08h; rodapé do site velho diz 09h — ver comentário acima
-    horario: ["Segunda a Sexta: 08:00–17:00", "Sábado: 09:00–12:00"],
+    horario: [
+      "Segunda a Sexta: 08:00–17:00",
+      "Sábado: 09:00–12:00",
+      "Fechado em feriados — atendemos em emendas e pontes",
+    ],
     mapsQuery:
       "Rua Iugoslávia, 167 - Parque das Nações, Santo André - SP",
     schema: {

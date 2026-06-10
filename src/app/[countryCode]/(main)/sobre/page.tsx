@@ -77,10 +77,10 @@ export default async function SobrePage({ params }: Props) {
         <p className="text-base-regular leading-7">
           A Copamar foi{" "}
           <strong className="font-semibold text-ui-fg-base">
-            fundada em 2005 por um casal de biólogos
+            fundada em 2006 por um casal de biólogos
           </strong>{" "}
-          — Seu Francisco, nosso pai, e nossa mãe — e nasceu unindo ciência e
-          cuidado. Foi a{" "}
+          — Seu Francisco, nosso pai, e dona Elisabete, nossa mãe — e nasceu
+          unindo ciência e cuidado. Foi a{" "}
           <strong className="font-semibold text-ui-fg-base">
             visão estratégica do Seu Francisco
           </strong>{" "}
@@ -95,8 +95,8 @@ export default async function SobrePage({ params }: Props) {
           .
         </p>
         <p className="text-base-regular leading-7">
-          Nossa mãe, também bióloga, esteve ao lado dele desde o primeiro dia.
-          Ela já não está entre nós — mas o cuidado que ajudou a construir
+          Dona Elisabete, também bióloga, esteve ao lado dele desde o primeiro
+          dia. Ela já não está entre nós — mas o cuidado que ajudou a construir
           permanece em tudo o que fazemos.
         </p>
         <p className="text-base-regular leading-7">

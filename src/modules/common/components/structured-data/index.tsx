@@ -60,7 +60,7 @@ export function organizationSchema() {
     "@id": `${SITE_URL}/#organization`,
     name: "Copamar Fraldas",
     legalName:
-      "Copamar Distribuidora e Atacadista de Fraldas e Produtos de Higiene LTDA",
+      "Copamar Distribuidora e Atacadista de Fraldas e Produtos de Higiene Ltda - ME",
     url: SITE_URL,
     logo: `${SITE_URL}/logo-512.png`,
     image: `${SITE_URL}/og-image.png`,

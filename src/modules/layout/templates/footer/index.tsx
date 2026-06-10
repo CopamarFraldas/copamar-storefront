@@ -48,8 +48,9 @@ export default async function Footer() {
         <div className="flex flex-col w-full pb-10 gap-y-3 text-ui-fg-subtle">
           {/* identificação legal — Decreto 7.962/2013 (garimpo #12) */}
           <Text className="txt-compact-xsmall text-ui-fg-muted">
-            Copamar Com. de Fraldas Descartáveis Ltda · CNPJ 08.140.992/0001-64 ·
-            Rua Iugoslávia, 167 — Parque das Nações, Santo André/SP, CEP 09280-110 ·{" "}
+            Copamar Distribuidora e Atacadista de Fraldas e Produtos de Higiene
+            Ltda - ME · CNPJ 08.140.992/0001-64 · Rua Iugoslávia, 167 — Parque
+            das Nações, Santo André/SP, CEP 09280-110 ·{" "}
             <a
               href="tel:+551141190201"
               className="hover:text-[#1251b8] transition-colors"
