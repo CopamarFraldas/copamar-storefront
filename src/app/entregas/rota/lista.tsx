@@ -78,11 +78,19 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
             <p className="text-xs/4 opacity-80">Rota de hoje · Dedé</p>
             <h1 className="text-xl font-bold">{paradas.length} entregas</h1>
           </div>
-          <form action={sair}>
-            <button className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95">
-              Sair
-            </button>
-          </form>
+          <div className="flex items-center gap-2">
+            <a
+              href="/entregas/importar"
+              className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95"
+            >
+              📋 Importar
+            </a>
+            <form action={sair}>
+              <button className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95">
+                Sair
+              </button>
+            </form>
+          </div>
         </div>
         {/* progresso */}
         <div className="mt-3 flex items-center gap-3">
