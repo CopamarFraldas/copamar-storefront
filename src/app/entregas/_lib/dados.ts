@@ -96,7 +96,7 @@ export function mensagemCliente(status: string, nome?: string | null): string {
     case "ausente":
       return `${oi}Passamos para entregar seu pedido da Copamar, mas não encontramos ninguém pra receber 🚪 Vamos tentar de novo em breve. Se quiser combinar um horário melhor, é só responder aqui!`
     case "adiado":
-      return `${oi}Tivemos um imprevisto na nossa rota de hoje e infelizmente seu pedido da Copamar *não vai sair hoje* 😔 Já remarcamos e ele é prioridade. Desculpe pelo transtorno — qualquer coisa, fale com a gente! 💙`
+      return `${oi}Tivemos um contratempo na nossa rota de hoje e o seu pedido da Copamar precisou ser remarcado 🙏 Já está reagendado — e *quando ele sair pra entrega de novo, a gente te avisa por aqui*. Desculpe o transtorno; qualquer coisa, é só responder! 💙`
     default:
       return ""
   }
