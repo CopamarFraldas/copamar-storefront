@@ -12,7 +12,7 @@ export default function ImportarForm() {
   const [nomeArquivo, setNomeArquivo] = useState("")
 
   return (
-    <div className="flex min-h-screen flex-col px-6 py-8">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-6 py-8">
       <a href="/entregas/rota" className="mb-4 text-sm text-[#1251b8]">← voltar pra rota</a>
       <div className="mb-1 text-4xl" aria-hidden>📋</div>
       <h1 className="text-2xl font-bold text-[#1251b8]">Importar a rota do dia</h1>

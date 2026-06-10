@@ -20,9 +20,11 @@ export const viewport: Viewport = {
 }
 
 export default function EntregasLayout({ children }: { children: React.ReactNode }) {
+  // sem largura fixa: cada tela controla a sua (login/importar centrados; a
+  // rota vira grid largo no desktop — o Marco e o irmão usam no PC).
   return (
     <div className="min-h-screen bg-[#f1f5f9] text-[#0f172a] antialiased">
-      <div className="mx-auto w-full max-w-md">{children}</div>
+      {children}
     </div>
   )
 }

@@ -74,6 +74,7 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
     <div className="pb-10">
       {/* topo */}
       <header className="sticky top-0 z-10 bg-[#1251b8] px-5 pb-4 pt-5 text-white shadow-md">
+       <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs/4 opacity-80">Rota de hoje · Dedé</p>
@@ -114,9 +115,10 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
         >
           {aviso || '📣 Avisar a rota: "sai hoje"'}
         </button>
+       </div>
       </header>
 
-      <ul className="flex flex-col gap-3 px-4 pt-4">
+      <ul className="mx-auto grid max-w-6xl grid-cols-1 gap-3 px-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
         {paradas.map((p) => {
           const st = status[p.numero_pedido]
           const sel = selecao[p.numero_pedido]
