@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { brl, rotuloPagamento, type Parada, type StatusParada } from "../_lib/dados"
 import { sair } from "../_lib/sessao"
 import { registrarStatus, avisarRotaSaiHoje } from "../_lib/acoes"
@@ -51,6 +51,28 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
     }).catch(() => {})
   }
 
+  // "Terminei as entregas" (Marco): some a lista e mostra o "bom descanso" com
+  // o resumo. A hora de início fica no localStorage (1ª abertura do dia) pra
+  // calcular a duração mesmo que ele recarregue a página.
+  const [terminou, setTerminou] = useState(false)
+  const [inicio, setInicio] = useState<number | null>(null)
+  useEffect(() => {
+    const hoje = new Date().toISOString().slice(0, 10)
+    const k = `entregas_inicio_${hoje}`
+    let v = localStorage.getItem(k)
+    if (!v) {
+      v = String(Date.now())
+      localStorage.setItem(k, v)
+    }
+    setInicio(Number(v))
+  }, [])
+  const duracao = () => {
+    if (!inicio) return ""
+    const min = Math.max(1, Math.round((Date.now() - inicio) / 60000))
+    const h = Math.floor(min / 60), m = min % 60
+    return h > 0 ? `${h}h${m > 0 ? ` ${m}min` : ""}` : `${m}min`
+  }
+
   const [aviso, setAviso] = useState("")
   const avisarRota = async () => {
     if (aviso === "enviando…") return
@@ -70,6 +92,34 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
     adiado: "Deixar pra outro dia 📅",
   }
 
+  // tela final — "Bom descanso, Dedé!"
+  if (terminou) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center px-8 text-center">
+        <div className="text-6xl" aria-hidden>🎉</div>
+        <h1 className="mt-4 text-3xl font-extrabold text-[#1251b8]">Bom descanso, Dedé!</h1>
+        <p className="mt-1 text-lg font-semibold text-slate-700">Missão cumprida 💪</p>
+        <div className="mt-7 w-full max-w-xs rounded-2xl bg-white p-6 shadow-sm">
+          <p className="text-4xl font-bold text-[#22c55e]">
+            {feitas} <span className="text-xl font-medium text-slate-400">de {paradas.length}</span>
+          </p>
+          <p className="text-sm text-slate-500">entregas concluídas</p>
+          {inicio && (
+            <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-600">
+              feitas em <strong>{duracao()}</strong>
+            </p>
+          )}
+        </div>
+        <button
+          onClick={() => setTerminou(false)}
+          className="mt-7 text-sm text-slate-400 underline underline-offset-2"
+        >
+          voltar à lista
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="pb-10">
       {/* topo */}
@@ -86,12 +136,6 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
               className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95"
             >
               📄 Comprovantes
-            </a>
-            <a
-              href="/entregas/importar"
-              className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95"
-            >
-              📋 Importar
             </a>
             <form action={sair}>
               <button className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95">
@@ -275,6 +319,16 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
           )
         })}
       </ul>
+
+      {/* fim da rota — "Terminei as entregas" */}
+      <div className="mx-auto max-w-md px-4 pt-6">
+        <button
+          onClick={() => setTerminou(true)}
+          className="w-full rounded-2xl bg-[#1251b8] py-4 text-base font-bold text-white shadow-sm active:scale-[0.99]"
+        >
+          ✅ Terminei as entregas
+        </button>
+      </div>
     </div>
   )
 }
