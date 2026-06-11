@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { grupoLoja } from "./product-filters"
 
 interface MinPricedProduct extends HttpTypes.StoreProduct {
   _minPrice?: number
@@ -9,11 +10,15 @@ interface MinPricedProduct extends HttpTypes.StoreProduct {
  * Helper function to sort products by price until the store API supports sorting by price
  * @param products
  * @param sortBy
- * @returns products sorted by price
+ * @param lojaBoost — só a /store: Tena primeiro, infantil por último (Marco
+ *   11/06; o rank 1-6 das Enzzo Baby jogava as INFANTIS pro topo da loja).
+ *   Não se aplica quando o cliente escolhe ordenar por preço (intenção explícita).
+ * @returns products sorted
  */
 export function sortProducts(
   products: HttpTypes.StoreProduct[],
-  sortBy: SortOptions
+  sortBy: SortOptions,
+  lojaBoost = false
 ): HttpTypes.StoreProduct[] {
   let sortedProducts = products as MinPricedProduct[]
 
@@ -54,6 +59,15 @@ export function sortProducts(
     const rb = Number((b.metadata as any)?.rank ?? Infinity)
     return ra - rb
   })
+
+  // Boost da LOJA (estável, por último = vence): Tena (0) → demais (1) →
+  // infantil (2). Dentro de cada grupo a ordenação acima se mantém — as Enzzo
+  // Baby seguem RN→P→M→G entre si, mas no FIM da vitrine.
+  if (lojaBoost && sortBy === "created_at") {
+    sortedProducts.sort(
+      (a, b) => grupoLoja(a.title || "", a.categories) - grupoLoja(b.title || "", b.categories)
+    )
+  }
 
   return sortedProducts
 }

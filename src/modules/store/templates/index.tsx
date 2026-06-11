@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
+import FiltrosLoja from "@modules/store/components/filtros-loja"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
@@ -23,7 +24,14 @@ const StoreTemplate = ({
       className="flex flex-col small:flex-row small:items-start py-6 content-container"
       data-testid="category-container"
     >
-      <RefinementList sortBy={sort} />
+      {/* sidebar: ordenar + FILTROS multi-seleção (marca/tamanho/gênero) —
+          só na loja (Marco 11/06); categorias seguem com o filtro próprio */}
+      <div className="small:sticky small:top-24 small:max-w-[280px]">
+        <RefinementList sortBy={sort} />
+        <div className="px-6 pb-8 small:px-0 small:ml-[1.675rem]">
+          <FiltrosLoja gridId="store-grid" />
+        </div>
+      </div>
       <div className="w-full">
         <div className="mb-8">
           {/* #56: H1 com as keywords reais (era "Todos os produtos", genérico) */}
@@ -39,6 +47,8 @@ const StoreTemplate = ({
             sortBy={sort}
             page={pageNumber}
             countryCode={countryCode}
+            gridId="store-grid"
+            lojaBoost
           />
         </Suspense>
       </div>

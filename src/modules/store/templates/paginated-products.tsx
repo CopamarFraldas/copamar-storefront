@@ -1,5 +1,6 @@
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { inferGenero, inferMarca } from "@lib/util/product-filters"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -23,6 +24,7 @@ export default async function PaginatedProducts({
   productsIds,
   countryCode,
   gridId,
+  lojaBoost,
 }: {
   sortBy?: SortOptions
   page: number
@@ -31,18 +33,19 @@ export default async function PaginatedProducts({
   productsIds?: string[]
   countryCode: string
   gridId?: string
+  lojaBoost?: boolean
 }) {
   const queryParams: PaginatedProductsParams = {
-    // modo filtro (gridId, ex. categoria): carrega mais pra o filtro client-side
-    // por data-attribute cobrir a categoria inteira (são poucos produtos).
-    limit: gridId ? 48 : 12,
+    // modo filtro (gridId, ex. categoria/loja): carrega TUDO pra o filtro
+    // client-side por data-attribute cobrir o catálogo inteiro (98 produtos).
+    limit: gridId ? 100 : 12,
   }
 
   if (gridId) {
-    // fields explícito com +metadata (filtro de tamanho) MAS preservando os
-    // campos de estoque — senão o card marca "esgotado" por falta do campo.
+    // fields explícito com +metadata (tamanho) e *categories (gênero) MAS
+    // preservando os campos de estoque — senão o card marca "esgotado".
     queryParams["fields"] =
-      "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata"
+      "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata,*categories"
   }
 
   if (collectionId) {
@@ -74,6 +77,7 @@ export default async function PaginatedProducts({
     queryParams,
     sortBy,
     countryCode,
+    lojaBoost,
   })
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
@@ -91,6 +95,8 @@ export default async function PaginatedProducts({
               key={p.id}
               data-titulo={p.title}
               data-tamanho={((p.metadata || {}) as any).tamanho || ""}
+              data-marca={inferMarca(p.title || "")}
+              data-genero={inferGenero(p.title || "", p.categories)}
             >
               <ProductPreview product={p} region={region} />
             </li>
