@@ -25,8 +25,11 @@ const StoreTemplate = ({
       data-testid="category-container"
     >
       {/* sidebar: ordenar + FILTROS multi-seleção (marca/tamanho/gênero) —
-          só na loja (Marco 11/06); categorias seguem com o filtro próprio */}
-      <div className="small:sticky small:top-24 small:max-w-[280px]">
+          só na loja (Marco 11/06); categorias seguem com o filtro próprio.
+          max-h + overflow próprio: a sidebar é mais alta que a viewport, e sem
+          isso o sticky deixava as opções de baixo inalcançáveis (scroll com o
+          mouse sobre ela rola a PRÓPRIA sidebar agora). */}
+      <div className="small:sticky small:top-20 small:max-w-[280px] small:max-h-[calc(100vh-6rem)] small:overflow-y-auto small:overscroll-contain small:pr-1">
         <RefinementList sortBy={sort} />
         <div className="px-6 pb-8 small:px-0 small:ml-[1.675rem]">
           <FiltrosLoja gridId="store-grid" />
