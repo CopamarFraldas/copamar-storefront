@@ -33,6 +33,32 @@ export function inferGenero(
   return "Unissex"
 }
 
+/** Tipo de produto pro filtro da loja (Marco 11/06): separa fraldas de
+ * higiene (luvas/toalhas), absorventes, pants e protetores de cama. */
+export function inferTipo(
+  titulo: string,
+  categorias?: HttpTypes.StoreProductCategory[] | null
+): string {
+  const t = (titulo || "").toLowerCase()
+  const nomes = (categorias || []).map((c) => c?.name || "").join(" | ").toLowerCase()
+  if (t.includes("pants") || nomes.includes("pants") || nomes.includes("roupa íntima") || nomes.includes("roupa intima"))
+    return "Pants (roupa íntima)"
+  if (t.includes("protetor") || t.includes("lençol") || t.includes("lencol") || nomes.includes("protetores de cama"))
+    return "Protetores de cama"
+  if (t.includes("absorvente") || t.startsWith("abs") || / abs\.? /.test(t) || nomes.includes("absorvente"))
+    return "Absorventes"
+  if (t.includes("fralda") || nomes.includes("fralda"))
+    return "Fraldas"
+  if (
+    t.includes("luva") || t.includes("toalha") || t.includes("lenço") || t.includes("lenco") ||
+    t.includes("sabonete") || t.includes("shampoo") || t.includes("creme") || t.includes("algodão") ||
+    t.includes("algodao") || t.includes("máscara") || t.includes("mascara") || t.includes("avental") ||
+    t.includes("touca") || nomes.includes("higiene")
+  )
+    return "Higiene (luvas, toalhas…)"
+  return "Outros"
+}
+
 /** Grupo de ordenação da loja: Tena primeiro (0), infantil por último (2). */
 export function grupoLoja(titulo: string, categorias?: HttpTypes.StoreProductCategory[] | null): number {
   if (inferGenero(titulo, categorias) === "Infantil") return 2

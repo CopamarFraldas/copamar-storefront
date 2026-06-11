@@ -10,8 +10,10 @@ import BannerEsteira from "@modules/home/components/banner-esteira"
  * humana (idoso + cuidador) com pacotes reais. Abaixo = faixa de marcas.
  * A foto humana é PLACEHOLDER (entra foto real/licenciada depois).
  */
-const MARCAS: { nome: string; logo: string | null }[] = [
-  { nome: "TENA", logo: "/logos/tena.png" },
+const MARCAS: { nome: string; logo: string | null; zoom?: boolean }[] = [
+  // zoom: logos mais "quadradas" (TENA tem os arcos) precisam de mais altura
+  // que o max-h padrão pra ter a mesma presença visual dos wordmarks
+  { nome: "TENA", logo: "/logos/tena.png", zoom: true },
   { nome: "Abena", logo: "/logos/abena.png" },
   { nome: "Adultcare (Incofral)", logo: "/logos/adultcare.png" },
   { nome: "Biofral", logo: "/logos/biofral.png" },
@@ -102,7 +104,7 @@ export default function HeroConversao() {
             >
               {m.logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={m.logo} alt={m.nome} className="max-h-7 w-auto max-w-full object-contain" />
+                <img src={m.logo} alt={m.nome} className={`${m.zoom ? "max-h-10" : "max-h-7"} w-auto max-w-full object-contain`} />
               ) : (
                 <span className="text-base font-bold tracking-tight text-copamar-primary/80">
                   {m.nome}

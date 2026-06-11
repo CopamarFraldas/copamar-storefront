@@ -1,6 +1,6 @@
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
-import { inferGenero, inferMarca } from "@lib/util/product-filters"
+import { inferGenero, inferMarca, inferTipo } from "@lib/util/product-filters"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -97,6 +97,7 @@ export default async function PaginatedProducts({
               data-tamanho={((p.metadata || {}) as any).tamanho || ""}
               data-marca={inferMarca(p.title || "")}
               data-genero={inferGenero(p.title || "", p.categories)}
+              data-tipo={inferTipo(p.title || "", p.categories)}
             >
               <ProductPreview product={p} region={region} />
             </li>
