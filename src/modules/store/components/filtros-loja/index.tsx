@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 /**
  * Filtros da LOJA (/store) na sidebar — Marca, Tamanho e "Para quem" em LISTA
@@ -14,11 +14,10 @@ const ORDEM_GEN = ["Unissex", "Masculino", "Feminino", "Infantil"]
 
 type Opcao = { valor: string; qtd: number }
 
+type Item = { tipo: string; marca: string; tamanho: string; genero: string }
+
 const FiltrosLoja = ({ gridId }: { gridId: string }) => {
-  const [tipos, setTipos] = useState<Opcao[]>([])
-  const [marcas, setMarcas] = useState<Opcao[]>([])
-  const [tamanhos, setTamanhos] = useState<Opcao[]>([])
-  const [generos, setGeneros] = useState<Opcao[]>([])
+  const [itens, setItens] = useState<Item[]>([])
   const [selTipo, setSelTipo] = useState<Set<string>>(new Set())
   const [selMarca, setSelMarca] = useState<Set<string>>(new Set())
   const [selTam, setSelTam] = useState<Set<string>>(new Set())
@@ -58,37 +57,13 @@ const FiltrosLoja = ({ gridId }: { gridId: string }) => {
         setTimeout(ler, 150)
         return
       }
-      const conta = (attr: string) => {
-        const m = new Map<string, number>()
-        lis.forEach((li) => {
-          const v = li.getAttribute(attr)
-          if (v) m.set(v, (m.get(v) || 0) + 1)
-        })
-        return m
-      }
-      const tp = conta("data-tipo")
-      const m = conta("data-marca")
-      const t = conta("data-tamanho")
-      const g = conta("data-genero")
-      setTipos(
-        Array.from(tp, ([valor, qtd]) => ({ valor, qtd })).sort((a, b) =>
-          a.valor === "Outros" ? 1 : b.valor === "Outros" ? -1 : b.qtd - a.qtd
-        )
-      )
-      setMarcas(
-        Array.from(m, ([valor, qtd]) => ({ valor, qtd })).sort((a, b) =>
-          a.valor === "Outras" ? 1 : b.valor === "Outras" ? -1 : b.qtd - a.qtd
-        )
-      )
-      setTamanhos(
-        Array.from(t, ([valor, qtd]) => ({ valor, qtd })).sort(
-          (a, b) => ORDEM_TAM.indexOf(a.valor) - ORDEM_TAM.indexOf(b.valor)
-        )
-      )
-      setGeneros(
-        Array.from(g, ([valor, qtd]) => ({ valor, qtd })).sort(
-          (a, b) => ORDEM_GEN.indexOf(a.valor) - ORDEM_GEN.indexOf(b.valor)
-        )
+      setItens(
+        lis.map((li) => ({
+          tipo: li.getAttribute("data-tipo") || "",
+          marca: li.getAttribute("data-marca") || "",
+          tamanho: li.getAttribute("data-tamanho") || "",
+          genero: li.getAttribute("data-genero") || "",
+        }))
       )
       setMostrando(lis.length)
       setTotal(lis.length)
@@ -116,6 +91,47 @@ const FiltrosLoja = ({ gridId }: { gridId: string }) => {
     })
     setMostrando(vis)
   }, [selTipo, selMarca, selTam, selGen, gridId])
+
+  // FACETS dinâmicos (Marco 11/06): a contagem de cada opção considera os
+  // filtros dos OUTROS grupos (não o próprio — preserva o OR interno). Opção
+  // que zera some da lista (a menos que esteja selecionada). A ORDEM é fixa
+  // (pela contagem total) pra lista não "dançar" a cada clique.
+  const sels: Record<keyof Item, Set<string>> = {
+    tipo: selTipo,
+    marca: selMarca,
+    tamanho: selTam,
+    genero: selGen,
+  }
+  const { tipos, marcas, tamanhos, generos } = useMemo(() => {
+    const casaExceto = (i: Item, exceto: keyof Item) =>
+      (Object.keys(sels) as (keyof Item)[]).every(
+        (k) => k === exceto || sels[k].size === 0 || sels[k].has(i[k])
+      )
+    const facet = (campo: keyof Item, ordem?: string[], ultimo?: string): Opcao[] => {
+      const totalPor = new Map<string, number>()
+      itens.forEach((i) => i[campo] && totalPor.set(i[campo], (totalPor.get(i[campo]) || 0) + 1))
+      const dinamico = new Map<string, number>()
+      itens.forEach((i) => {
+        if (i[campo] && casaExceto(i, campo))
+          dinamico.set(i[campo], (dinamico.get(i[campo]) || 0) + 1)
+      })
+      return Array.from(totalPor.keys())
+        .sort((a, b) =>
+          ordem
+            ? ordem.indexOf(a) - ordem.indexOf(b)
+            : a === ultimo ? 1 : b === ultimo ? -1 : (totalPor.get(b) || 0) - (totalPor.get(a) || 0)
+        )
+        .map((valor) => ({ valor, qtd: dinamico.get(valor) || 0 }))
+        .filter((o) => o.qtd > 0 || sels[campo].has(o.valor))
+    }
+    return {
+      tipos: facet("tipo", undefined, "Outros"),
+      marcas: facet("marca", undefined, "Outras"),
+      tamanhos: facet("tamanho", ORDEM_TAM),
+      generos: facet("genero", ORDEM_GEN),
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itens, selTipo, selMarca, selTam, selGen])
 
   const toggle = (set: Set<string>, setter: (s: Set<string>) => void, v: string) => {
     const n = new Set(set)
