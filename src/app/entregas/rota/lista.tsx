@@ -6,6 +6,7 @@ import { sair } from "../_lib/sessao"
 import { registrarStatus, avisarRotaSaiHoje } from "../_lib/acoes"
 import ComprovanteEntrega from "./comprovante"
 import TentativaEntrega from "./tentativa"
+import MapaRota from "./mapa-rota"
 
 /**
  * Lista da rota do dia (Marco 10/06). Cada parada: nome, endereço (abrir no
@@ -163,6 +164,19 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
     adiado: "Deixar pra outro dia 📅",
   }
 
+  // LINHAS COLAPSÁVEIS (redesign Spoke, Marco 11/06): cada parada é uma linha
+  // compacta; clicar expande os botões. A PRÓXIMA pendente abre sozinha (e o
+  // pino dela pulsa no mapa). Entregues vão pra aba cinza no topo.
+  const [expandido, setExpandido] = useState<Record<string, boolean>>({})
+  const [mostrarEntregues, setMostrarEntregues] = useState(false)
+  const proxima = paradas.find((p) => (status[p.numero_pedido] || "pendente") === "pendente")
+  const estaAberta = (pedido: string) =>
+    expandido[pedido] ?? proxima?.numero_pedido === pedido
+  const toggleLinha = (pedido: string) =>
+    setExpandido((e) => ({ ...e, [pedido]: !estaAberta(pedido) }))
+  const entreguesArr = paradas.filter((p) => status[p.numero_pedido] === "entregue")
+  const ativas = paradas.filter((p) => status[p.numero_pedido] !== "entregue")
+
   // sem rota importada hoje — NUNCA mostra rota demo em produção (auditoria 11/06)
   if (paradas.length === 0) {
     return (
@@ -275,52 +289,96 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
        </div>
       </header>
 
-      <ul className="mx-auto grid max-w-6xl grid-cols-1 gap-3 px-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
-        {paradas.map((p) => {
+      {/* MAPA DA ROTA estilo Spoke: pinos numerados, trajeto, próxima pulsando */}
+      <div className="mx-auto max-w-6xl">
+        <MapaRota paradas={paradas} status={status} />
+      </div>
+
+      <div className="mx-auto max-w-3xl px-3 pt-3">
+        {/* aba ENTREGUES (cinza, recolhida) no topo */}
+        {entreguesArr.length > 0 && (
+          <div className="mb-2 overflow-hidden rounded-xl bg-slate-100">
+            <button
+              onClick={() => setMostrarEntregues((v) => !v)}
+              className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-500"
+            >
+              <span>✅ Entregues ({entreguesArr.length})</span>
+              <span className={`transition-transform ${mostrarEntregues ? "rotate-180" : ""}`} aria-hidden>▾</span>
+            </button>
+            {mostrarEntregues && (
+              <ul className="border-t border-slate-200">
+                {entreguesArr.map((p) => (
+                  <li
+                    key={p.numero_pedido}
+                    className="flex items-center gap-2.5 border-b border-slate-200/70 px-4 py-2 last:border-0"
+                  >
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-300 text-xs font-bold text-white">✓</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-slate-500 line-through">{p.endereco || p.nome_cliente}</p>
+                      <p className="text-[11px] text-slate-400">#{p.numero_pedido}{p.nome_cliente ? ` · ${p.nome_cliente}` : ""}</p>
+                    </div>
+                    <a href={`/entregas/comprovante/${p.numero_pedido}`} className="shrink-0 text-xs font-semibold text-[#1251b8]">📄</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {/* LINHAS das entregas (clica → expande os botões) */}
+        <ul className="flex flex-col gap-1.5 pb-2">
+        {ativas.map((p) => {
           const st = status[p.numero_pedido]
           const sel = selecao[p.numero_pedido]
-          const concluida = st !== "pendente"
+          const aberta = estaAberta(p.numero_pedido)
+          const ehProxima = proxima?.numero_pedido === p.numero_pedido
           return (
             <li
               key={p.numero_pedido}
-              className={`rounded-2xl bg-white p-4 shadow-sm transition ${
-                concluida ? "opacity-60" : ""
+              className={`overflow-hidden rounded-xl bg-white shadow-sm transition ${
+                ehProxima ? "ring-2 ring-[#1251b8]/50" : ""
               }`}
             >
-              <div className="flex items-start gap-3">
+              {/* LINHA compacta: nº · endereço · pedido · cobrança · valor */}
+              <button
+                onClick={() => toggleLinha(p.numero_pedido)}
+                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left"
+                aria-expanded={aberta}
+              >
                 <span
-                  className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                    st === "entregue"
-                      ? "bg-[#22c55e] text-white"
-                      : st === "ausente"
-                        ? "bg-amber-400 text-white"
-                        : st === "adiado"
-                          ? "bg-indigo-400 text-white"
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                    st === "ausente"
+                      ? "bg-amber-400 text-white"
+                      : st === "adiado"
+                        ? "bg-indigo-400 text-white"
+                        : ehProxima
+                          ? "bg-[#1251b8] text-white"
                           : "bg-[#1251b8]/10 text-[#1251b8]"
                   }`}
                 >
-                  {st === "entregue" ? "✓" : st === "ausente" ? "!" : st === "adiado" ? "↦" : p.ordem}
+                  {st === "ausente" ? "!" : st === "adiado" ? "↦" : p.ordem}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-slate-900">
-                    {p.nome_cliente || `Pedido #${p.numero_pedido}`}
+                  <p className="truncate text-sm font-semibold text-slate-800">
+                    {p.endereco || p.nome_cliente || `Pedido #${p.numero_pedido}`}
                   </p>
-                  <p className="text-xs text-slate-500">Pedido #{p.numero_pedido}</p>
+                  <p className="truncate text-[11px] text-slate-500">
+                    #{p.numero_pedido}
+                    {p.nome_cliente ? ` · ${p.nome_cliente}` : ""}
+                  </p>
                 </div>
-                {/* selo de pagamento */}
                 {p.ja_pago ? (
-                  <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
-                    🟢 {rotuloPagamento(p)}
-                  </span>
+                  <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">🟢 pago</span>
                 ) : (
-                  <span className="shrink-0 rounded-full bg-orange-50 px-2.5 py-1 text-right text-xs font-bold text-orange-700">
+                  <span className="shrink-0 rounded-full bg-orange-50 px-2 py-0.5 text-right text-[11px] font-bold text-orange-700">
                     💰 {brl(p.valor_total)}
-                    <span className="block text-[10px] font-medium opacity-80">
-                      {p.forma_pagamento}
-                    </span>
                   </span>
                 )}
-              </div>
+                <span className={`shrink-0 text-slate-400 transition-transform ${aberta ? "rotate-180" : ""}`} aria-hidden>▾</span>
+              </button>
+
+              {/* CORPO expandido */}
+              <div className={aberta ? "px-3 pb-3" : "hidden"}>
 
               {/* endereço + navegação (Maps OU Waze — Marco 11/06) */}
               {p.endereco && (
@@ -471,10 +529,12 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
                     </a>
                   ) : null
                 })()}
+              </div>{/* fim do corpo expandido */}
             </li>
           )
         })}
-      </ul>
+        </ul>
+      </div>
 
       {/* fim da rota — "Terminei as entregas" */}
       <div className="mx-auto max-w-md px-4 pt-6">

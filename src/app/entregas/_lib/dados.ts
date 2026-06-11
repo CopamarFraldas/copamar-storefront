@@ -23,6 +23,8 @@ export type Parada = {
   gps_long: number | null
   aviso_sai_hoje_em: string | null
   instrucao_cliente: string | null
+  dest_lat: number | null
+  dest_long: number | null
 }
 
 const SUPA = process.env.SUPABASE_URL
@@ -52,6 +54,8 @@ function normaliza(p: any): Parada {
     gps_long: typeof p.gps_long === "number" ? p.gps_long : null,
     aviso_sai_hoje_em: p.aviso_sai_hoje_em ?? null,
     instrucao_cliente: p.instrucao_cliente ?? null,
+    dest_lat: typeof p.dest_lat === "number" ? p.dest_lat : null,
+    dest_long: typeof p.dest_long === "number" ? p.dest_long : null,
   }
 }
 
