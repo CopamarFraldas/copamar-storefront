@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { logado } from "../../_lib/sessao"
+import { fotoComprovante } from "../../_lib/dados"
 import BotaoBaixar from "./baixar"
 
 const SUPA = process.env.SUPABASE_URL
@@ -41,6 +42,8 @@ export default async function ComprovantePage(props: {
   if (!(await logado())) redirect("/entregas")
   const { pedido } = await props.params
   const c = await getComprovante(pedido)
+  // foto: path no bucket → signed URL (compatível com bucket privado/LGPD)
+  const fotoUrl = c ? await fotoComprovante(c.foto_url) : null
 
   if (!c) {
     return (
@@ -106,9 +109,9 @@ export default async function ComprovantePage(props: {
         {/* foto */}
         <div className="mt-5">
           <p className="mb-2 text-sm font-semibold text-slate-500">Foto da entrega</p>
-          {c.foto_url ? (
+          {fotoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={c.foto_url} alt="Foto da entrega" className="max-h-80 rounded-lg border border-slate-200 object-contain" />
+            <img src={fotoUrl} alt="Foto da entrega" className="max-h-80 rounded-lg border border-slate-200 object-contain" />
           ) : (
             <p className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">
               Sem foto registrada nesta entrega.

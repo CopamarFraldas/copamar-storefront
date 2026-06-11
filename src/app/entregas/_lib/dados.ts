@@ -19,6 +19,8 @@ export type Parada = {
   ja_pago: boolean
   status: StatusParada
   tentativas: number
+  gps_lat: number | null
+  gps_long: number | null
 }
 
 const SUPA = process.env.SUPABASE_URL
@@ -44,30 +46,68 @@ function normaliza(p: any): Parada {
     ja_pago: !!p.ja_pago,
     status: (p.status as StatusParada) || "pendente",
     tentativas: p.tentativas || 0,
+    gps_lat: typeof p.gps_lat === "number" ? p.gps_lat : null,
+    gps_long: typeof p.gps_long === "number" ? p.gps_long : null,
   }
 }
 
 /**
  * Rota do dia. Lê do Supabase (entregas_frota de HOJE) — a fonte real, populada
- * pelo cruzamento com o Bling. Fallback: JSON anonimizado (dev/sem banco). O git
- * não guarda dado real de cliente; eles vivem no Supabase (Marco 10/06).
+ * pelo cruzamento com o Bling. Sem rota importada (ou erro) → lista VAZIA, e a
+ * tela mostra "sem rota hoje" — NUNCA a rota demo: o Dedé não pode ver paradas
+ * falsas em produção (auditoria 11/06). O JSON anonimizado fica só pra dev sem
+ * banco configurado. Dado real de cliente vive no Supabase, não no git.
  */
 export async function getRota(): Promise<Parada[]> {
-  if (SUPA && KEY) {
+  if (!SUPA || !KEY) {
+    // dev sem banco: rota demo anonimizada
+    return (rotaJson as any[]).map(normaliza).sort((a, b) => a.ordem - b.ordem)
+  }
+  try {
+    const r = await fetch(
+      `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&order=ordem`,
+      { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }, cache: "no-store" }
+    )
+    if (r.ok) {
+      const rows = await r.json()
+      if (Array.isArray(rows)) return rows.map(normaliza)
+    }
+  } catch {
+    /* erro de rede → vazio (tela "sem rota") */
+  }
+  return []
+}
+
+/**
+ * URL exibível da foto do comprovante. Aceita o PATH no bucket (formato novo) ou
+ * a URL pública antiga. Bucket é PRIVADO (LGPD, Marco 11/06): gera signed URL de
+ * 7 DIAS — dá pra encaminhar o link (chargeback, cliente) e a pessoa ver com
+ * calma; abrir o comprovante de novo gera um link novo de 7 dias.
+ */
+export async function fotoComprovante(fotoRef: string | null): Promise<string | null> {
+  if (!fotoRef || !SUPA || !KEY) return fotoRef
+  const path = fotoRef.startsWith("http")
+    ? decodeURIComponent(fotoRef.split("/comprovantes/")[1] || "")
+    : fotoRef
+  if (!path) return fotoRef
+  // 2 tentativas: falha transitória da assinatura não pode virar "Sem foto"
+  for (let tentativa = 0; tentativa < 2; tentativa++) {
     try {
-      const r = await fetch(
-        `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&order=ordem`,
-        { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }, cache: "no-store" }
-      )
+      const r = await fetch(`${SUPA}/storage/v1/object/sign/comprovantes/${path}`, {
+        method: "POST",
+        headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ expiresIn: 7 * 24 * 3600 }),
+      })
       if (r.ok) {
-        const rows = await r.json()
-        if (Array.isArray(rows) && rows.length) return rows.map(normaliza)
+        const j = await r.json()
+        if (j?.signedURL) return `${SUPA}/storage/v1${j.signedURL}`
       }
+      if (r.status === 400 || r.status === 404) break // objeto não existe (ex.: tentativa >7d apagada)
     } catch {
-      /* cai no fallback */
+      /* tenta de novo */
     }
   }
-  return (rotaJson as any[]).map(normaliza).sort((a, b) => a.ordem - b.ordem)
+  return fotoRef.startsWith("http") ? fotoRef : null
 }
 
 export const brl = (n: number) =>

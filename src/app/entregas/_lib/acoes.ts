@@ -1,6 +1,6 @@
 "use server"
 
-import { getRota, hojeBR, mensagemCliente } from "./dados"
+import { getRota, hojeBR, mensagemCliente, fotoComprovante } from "./dados"
 
 const SUPA = process.env.SUPABASE_URL
 const KEY = process.env.SUPABASE_SERVICE_KEY
@@ -15,7 +15,11 @@ const SHADOW = process.env.ENTREGAS_WHATSAPP_SHADOW === "true"
 const LIVE = process.env.ENTREGAS_WHATSAPP_LIVE === "true"
 const SHADOW_NUM = process.env.ENTREGAS_SHADOW_NUMERO || ""
 
-async function enviarWhatsApp(celularCliente: string | null | undefined, texto: string) {
+async function enviarWhatsApp(
+  celularCliente: string | null | undefined,
+  texto: string,
+  pedido?: string
+) {
   if (!WPP_URL || !WPP_KEY || !texto) return
   const cel = (celularCliente || "").replace(/\D/g, "")
   let number = ""
@@ -24,7 +28,8 @@ async function enviarWhatsApp(celularCliente: string | null | undefined, texto: 
     number = cel.startsWith("55") ? cel : `55${cel}`
   } else if (SHADOW && SHADOW_NUM) {
     number = SHADOW_NUM
-    text = `🔬 *SHADOW* — iria pro cliente ${celularCliente || "(sem celular)"}\n\n${texto}`
+    const ref = pedido ? `pedido #${pedido} · ` : ""
+    text = `🔬 *SHADOW* — ${ref}iria pro cliente ${celularCliente || "(sem celular)"}\n\n${texto}`
   } else {
     return // nenhum modo ligado
   }
@@ -36,6 +41,48 @@ async function enviarWhatsApp(celularCliente: string | null | undefined, texto: 
     })
   } catch {
     /* não derruba a ação se o WhatsApp falhar */
+  }
+}
+
+/**
+ * Envia FOTO + legenda no WhatsApp (Evolution sendMedia) — usado na tentativa
+ * de entrega: o cliente recebe a foto da frente da casa como prova da visita
+ * (Marco 11/06). Mesmos modos shadow/live do texto.
+ */
+async function enviarWhatsAppFoto(
+  celularCliente: string | null | undefined,
+  fotoUrl: string,
+  legenda: string,
+  pedido?: string
+) {
+  if (!WPP_URL || !WPP_KEY || !fotoUrl) return
+  const cel = (celularCliente || "").replace(/\D/g, "")
+  let number = ""
+  let caption = legenda
+  if (LIVE && cel) {
+    number = cel.startsWith("55") ? cel : `55${cel}`
+  } else if (SHADOW && SHADOW_NUM) {
+    number = SHADOW_NUM
+    const ref = pedido ? `pedido #${pedido} · ` : ""
+    caption = `🔬 *SHADOW* — ${ref}iria pro cliente ${celularCliente || "(sem celular)"}\n\n${legenda}`
+  } else {
+    return
+  }
+  try {
+    await fetch(WPP_URL.replace("/sendText/", "/sendMedia/"), {
+      method: "POST",
+      headers: { apikey: WPP_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        number,
+        mediatype: "image",
+        mimetype: "image/jpeg",
+        fileName: `visita-copamar-${pedido || "entrega"}.jpg`,
+        media: fotoUrl,
+        caption,
+      }),
+    })
+  } catch {
+    /* best-effort */
   }
 }
 
@@ -70,7 +117,9 @@ export async function registrarEntrega(
         headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": foto.type || "image/jpeg" },
         body: Buffer.from(await foto.arrayBuffer()),
       })
-      if (up.ok) foto_url = `${SUPA}/storage/v1/object/public/comprovantes/${path}`
+      // grava o PATH (não a URL pública): a exibição gera signed URL via
+      // fotoComprovante() — pronto pro bucket privado no go-live (LGPD)
+      if (up.ok) foto_url = path
     } catch {
       /* segue sem foto */
     }
@@ -90,16 +139,99 @@ export async function registrarEntrega(
     foto_url,
   }
   try {
+    // return=representation: 204 do PostgREST NÃO garante que casou linha — só
+    // consideramos gravado se voltou ≥1 linha (auditoria 11/06). Bônus: a linha
+    // devolvida traz celular/nome que o cruzamento Bling pode ter preenchido
+    // DEPOIS da tela do Dedé carregar.
     const r = await fetch(
       `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&numero_pedido=eq.${encodeURIComponent(numero_pedido)}`,
       {
         method: "PATCH",
-        headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+        headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", Prefer: "return=representation" },
         body: JSON.stringify(patch),
       }
     )
-    await enviarWhatsApp(celular, mensagemCliente("entregue", nome_cliente))
-    return { ok: r.ok }
+    const linhas = r.ok ? await r.json() : []
+    const gravou = r.ok && Array.isArray(linhas) && linhas.length > 0
+    if (gravou) {
+      const cel = celular || linhas[0]?.celular
+      const nome = nome_cliente || linhas[0]?.nome_cliente
+      await enviarWhatsApp(cel, mensagemCliente("entregue", nome), numero_pedido)
+    }
+    return { ok: gravou, erro: gravou ? undefined : "Falha ao gravar (pedido não está na rota de hoje?). Tente de novo." }
+  } catch {
+    return { ok: false, erro: "Falha ao gravar. Tente de novo." }
+  }
+}
+
+/**
+ * TENTATIVA de entrega — "ninguém em casa" com PROVA (Marco 11/06): foto da
+ * frente da casa + GPS + hora. A foto vai PRO CLIENTE no WhatsApp (prova de que
+ * passamos lá) e fica no banco por 7 DIAS (cron limpa depois — o cliente já tem
+ * a dele). Tudo best-effort: sem foto/GPS, registra mesmo assim.
+ */
+export async function registrarTentativa(
+  formData: FormData
+): Promise<{ ok: boolean; erro?: string }> {
+  if (!SUPA || !KEY) return { ok: false, erro: "Banco não configurado." }
+  const numero_pedido = String(formData.get("numero_pedido") || "")
+  if (!numero_pedido) return { ok: false, erro: "Pedido não informado." }
+  const gps_lat = formData.get("gps_lat") ? Number(formData.get("gps_lat")) : null
+  const gps_long = formData.get("gps_long") ? Number(formData.get("gps_long")) : null
+  const celular = String(formData.get("celular") || "")
+  const nome_cliente = String(formData.get("nome_cliente") || "")
+  const foto = formData.get("foto") as File | null
+
+  // sobe a foto (prefixo "tentativa-": o cron de limpeza apaga estas após 7
+  // dias; as fotos de ENTREGA, sem o prefixo, ficam — são o anti-chargeback)
+  let foto_path: string | null = null
+  if (foto && foto.size > 0) {
+    try {
+      const ext = foto.type.includes("png") ? "png" : foto.type.includes("webp") ? "webp" : "jpg"
+      const path = `${hojeBR()}/tentativa-${numero_pedido}-${Date.now()}.${ext}`
+      const up = await fetch(`${SUPA}/storage/v1/object/comprovantes/${path}`, {
+        method: "POST",
+        headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": foto.type || "image/jpeg" },
+        body: Buffer.from(await foto.arrayBuffer()),
+      })
+      if (up.ok) foto_path = path
+    } catch {
+      /* segue sem foto */
+    }
+  }
+
+  const agora = new Date().toISOString()
+  const patch: Record<string, any> = {
+    status: "ausente",
+    atualizado_em: agora,
+    ultima_tentativa_em: agora,
+    gps_lat,
+    gps_long,
+    foto_tentativa_url: foto_path,
+  }
+  try {
+    const r = await fetch(
+      `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&numero_pedido=eq.${encodeURIComponent(numero_pedido)}`,
+      {
+        method: "PATCH",
+        headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", Prefer: "return=representation" },
+        body: JSON.stringify(patch),
+      }
+    )
+    const linhas = r.ok ? await r.json() : []
+    const gravou = r.ok && Array.isArray(linhas) && linhas.length > 0
+    if (gravou) {
+      const cel = celular || linhas[0]?.celular
+      const nome = nome_cliente || linhas[0]?.nome_cliente
+      const legenda = mensagemCliente("ausente", nome)
+      const signed = foto_path ? await fotoComprovante(foto_path) : null
+      if (signed) {
+        await enviarWhatsAppFoto(cel, signed, `${legenda}\n\n📷 Foto da nossa visita 👆`, numero_pedido)
+      } else {
+        await enviarWhatsApp(cel, legenda, numero_pedido)
+      }
+    }
+    return { ok: gravou, erro: gravou ? undefined : "Falha ao gravar (pedido não está na rota de hoje?). Tente de novo." }
   } catch {
     return { ok: false, erro: "Falha ao gravar. Tente de novo." }
   }
@@ -115,6 +247,8 @@ export async function registrarStatus(input: {
   status: "entregue" | "ausente" | "adiado"
   nome_cliente?: string | null
   celular?: string | null
+  gps_lat?: number | null
+  gps_long?: number | null
 }): Promise<{ ok: boolean }> {
   if (!SUPA || !KEY) return { ok: false }
   const agora = new Date().toISOString()
@@ -124,6 +258,12 @@ export async function registrarStatus(input: {
     ultima_tentativa_em: agora,
   }
   if (input.status === "entregue") patch.entregue_em = agora
+  // GPS da marcação (Marco 11/06): prova de que o Dedé FOI até o endereço —
+  // vale principalmente pro "ninguém em casa" (tentativa), mas grava em todas
+  if (typeof input.gps_lat === "number" && typeof input.gps_long === "number") {
+    patch.gps_lat = input.gps_lat
+    patch.gps_long = input.gps_long
+  }
 
   try {
     const r = await fetch(
@@ -136,14 +276,22 @@ export async function registrarStatus(input: {
           apikey: KEY,
           Authorization: `Bearer ${KEY}`,
           "Content-Type": "application/json",
-          Prefer: "return=minimal",
+          Prefer: "return=representation",
         },
         body: JSON.stringify(patch),
       }
     )
-    // avisa o cliente (entregue/ausente/adiado) — shadow vai pro Marco
-    await enviarWhatsApp(input.celular, mensagemCliente(input.status, input.nome_cliente))
-    return { ok: r.ok }
+    const linhas = r.ok ? await r.json() : []
+    const gravou = r.ok && Array.isArray(linhas) && linhas.length > 0
+    // avisa o cliente SÓ se gravou de verdade (≥1 linha casada) — shadow → Marco
+    if (gravou) {
+      await enviarWhatsApp(
+        input.celular || linhas[0]?.celular,
+        mensagemCliente(input.status, input.nome_cliente || linhas[0]?.nome_cliente),
+        input.numero_pedido
+      )
+    }
+    return { ok: gravou }
   } catch {
     return { ok: false }
   }

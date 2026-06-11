@@ -1,7 +1,7 @@
 "use client"
 
 import { entrar } from "../_lib/sessao"
-import { useActionState, useState } from "react"
+import { useActionState, useEffect, useState } from "react"
 
 /**
  * Login do app de entregas por PIN (teclado numérico grande, mobile). O PIN é
@@ -10,6 +10,11 @@ import { useActionState, useState } from "react"
 export default function PinForm() {
   const [erro, action, pending] = useActionState(entrar, "")
   const [pin, setPin] = useState("")
+
+  // PIN errado → limpa os dígitos sozinho (o Dedé não apaga 1 a 1)
+  useEffect(() => {
+    if (erro) setPin("")
+  }, [erro])
 
   const tecla = (n: string) => setPin((p) => (p.length < 6 ? p + n : p))
   const apaga = () => setPin((p) => p.slice(0, -1))
