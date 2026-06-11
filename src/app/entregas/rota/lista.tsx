@@ -82,6 +82,12 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
           </div>
           <div className="flex items-center gap-2">
             <a
+              href="/entregas/comprovantes"
+              className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95"
+            >
+              📄 Comprovantes
+            </a>
+            <a
               href="/entregas/importar"
               className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95"
             >
@@ -256,6 +262,14 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
                     📅 Deixar pra outro dia
                   </button>
                 </>
+              )}
+              {st === "entregue" && (
+                <a
+                  href={`/entregas/comprovante/${p.numero_pedido}`}
+                  className="mt-2 block text-center text-xs font-semibold text-[#1251b8]"
+                >
+                  📄 ver comprovante
+                </a>
               )}
             </li>
           )
