@@ -137,7 +137,9 @@ export function mensagemCliente(status: string, nome?: string | null): string {
   const oi = bonito ? `Oi, ${bonito}! ` : "Oi! "
   switch (status) {
     case "sai_hoje":
-      return `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros. Pode receber em casa ou deixar na portaria, como for melhor pra você 👍`
+      // sem "pode deixar na portaria/em casa" — oferecer opções GERA resposta
+      // e dúvida (caso Elcia 11/06); só a boa notícia, direto
+      return `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros! 😊`
     case "entregue":
       return `${oi}Seu pedido da Copamar foi *entregue* agora 💙 Obrigado pela confiança! Qualquer coisa, é só chamar.`
     case "ausente":
