@@ -1,6 +1,7 @@
 "use client"
 
 import { registrarTentativa } from "../_lib/acoes"
+import { comprimeFoto } from "../_lib/foto"
 import { useEffect, useState } from "react"
 import type { Parada } from "../_lib/dados"
 
@@ -34,11 +35,12 @@ export default function TentativaEntrega({
     )
   }, [])
 
-  const escolherFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const escolherFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]
     if (f) {
-      setFoto(f)
-      setPreview(URL.createObjectURL(f))
+      const c = await comprimeFoto(f) // 10MB da câmera → ~300KB (4G de rua)
+      setFoto(c)
+      setPreview(URL.createObjectURL(c))
     }
   }
 

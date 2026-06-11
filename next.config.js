@@ -12,6 +12,11 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  // Foto do comprovante de entrega (camera real = 5-15MB) — o default de 1MB
+  // dava 413 e o motorista nao conseguia confirmar (incidente 11/06)
+  experimental: {
+    serverActions: { bodySizeLimit: "15mb" },
+  },
   // ── 301 do Magento → site novo (#62, caminho crítico do cutover) ──
   // Mapa gerado da migração (sitemap antigo crawleado + matching contra o
   // catálogo novo + revisão multi-agente). Reviewável em redirects-magento.csv
