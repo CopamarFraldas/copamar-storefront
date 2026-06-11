@@ -4,6 +4,7 @@ import { registrarTentativa } from "../_lib/acoes"
 import { comprimeFoto } from "../_lib/foto"
 import { useEffect, useState } from "react"
 import type { Parada } from "../_lib/dados"
+import CameraCaptura from "./camera"
 
 /**
  * Registro de TENTATIVA de entrega — "ninguém em casa" (Marco 11/06): foto da
@@ -25,6 +26,10 @@ export default function TentativaEntrega({
   const [gps, setGps] = useState<{ lat: number; long: number } | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState("")
+  // câmera in-browser (não salva no celular — "falta memória" 11/06);
+  // se falhar, cai no input file (galeria/app de câmera)
+  const [cameraAberta, setCameraAberta] = useState(false)
+  const [usarInputFile, setUsarInputFile] = useState(false)
 
   // GPS ao abrir (best-effort)
   useEffect(() => {
@@ -80,26 +85,60 @@ export default function TentativaEntrega({
         <span className="block font-normal">Sem pessoas na foto, por favor.</span>
       </p>
 
-      {/* foto pela câmera */}
-      <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-amber-300 bg-white py-4 active:bg-amber-50">
-        {preview ? (
-          <img src={preview} alt="frente da casa" className="h-28 rounded-lg object-cover" />
-        ) : (
-          <>
-            <span className="text-3xl" aria-hidden>📷</span>
-            <span className="mt-1 text-xs font-semibold text-slate-600">
-              Tirar foto da frente da casa
-            </span>
-          </>
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={escolherFoto}
-          className="hidden"
+      {/* foto pela câmera in-browser (não gasta armazenamento do celular) */}
+      {cameraAberta && (
+        <CameraCaptura
+          onFoto={(f) => {
+            setFoto(f)
+            setPreview(URL.createObjectURL(f))
+            setCameraAberta(false)
+          }}
+          onCancelar={() => setCameraAberta(false)}
+          onFalha={() => {
+            setCameraAberta(false)
+            setUsarInputFile(true)
+          }}
         />
-      </label>
+      )}
+      {usarInputFile ? (
+        <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-amber-300 bg-white py-4 active:bg-amber-50">
+          {preview ? (
+            <img src={preview} alt="frente da casa" className="h-28 rounded-lg object-cover" />
+          ) : (
+            <>
+              <span className="text-3xl" aria-hidden>📷</span>
+              <span className="mt-1 text-xs font-semibold text-slate-600">
+                Tirar foto da frente da casa
+              </span>
+            </>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={escolherFoto}
+            className="hidden"
+          />
+        </label>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setCameraAberta(true)}
+          className="mt-2 flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-amber-300 bg-white py-4 active:bg-amber-50"
+        >
+          {preview ? (
+            <img src={preview} alt="frente da casa" className="h-28 rounded-lg object-cover" />
+          ) : (
+            <>
+              <span className="text-3xl" aria-hidden>📷</span>
+              <span className="mt-1 text-xs font-semibold text-slate-600">
+                Tirar foto da frente da casa
+              </span>
+              <span className="text-[10px] text-slate-400">(não gasta a memória do celular)</span>
+            </>
+          )}
+        </button>
+      )}
 
       <p className="mt-2 text-center text-[11px] text-slate-400">
         {gps ? "📍 Localização registrada" : "📍 registrando localização…"} · 🕐 hora automática

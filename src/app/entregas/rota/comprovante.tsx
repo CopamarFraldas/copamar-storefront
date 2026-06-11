@@ -4,6 +4,7 @@ import { registrarEntrega } from "../_lib/acoes"
 import { comprimeFoto } from "../_lib/foto"
 import { useEffect, useState } from "react"
 import type { Parada } from "../_lib/dados"
+import CameraCaptura from "./camera"
 
 /**
  * Comprovante de entrega (Fase 2, Marco 10/06): foto da entrega + nome/CPF de
@@ -34,6 +35,9 @@ export default function ComprovanteEntrega({
   const [gps, setGps] = useState<{ lat: number; long: number } | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState("")
+  // câmera in-browser (não salva no celular — "falta memória" 11/06)
+  const [cameraAberta, setCameraAberta] = useState(false)
+  const [usarInputFile, setUsarInputFile] = useState(false)
 
   // captura GPS ao abrir (best-effort — se o cliente negar, segue sem)
   useEffect(() => {
@@ -86,26 +90,60 @@ export default function ComprovanteEntrega({
         Comprovante de entrega ✅
       </p>
 
-      {/* foto pela câmera */}
-      <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-emerald-300 bg-white py-4 active:bg-emerald-50">
-        {preview ? (
-          <img src={preview} alt="comprovante" className="h-28 rounded-lg object-cover" />
-        ) : (
-          <>
-            <span className="text-3xl" aria-hidden>📷</span>
-            <span className="mt-1 text-xs font-semibold text-slate-600">
-              Tirar foto da entrega
-            </span>
-          </>
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={escolherFoto}
-          className="hidden"
+      {/* foto pela câmera in-browser (não gasta armazenamento do celular) */}
+      {cameraAberta && (
+        <CameraCaptura
+          onFoto={(f) => {
+            setFoto(f)
+            setPreview(URL.createObjectURL(f))
+            setCameraAberta(false)
+          }}
+          onCancelar={() => setCameraAberta(false)}
+          onFalha={() => {
+            setCameraAberta(false)
+            setUsarInputFile(true)
+          }}
         />
-      </label>
+      )}
+      {usarInputFile ? (
+        <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-emerald-300 bg-white py-4 active:bg-emerald-50">
+          {preview ? (
+            <img src={preview} alt="comprovante" className="h-28 rounded-lg object-cover" />
+          ) : (
+            <>
+              <span className="text-3xl" aria-hidden>📷</span>
+              <span className="mt-1 text-xs font-semibold text-slate-600">
+                Tirar foto da entrega
+              </span>
+            </>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={escolherFoto}
+            className="hidden"
+          />
+        </label>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setCameraAberta(true)}
+          className="mt-2 flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-emerald-300 bg-white py-4 active:bg-emerald-50"
+        >
+          {preview ? (
+            <img src={preview} alt="comprovante" className="h-28 rounded-lg object-cover" />
+          ) : (
+            <>
+              <span className="text-3xl" aria-hidden>📷</span>
+              <span className="mt-1 text-xs font-semibold text-slate-600">
+                Tirar foto da entrega
+              </span>
+              <span className="text-[10px] text-slate-400">(não gasta a memória do celular)</span>
+            </>
+          )}
+        </button>
+      )}
 
       <input
         value={nome}
