@@ -149,7 +149,8 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
     setAviso("enviando…")
     try {
       const r = await avisarRotaSaiHoje()
-      setAviso(`✓ ${r.total} clientes avisados`)
+      if (r.ja_avisada) setAviso("✓ a rota de hoje já foi avisada")
+      else setAviso(`✓ ${r.total} clientes avisados`)
     } catch {
       setAviso("erro ao avisar")
     }
@@ -337,6 +338,13 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
                     abrir →
                   </span>
                 </a>
+              )}
+
+              {/* instrução que o CLIENTE mandou no WhatsApp (fast-path da MAPA) */}
+              {p.instrucao_cliente && (
+                <p className="mt-2 rounded-lg bg-sky-50 px-3 py-2 text-xs font-medium text-sky-800">
+                  💬 Cliente avisou: “{p.instrucao_cliente}”
+                </p>
               )}
 
               {/* telefone */}

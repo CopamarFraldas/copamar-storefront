@@ -300,18 +300,36 @@ export async function registrarStatus(input: {
 /**
  * Avisa a rota de hoje que "sai pra entrega hoje" (ideia 1). Em SHADOW manda só
  * 1 exemplo pro Marco + o total que iria, pra não lotar o WhatsApp dele. Em LIVE
- * manda pra cada cliente pendente com celular.
+ * manda pra cada cliente pendente com celular — UMA VEZ por dia: a coluna
+ * aviso_sai_hoje_em trava re-disparo (apertar 2x não duplica; go-live 11/06).
  */
-export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: number }> {
+export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: number; ja_avisada?: boolean }> {
   const rota = await getRota()
-  const alvos = rota.filter((p) => p.status === "pendente" && p.celular)
-  if (LIVE) {
-    for (const p of alvos) {
-      await enviarWhatsApp(p.celular, mensagemCliente("sai_hoje", p.nome_cliente))
-    }
-    return { enviados: alvos.length, total: alvos.length }
+  const alvos = rota.filter((p) => p.status === "pendente" && p.celular && !p.aviso_sai_hoje_em)
+  if (!alvos.length) {
+    return { enviados: 0, total: 0, ja_avisada: rota.some((p) => p.aviso_sai_hoje_em) }
   }
-  // shadow: 1 exemplo + nota do volume
+  if (LIVE) {
+    let enviados = 0
+    for (const p of alvos) {
+      await enviarWhatsApp(p.celular, mensagemCliente("sai_hoje", p.nome_cliente), p.numero_pedido)
+      // marca o aviso (trava) — por pedido, logo após o envio
+      try {
+        await fetch(
+          `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&numero_pedido=eq.${encodeURIComponent(p.numero_pedido)}`,
+          {
+            method: "PATCH",
+            headers: { apikey: KEY!, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+            body: JSON.stringify({ aviso_sai_hoje_em: new Date().toISOString() }),
+          }
+        )
+      } catch { /* trava é best-effort */ }
+      enviados++
+      await new Promise((r) => setTimeout(r, 1000)) // pausa entre envios (anti-spam)
+    }
+    return { enviados, total: alvos.length }
+  }
+  // shadow: 1 exemplo + nota do volume (sem gravar a trava — é ensaio)
   const ex = alvos[0]
   if (ex) {
     await enviarWhatsApp(

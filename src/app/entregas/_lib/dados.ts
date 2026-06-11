@@ -21,6 +21,8 @@ export type Parada = {
   tentativas: number
   gps_lat: number | null
   gps_long: number | null
+  aviso_sai_hoje_em: string | null
+  instrucao_cliente: string | null
 }
 
 const SUPA = process.env.SUPABASE_URL
@@ -48,6 +50,8 @@ function normaliza(p: any): Parada {
     tentativas: p.tentativas || 0,
     gps_lat: typeof p.gps_lat === "number" ? p.gps_lat : null,
     gps_long: typeof p.gps_long === "number" ? p.gps_long : null,
+    aviso_sai_hoje_em: p.aviso_sai_hoje_em ?? null,
+    instrucao_cliente: p.instrucao_cliente ?? null,
   }
 }
 
@@ -127,7 +131,10 @@ export function rotuloPagamento(p: Parada): string {
  * - adiado: imprevisto NOSSO → pede desculpa, NÃO conta como tentativa.
  */
 export function mensagemCliente(status: string, nome?: string | null): string {
-  const oi = nome ? `Oi, ${nome.split(" ")[0]}! ` : "Oi! "
+  // nomes do Bling vêm em CAIXA ALTA — capitaliza o primeiro ("Oi, Benedita!")
+  const pn = (nome || "").trim().split(" ")[0]
+  const bonito = pn ? pn[0].toUpperCase() + pn.slice(1).toLowerCase() : ""
+  const oi = bonito ? `Oi, ${bonito}! ` : "Oi! "
   switch (status) {
     case "sai_hoje":
       return `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros. Pode receber em casa ou deixar na portaria, como for melhor pra você 👍`
