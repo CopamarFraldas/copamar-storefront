@@ -322,22 +322,36 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
                 )}
               </div>
 
-              {/* endereço + mapa */}
+              {/* endereço + navegação (Maps OU Waze — Marco 11/06) */}
               {p.endereco && (
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    p.maps_query || p.endereco
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2.5 text-sm text-slate-700 active:bg-slate-100"
-                >
-                  <span className="text-lg">📍</span>
-                  <span className="min-w-0 flex-1 leading-snug">{p.endereco}</span>
-                  <span className="shrink-0 text-xs font-semibold text-[#1251b8]">
-                    abrir →
-                  </span>
-                </a>
+                <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2.5">
+                  <div className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="text-lg">📍</span>
+                    <span className="min-w-0 flex-1 leading-snug">{p.endereco}</span>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        p.maps_query || p.endereco
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg bg-white py-2 text-center text-xs font-bold text-[#1251b8] shadow-sm active:scale-[0.98]"
+                    >
+                      🗺️ Google Maps
+                    </a>
+                    <a
+                      href={`https://waze.com/ul?q=${encodeURIComponent(
+                        p.maps_query || p.endereco
+                      )}&navigate=yes`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg bg-white py-2 text-center text-xs font-bold text-[#33ccff] shadow-sm active:scale-[0.98]"
+                    >
+                      🚗 Waze
+                    </a>
+                  </div>
+                </div>
               )}
 
               {/* instrução que o CLIENTE mandou no WhatsApp (fast-path da MAPA) */}
