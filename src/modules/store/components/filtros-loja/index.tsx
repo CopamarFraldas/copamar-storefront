@@ -31,6 +31,19 @@ const FiltrosLoja = ({ gridId }: { gridId: string }) => {
   })
   const [mostrando, setMostrando] = useState(0)
   const [total, setTotal] = useState(0)
+  // mobile: gaveta lateral (aba fixa no canto esquerdo abre/fecha — Marco 11/06)
+  const [gaveta, setGaveta] = useState(false)
+
+  // trava o scroll da página enquanto a gaveta está aberta
+  useEffect(() => {
+    if (gaveta) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = "hidden"
+      return () => {
+        document.body.style.overflow = prev
+      }
+    }
+  }, [gaveta])
 
   // descobre opções + contagens no grid (retry — o grid chega via Suspense)
   useEffect(() => {
@@ -186,9 +199,10 @@ const FiltrosLoja = ({ gridId }: { gridId: string }) => {
     )
   }
 
-  return (
+  const nSel = selTipo.size + selMarca.size + selTam.size + selGen.size
+
+  const corpo = (
     <div className="flex flex-col gap-1">
-      <p className="text-xs font-semibold uppercase tracking-wide text-ui-fg-subtle">Filtrar</p>
       <Grupo titulo="Tipo de produto" opcoes={tipos} sel={selTipo} setter={setSelTipo} />
       <Grupo titulo="Marca" opcoes={marcas} sel={selMarca} setter={setSelMarca} />
       <Grupo titulo="Tamanho" opcoes={tamanhos} sel={selTam} setter={setSelTam} />
@@ -211,6 +225,75 @@ const FiltrosLoja = ({ gridId }: { gridId: string }) => {
         </p>
       )}
     </div>
+  )
+
+  return (
+    <>
+      {/* DESKTOP: inline na sidebar */}
+      <div className="hidden small:flex small:flex-col small:gap-1">
+        <p className="text-xs font-semibold uppercase tracking-wide text-ui-fg-subtle">Filtrar</p>
+        {corpo}
+      </div>
+
+      {/* MOBILE: aba fixa no canto esquerdo → gaveta deslizante */}
+      <div className="small:hidden">
+        {!gaveta && (
+          <button
+            type="button"
+            onClick={() => setGaveta(true)}
+            aria-label="Abrir filtros"
+            className="fixed left-0 top-1/3 z-30 flex items-center gap-1 rounded-r-xl bg-copamar-primary py-3 pl-2 pr-2.5 text-sm font-bold text-white shadow-lg active:scale-95"
+          >
+            <span aria-hidden>▸</span> Filtrar
+            {nSel > 0 && (
+              <span className="rounded-full bg-white px-1.5 text-[11px] font-bold text-copamar-primary">
+                {nSel}
+              </span>
+            )}
+          </button>
+        )}
+        {gaveta && (
+          <>
+            {/* fundo escurecido — tocar fora também fecha */}
+            <div
+              className="fixed inset-0 z-40 bg-black/40"
+              onClick={() => setGaveta(false)}
+              aria-hidden
+            />
+            <div className="fixed left-0 top-0 z-50 flex h-full w-[84%] max-w-[330px] flex-col bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b border-ui-border-base px-4 py-3">
+                <span className="text-sm font-bold uppercase tracking-wide text-ui-fg-base">
+                  Filtrar
+                  {nSel > 0 && (
+                    <span className="ml-2 rounded-full bg-copamar-primary px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {nSel}
+                    </span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setGaveta(false)}
+                  aria-label="Fechar filtros"
+                  className="rounded-lg bg-ui-bg-subtle px-3 py-1.5 text-base font-bold text-ui-fg-base active:scale-95"
+                >
+                  ◂
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3">{corpo}</div>
+              <div className="border-t border-ui-border-base px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => setGaveta(false)}
+                  className="w-full rounded-xl bg-copamar-primary py-3 text-sm font-bold text-white active:scale-[0.99]"
+                >
+                  Ver {mostrando} produto{mostrando === 1 ? "" : "s"}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </>
   )
 }
 

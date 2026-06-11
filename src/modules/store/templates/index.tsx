@@ -31,7 +31,7 @@ const StoreTemplate = ({
           mouse sobre ela rola a PRÓPRIA sidebar agora). */}
       <div className="small:sticky small:top-20 small:max-w-[280px] small:max-h-[calc(100vh-13rem)] small:overflow-y-auto small:overscroll-contain small:pr-1">
         <RefinementList sortBy={sort} />
-        <div className="px-6 pb-8 small:px-0 small:ml-[1.675rem]">
+        <div className="small:px-0 small:pb-8 small:ml-[1.675rem]">
           <FiltrosLoja gridId="store-grid" />
         </div>
       </div>
