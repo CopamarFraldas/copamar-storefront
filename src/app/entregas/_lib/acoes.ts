@@ -15,6 +15,26 @@ const SHADOW = process.env.ENTREGAS_WHATSAPP_SHADOW === "true"
 const LIVE = process.env.ENTREGAS_WHATSAPP_LIVE === "true"
 const SHADOW_NUM = process.env.ENTREGAS_SHADOW_NUMERO || ""
 
+/**
+ * Histórico pra MAPA (caso Sinobu 12/06): o aviso proativo entra em
+ * logs_atendimento com mensagem vazia → o crew mostra só como "Bot:" e a MAPA
+ * SABE que avisamos o cliente (não se re-apresenta nem contradiz o aviso).
+ * Só em LIVE (shadow é ensaio). Best-effort — nunca trava o envio.
+ */
+async function logAvisoProativo(number: string, texto: string) {
+  if (!SUPA || !KEY) return
+  // logs usam 11 dígitos (DDD+número, sem o 55 do país)
+  let cel = number.replace(/\D/g, "")
+  if (cel.startsWith("55") && cel.length >= 12) cel = cel.slice(2)
+  try {
+    await fetch(`${SUPA}/rest/v1/logs_atendimento`, {
+      method: "POST",
+      headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ celular: cel, mensagem: "", resposta: texto, tipo: "sistema", segmento: "aviso_entrega", escalado: false, erro_ia: false }),
+    })
+  } catch { /* histórico é best-effort */ }
+}
+
 async function enviarWhatsApp(
   celularCliente: string | null | undefined,
   texto: string,
@@ -39,6 +59,7 @@ async function enviarWhatsApp(
       headers: { apikey: WPP_KEY, "Content-Type": "application/json" },
       body: JSON.stringify({ number, text }),
     })
+    if (LIVE && cel) await logAvisoProativo(number, texto)
   } catch {
     /* não derruba a ação se o WhatsApp falhar */
   }
@@ -81,8 +102,42 @@ async function enviarWhatsAppFoto(
         caption,
       }),
     })
+    if (LIVE && cel) await logAvisoProativo(number, `${legenda} [foto da visita]`)
   } catch {
     /* best-effort */
+  }
+}
+
+/**
+ * Mesma pessoa com VÁRIOS pedidos na rota (caso Inovha 12/06: 3 pedidos no
+ * mesmo endereço = 3 WhatsApps iguais): se OUTRO pedido do mesmo celular já
+ * foi marcado com este mesmo status há pouco (30 min), não repete a mensagem
+ * — o Dedé marca os 3, o cliente recebe 1.
+ */
+async function avisoRepetido(
+  numero_pedido: string,
+  celular: string | null | undefined,
+  status: string
+): Promise<boolean> {
+  const cel = (celular || "").replace(/\D/g, "")
+  if (!SUPA || !KEY || cel.length < 8) return false
+  try {
+    const r = await fetch(
+      `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&status=eq.${encodeURIComponent(status)}&select=numero_pedido,celular,atualizado_em`,
+      { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }, cache: "no-store" }
+    )
+    if (!r.ok) return false
+    const rows = (await r.json()) as any[]
+    const corte = Date.now() - 30 * 60 * 1000
+    return rows.some(
+      (x) =>
+        x.numero_pedido !== numero_pedido &&
+        (x.celular || "").replace(/\D/g, "").slice(-8) === cel.slice(-8) &&
+        x.atualizado_em &&
+        new Date(x.atualizado_em).getTime() >= corte
+    )
+  } catch {
+    return false
   }
 }
 
@@ -156,7 +211,9 @@ export async function registrarEntrega(
     if (gravou) {
       const cel = celular || linhas[0]?.celular
       const nome = nome_cliente || linhas[0]?.nome_cliente
-      await enviarWhatsApp(cel, mensagemCliente("entregue", nome), numero_pedido)
+      if (!(await avisoRepetido(numero_pedido, cel, "entregue"))) {
+        await enviarWhatsApp(cel, mensagemCliente("entregue", nome), numero_pedido)
+      }
     }
     return { ok: gravou, erro: gravou ? undefined : "Falha ao gravar (pedido não está na rota de hoje?). Tente de novo." }
   } catch {
@@ -223,12 +280,14 @@ export async function registrarTentativa(
     if (gravou) {
       const cel = celular || linhas[0]?.celular
       const nome = nome_cliente || linhas[0]?.nome_cliente
-      const legenda = mensagemCliente("ausente", nome)
-      const signed = foto_path ? await fotoComprovante(foto_path) : null
-      if (signed) {
-        await enviarWhatsAppFoto(cel, signed, `${legenda}\n\n📷 Foto da nossa visita 👆`, numero_pedido)
-      } else {
-        await enviarWhatsApp(cel, legenda, numero_pedido)
+      if (!(await avisoRepetido(numero_pedido, cel, "ausente"))) {
+        const legenda = mensagemCliente("ausente", nome)
+        const signed = foto_path ? await fotoComprovante(foto_path) : null
+        if (signed) {
+          await enviarWhatsAppFoto(cel, signed, `${legenda}\n\n📷 Foto da nossa visita 👆`, numero_pedido)
+        } else {
+          await enviarWhatsApp(cel, legenda, numero_pedido)
+        }
       }
     }
     return { ok: gravou, erro: gravou ? undefined : "Falha ao gravar (pedido não está na rota de hoje?). Tente de novo." }
@@ -285,11 +344,14 @@ export async function registrarStatus(input: {
     const gravou = r.ok && Array.isArray(linhas) && linhas.length > 0
     // avisa o cliente SÓ se gravou de verdade (≥1 linha casada) — shadow → Marco
     if (gravou) {
-      await enviarWhatsApp(
-        input.celular || linhas[0]?.celular,
-        mensagemCliente(input.status, input.nome_cliente || linhas[0]?.nome_cliente),
-        input.numero_pedido
-      )
+      const cel = input.celular || linhas[0]?.celular
+      if (!(await avisoRepetido(input.numero_pedido, cel, input.status))) {
+        await enviarWhatsApp(
+          cel,
+          mensagemCliente(input.status, input.nome_cliente || linhas[0]?.nome_cliente),
+          input.numero_pedido
+        )
+      }
     }
     return { ok: gravou }
   } catch {
@@ -310,13 +372,28 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
     return { enviados: 0, total: 0, ja_avisada: rota.some((p) => p.aviso_sai_hoje_em) }
   }
   if (LIVE) {
-    let enviados = 0
+    // AGRUPA por celular (caso Inovha 12/06: 3 pedidos no mesmo endereço = 3
+    // mensagens idênticas) — 1 mensagem por PESSOA, no plural se tem N pedidos
+    const grupos = new Map<string, typeof alvos>()
     for (const p of alvos) {
-      await enviarWhatsApp(p.celular, mensagemCliente("sai_hoje", p.nome_cliente), p.numero_pedido)
-      // marca o aviso (trava) — por pedido, logo após o envio
+      const k = (p.celular || "").replace(/\D/g, "").slice(-8)
+      const g = grupos.get(k)
+      if (g) g.push(p)
+      else grupos.set(k, [p])
+    }
+    let enviados = 0
+    for (const grupo of grupos.values()) {
+      const p = grupo[0]
+      await enviarWhatsApp(
+        p.celular,
+        mensagemCliente("sai_hoje", p.nome_cliente, grupo.length),
+        grupo.map((x) => x.numero_pedido).join("/")
+      )
+      // marca o aviso (trava) — TODOS os pedidos do grupo de uma vez
       try {
+        const nums = grupo.map((x) => `"${x.numero_pedido}"`).join(",")
         await fetch(
-          `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&numero_pedido=eq.${encodeURIComponent(p.numero_pedido)}`,
+          `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&numero_pedido=in.(${encodeURIComponent(nums)})`,
           {
             method: "PATCH",
             headers: { apikey: KEY!, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
@@ -327,7 +404,7 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
       enviados++
       await new Promise((r) => setTimeout(r, 1000)) // pausa entre envios (anti-spam)
     }
-    return { enviados, total: alvos.length }
+    return { enviados, total: grupos.size }
   }
   // shadow: 1 exemplo + nota do volume (sem gravar a trava — é ensaio)
   const ex = alvos[0]

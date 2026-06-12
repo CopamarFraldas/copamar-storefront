@@ -134,7 +134,7 @@ export function rotuloPagamento(p: Parada): string {
  * - entregue: confirmação na hora.  - ausente: ninguém em casa (nova tentativa).
  * - adiado: imprevisto NOSSO → pede desculpa, NÃO conta como tentativa.
  */
-export function mensagemCliente(status: string, nome?: string | null): string {
+export function mensagemCliente(status: string, nome?: string | null, qtd = 1): string {
   // nomes do Bling vêm em CAIXA ALTA — capitaliza o primeiro ("Oi, Benedita!")
   const pn = (nome || "").trim().split(" ")[0]
   const bonito = pn ? pn[0].toUpperCase() + pn.slice(1).toLowerCase() : ""
@@ -142,8 +142,11 @@ export function mensagemCliente(status: string, nome?: string | null): string {
   switch (status) {
     case "sai_hoje":
       // sem "pode deixar na portaria/em casa" — oferecer opções GERA resposta
-      // e dúvida (caso Elcia 11/06); só a boa notícia, direto
-      return `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros! 😊`
+      // e dúvida (caso Elcia 11/06); só a boa notícia, direto. Vários pedidos
+      // da mesma pessoa (caso Inovha 12/06) = 1 mensagem no plural
+      return qtd > 1
+        ? `${oi}🚚 Boa notícia: os seus ${qtd} pedidos da Copamar *saem pra entrega hoje* pelos nossos próprios carros! 😊`
+        : `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros! 😊`
     case "entregue":
       return `${oi}Seu pedido da Copamar foi *entregue* agora 💙 Obrigado pela confiança! Qualquer coisa, é só chamar.`
     case "ausente":
