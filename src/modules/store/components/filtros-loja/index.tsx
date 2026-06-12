@@ -141,6 +141,15 @@ const FiltrosLoja = ({ gridId }: { gridId: string }) => {
 
   const temFiltro = selTipo.size + selMarca.size + selTam.size + selGen.size > 0
 
+  // avisa o nº de filtros ativos (badge do botão "Filtros" recolhido no desktop)
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("filtros-loja:count", {
+        detail: selTipo.size + selMarca.size + selTam.size + selGen.size,
+      })
+    )
+  }, [selTipo, selMarca, selTam, selGen])
+
   const Grupo = ({
     titulo,
     opcoes,
