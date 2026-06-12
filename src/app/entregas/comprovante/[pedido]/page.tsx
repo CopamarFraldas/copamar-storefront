@@ -1,7 +1,17 @@
+import { createHmac } from "crypto"
 import { redirect } from "next/navigation"
 import { logado } from "../../_lib/sessao"
 import { fotoComprovante } from "../../_lib/dados"
 import BotaoBaixar from "./baixar"
+
+/** Token assinado vindo do PAINEL admin (Marco 12/06): HMAC(pedido) com o
+ * secret compartilhado dispensa o PIN — o painel é o centro de controle. */
+function tokenValido(pedido: string, t?: string): boolean {
+  const secret = process.env.ENTREGAS_IMPORT_SECRET || ""
+  if (!secret || !t) return false
+  const esperado = createHmac("sha256", secret).update(`comprovante:${pedido}`).digest("hex").slice(0, 32)
+  return t === esperado
+}
 
 const SUPA = process.env.SUPABASE_URL
 const KEY = process.env.SUPABASE_SERVICE_KEY
@@ -38,9 +48,11 @@ const brl = (n: number) =>
  */
 export default async function ComprovantePage(props: {
   params: Promise<{ pedido: string }>
+  searchParams: Promise<{ t?: string }>
 }) {
-  if (!(await logado())) redirect("/entregas")
   const { pedido } = await props.params
+  const { t } = await props.searchParams
+  if (!tokenValido(pedido, t) && !(await logado())) redirect("/entregas")
   const c = await getComprovante(pedido)
   // foto: path no bucket → signed URL (compatível com bucket privado/LGPD)
   const fotoUrl = c ? await fotoComprovante(c.foto_url) : null

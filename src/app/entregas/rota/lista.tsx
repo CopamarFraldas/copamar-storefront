@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { brl, hojeBR, rotuloPagamento, type Parada, type StatusParada } from "../_lib/dados"
 import { sair } from "../_lib/sessao"
 import { registrarStatus, avisarRotaSaiHoje } from "../_lib/acoes"
@@ -144,18 +144,36 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
     return h > 0 ? `${h}h${m > 0 ? ` ${m}min` : ""}` : `${m}min`
   }
 
+  // botão "avisar a rota": fica CINZA e inclicável depois de usado (Marco
+  // 12/06) — o estado vem do banco (aviso_sai_hoje_em) e do pós-clique
   const [aviso, setAviso] = useState("")
+  const rotaJaAvisada =
+    paradas.some((p) => p.aviso_sai_hoje_em) || aviso.startsWith("✓")
   const avisarRota = async () => {
-    if (aviso === "enviando…") return
+    if (aviso === "enviando…" || rotaJaAvisada) return
     setAviso("enviando…")
     try {
       const r = await avisarRotaSaiHoje()
-      if (r.ja_avisada) setAviso("✓ a rota de hoje já foi avisada")
-      else setAviso(`✓ ${r.total} clientes avisados`)
+      if (r.ja_avisada) setAviso("✓ Rota avisada")
+      else setAviso(`✓ Rota avisada (${r.total} clientes)`)
     } catch {
-      setAviso("erro ao avisar")
+      setAviso("erro ao avisar — tente de novo")
     }
   }
+
+  // AUTO-FINALIZAÇÃO (Marco 12/06): quando a ÚLTIMA pendente é tratada, o
+  // "Bom descanso" abre sozinho — sem botão "Terminei". Dispara só na
+  // TRANSIÇÃO >0 → 0 (reload com tudo pronto não força a tela; e o "voltar
+  // à lista" do Bom descanso segue funcionando pra revisar).
+  const pendentes = paradas.length - feitas
+  const prevPend = useRef<number | null>(null)
+  useEffect(() => {
+    if (prevPend.current !== null && prevPend.current > 0 && pendentes === 0 && paradas.length > 0) {
+      setTerminou(true)
+    }
+    prevPend.current = pendentes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendentes, paradas.length])
 
   const LABEL: Record<StatusParada, string> = {
     pendente: "",
@@ -251,12 +269,7 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
             <h1 className="text-xl font-bold">{paradas.length} entregas</h1>
           </div>
           <div className="flex items-center gap-2">
-            <a
-              href="/entregas/comprovantes"
-              className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95"
-            >
-              📄 Comprovantes
-            </a>
+
             <form action={sair}>
               <button className="rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium active:scale-95">
                 Sair
@@ -281,10 +294,14 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
         </p>
         <button
           onClick={avisarRota}
-          disabled={aviso === "enviando…"}
-          className="mt-3 w-full rounded-lg bg-white/15 py-2 text-xs font-semibold active:scale-[0.99] disabled:opacity-50"
+          disabled={aviso === "enviando…" || rotaJaAvisada}
+          className={`mt-3 w-full rounded-lg py-2 text-xs font-semibold active:scale-[0.99] ${
+            rotaJaAvisada
+              ? "cursor-not-allowed bg-white/10 text-white/50"
+              : "bg-white/15 disabled:opacity-50"
+          }`}
         >
-          {aviso || '📣 Avisar a rota: "sai hoje"'}
+          {rotaJaAvisada ? "✓ Rota avisada: \"sai hoje\"" : aviso || '📣 Avisar a rota: "sai hoje"'}
         </button>
        </div>
       </header>
@@ -317,7 +334,6 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
                       <p className="truncate text-sm text-slate-500 line-through">{p.endereco || p.nome_cliente}</p>
                       <p className="text-[11px] text-slate-400">#{p.numero_pedido}{p.nome_cliente ? ` · ${p.nome_cliente}` : ""}</p>
                     </div>
-                    <a href={`/entregas/comprovante/${p.numero_pedido}`} className="shrink-0 text-xs font-semibold text-[#1251b8]">📄</a>
                   </li>
                 ))}
               </ul>
@@ -503,14 +519,6 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
                   </button>
                 </>
               )}
-              {st === "entregue" && (
-                <a
-                  href={`/entregas/comprovante/${p.numero_pedido}`}
-                  className="mt-2 block text-center text-xs font-semibold text-[#1251b8]"
-                >
-                  📄 ver comprovante
-                </a>
-              )}
               {st === "ausente" &&
                 (() => {
                   // prova da tentativa: GPS capturado na marcação (recém-feita
@@ -536,15 +544,6 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
         </ul>
       </div>
 
-      {/* fim da rota — "Terminei as entregas" */}
-      <div className="mx-auto max-w-md px-4 pt-6">
-        <button
-          onClick={() => setTerminou(true)}
-          className="w-full rounded-2xl bg-[#1251b8] py-4 text-base font-bold text-white shadow-sm active:scale-[0.99]"
-        >
-          ✅ Terminei as entregas
-        </button>
-      </div>
     </div>
   )
 }
