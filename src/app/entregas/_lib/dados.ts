@@ -140,13 +140,20 @@ export function mensagemCliente(status: string, nome?: string | null, qtd = 1): 
   const bonito = pn ? pn[0].toUpperCase() + pn.slice(1).toLowerCase() : ""
   const oi = bonito ? `Oi, ${bonito}! ` : "Oi! "
   switch (status) {
-    case "sai_hoje":
-      // sem "pode deixar na portaria/em casa" — oferecer opções GERA resposta
-      // e dúvida (caso Elcia 11/06); só a boa notícia, direto. Vários pedidos
-      // da mesma pessoa (caso Inovha 12/06) = 1 mensagem no plural
-      return qtd > 1
-        ? `${oi}🚚 Boa notícia: os seus ${qtd} pedidos da Copamar *saem pra entrega hoje* pelos nossos próprios carros! 😊`
-        : `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros! 😊`
+    case "sai_hoje": {
+      // boa notícia + CONVITE a instruções (Marco 15/06): não precisa responder,
+      // mas se não tiver quem receba OU tiver instrução pro entregador, o cliente
+      // manda aqui e a gente repassa (vira p.instrucao_cliente na tela do Dedé,
+      // via fast-path da MAPA). Convite ≠ pergunta — substitui a regra antiga
+      // "sem opções" (caso Elcia 11/06): lá o problema era OFERECER portaria/casa
+      // (gerava dúvida); aqui é só uma porta aberta caso precise. Vários pedidos
+      // da mesma pessoa (caso Inovha 12/06) = 1 mensagem no plural.
+      const base =
+        qtd > 1
+          ? `${oi}🚚 Boa notícia: os seus ${qtd} pedidos da Copamar *saem pra entrega hoje* pelos nossos próprios carros! 😊`
+          : `${oi}🚚 Boa notícia: o seu pedido da Copamar *sai pra entrega hoje* pelos nossos próprios carros! 😊`
+      return `${base}\n\nNão precisa responder a essa mensagem 🙂 Mas se por acaso não tiver ninguém pra receber, ou tiver alguma instrução pro entregador, é só mandar por aqui que a gente avisa o motorista. 🙌`
+    }
     case "entregue":
       return `${oi}Seu pedido da Copamar foi *entregue* agora 💙 Obrigado pela confiança! Qualquer coisa, é só chamar.`
     case "ausente":

@@ -474,6 +474,14 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     if (fiscalTipo === "J" && !fiscalMeta.razao_social) {
       return "Informe a razão social da empresa para a nota fiscal."
     }
+    // Opt-in de marketing (#97) — checkbox DESMARCADO por padrão (LGPD). Persiste
+    // no cart.metadata (flui pro order.metadata); o registro no n8n é feito na
+    // página de confirmação (placeOrder faz redirect e mata código posterior).
+    const marketingConsent = formData.get("marketing_consent") === "on"
+    fiscalMeta.marketing_consent = marketingConsent ? "true" : "false"
+    fiscalMeta.marketing_consent_ts = marketingConsent
+      ? new Date().toISOString()
+      : ""
     const existing = await retrieveCart(cartId, "id,metadata")
     data.metadata = { ...(existing?.metadata || {}), ...fiscalMeta }
 

@@ -132,7 +132,7 @@ export default function ReguaGotas({
             <span
               className={`text-[11px] font-medium tabular-nums transition-colors ${
                 ativo
-                  ? "text-copamar-cta"
+                  ? "text-[#b35309]"
                   : aceso
                   ? "text-copamar-primary"
                   : "text-ui-fg-muted"

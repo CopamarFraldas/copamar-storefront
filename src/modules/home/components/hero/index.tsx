@@ -35,7 +35,7 @@ const Hero = () => {
             </div>
             <a
               href="#nossos-produtos"
-              className="inline-block mt-4 small:mt-6 px-6 py-3 bg-copamar-cta hover:bg-copamar-cta-dark text-white font-semibold rounded-large transition-colors"
+              className="inline-block mt-4 small:mt-6 px-6 py-3 bg-copamar-cta hover:bg-copamar-cta-dark text-[#0a2e6b] font-semibold rounded-large transition-colors"
               data-testid="hero-cta-explorar"
             >
               Ver produtos

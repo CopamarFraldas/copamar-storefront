@@ -147,18 +147,57 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
   // botão "avisar a rota": fica CINZA e inclicável depois de usado (Marco
   // 12/06) — o estado vem do banco (aviso_sai_hoje_em) e do pós-clique
   const [aviso, setAviso] = useState("")
+  const [jaTentou, setJaTentou] = useState(false)
+  const [rodando, setRodando] = useState(false)
   const rotaJaAvisada =
     paradas.some((p) => p.aviso_sai_hoje_em) || aviso.startsWith("✓")
+  // GATE (Marco 15/06): tudo abaixo do botão fica cinza até a rota ser avisada.
+  // BUGS 16/06 corrigidos: (1) só marca "✓ avisado" quando ALGO realmente saiu
+  // (enviados>0) — antes usava o total TENTADO, então um soluço do gateway
+  // marcava "avisado" com 0 enviados; (2) libera as entregas na TENTATIVA, não
+  // no sucesso — senão gateway fora trancaria o motorista.
+  const liberado = rotaJaAvisada || jaTentou
   const avisarRota = async () => {
-    if (aviso === "enviando…" || rotaJaAvisada) return
+    if (rodando || rotaJaAvisada) return
+    setRodando(true)
+    setJaTentou(true) // libera as entregas JÁ — o aviso roda com retry em paralelo
     setAviso("enviando…")
-    try {
-      const r = await avisarRotaSaiHoje()
-      if (r.ja_avisada) setAviso("✓ Rota avisada")
-      else setAviso(`✓ Rota avisada (${r.total} clientes)`)
-    } catch {
-      setAviso("erro ao avisar — tente de novo")
+    // RETRY EM ROUNDS (Marco 16/06): a partir do clique, re-chama a action até
+    // TODOS saírem 1x ou bater o teto. Cada chamada só pega os SEM trava (não
+    // duplica). Teto evita loop infinito em número quebrado (volta "sem WhatsApp").
+    const MAX = 8
+    let totalAlvos = 0
+    let enviadosTotal = 0
+    let jaAvisada = false
+    for (let i = 1; i <= MAX; i++) {
+      try {
+        const r = await avisarRotaSaiHoje()
+        if (i === 1) totalAlvos = r.total || 0
+        enviadosTotal += r.enviados || 0
+        if (r.ja_avisada) {
+          jaAvisada = true
+          break
+        }
+        if ((r.falhas ?? 0) === 0) break // round sem falha → todos enviados
+        setAviso(`enviando… (${enviadosTotal} ok, tentando o resto…)`)
+      } catch {
+        /* erro de rede nesta rodada — retenta após o backoff */
+      }
+      if (i < MAX) await new Promise((res) => setTimeout(res, Math.min(i * 2000, 10000)))
     }
+    if (jaAvisada && enviadosTotal === 0) {
+      setAviso("✓ Rota avisada")
+    } else if (enviadosTotal > 0) {
+      const falhas = Math.max(0, totalAlvos - enviadosTotal)
+      setAviso(
+        falhas > 0
+          ? `✓ Avisados ${enviadosTotal} · ${falhas} sem WhatsApp`
+          : `✓ Rota avisada (${enviadosTotal} clientes)`
+      )
+    } else {
+      setAviso("⚠️ aviso não saiu — toque pra tentar de novo")
+    }
+    setRodando(false)
   }
 
   // AUTO-FINALIZAÇÃO (Marco 12/06): quando a ÚLTIMA pendente é tratada, o
@@ -294,18 +333,37 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
         </p>
         <button
           onClick={avisarRota}
-          disabled={aviso === "enviando…" || rotaJaAvisada}
-          className={`mt-3 w-full rounded-lg py-2 text-xs font-semibold active:scale-[0.99] ${
+          disabled={rodando || rotaJaAvisada}
+          className={`mt-3 w-full rounded-xl font-bold transition active:scale-[0.99] ${
             rotaJaAvisada
-              ? "cursor-not-allowed bg-white/10 text-white/50"
-              : "bg-white/15 disabled:opacity-50"
+              ? "cursor-not-allowed bg-white/10 py-2 text-xs text-white/50"
+              : `bg-white py-3.5 text-sm text-[#1251b8] shadow-lg ring-2 ring-white/70 ${
+                  aviso ? "" : "animate-pulse"
+                }`
           }`}
         >
-          {rotaJaAvisada ? "✓ Rota avisada: \"sai hoje\"" : aviso || '📣 Avisar a rota: "sai hoje"'}
+          {rotaJaAvisada
+            ? '✓ Clientes avisados — pode entregar'
+            : aviso || "🚀 Iniciar entregas (avisar clientes)"}
         </button>
        </div>
       </header>
 
+      {/* aviso do gate (Marco 15/06): some assim que a rota é avisada */}
+      {!liberado && (
+        <div className="mx-auto mt-3 max-w-3xl px-4">
+          <p className="rounded-xl bg-amber-50 px-4 py-3 text-center text-sm font-medium text-amber-800 ring-1 ring-amber-200">
+            👆 Toque em <strong>“Iniciar entregas”</strong> aí em cima pra avisar os
+            clientes que a entrega sai hoje. As paradas liberam logo em seguida. 🚚
+          </p>
+        </div>
+      )}
+
+      {/* GATE: tudo abaixo só fica colorido e clicável DEPOIS de avisar a rota */}
+      <div
+        className={liberado ? undefined : "pointer-events-none select-none opacity-40 grayscale"}
+        aria-disabled={!liberado}
+      >
       {/* MAPA DA ROTA estilo Spoke: pinos numerados, trajeto, próxima pulsando */}
       <div className="mx-auto max-w-6xl">
         <MapaRota paradas={paradas} status={status} />
@@ -363,16 +421,25 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
               >
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                    st === "ausente"
-                      ? "bg-amber-400 text-white"
-                      : st === "adiado"
-                        ? "bg-indigo-400 text-white"
-                        : ehProxima
-                          ? "bg-[#1251b8] text-white"
-                          : "bg-[#1251b8]/10 text-[#1251b8]"
+                    p.instrucao_cliente
+                      ? "bg-red-400 text-white ring-2 ring-red-200"
+                      : st === "ausente"
+                        ? "bg-amber-400 text-white"
+                        : st === "adiado"
+                          ? "bg-indigo-400 text-white"
+                          : ehProxima
+                            ? "bg-[#1251b8] text-white"
+                            : "bg-[#1251b8]/10 text-[#1251b8]"
                   }`}
                 >
-                  {st === "ausente" ? "!" : st === "adiado" ? "↦" : p.ordem}
+                  {/* parada COM recado → bolinha vermelha clara, número dentro (Marco 16/06) */}
+                  {p.instrucao_cliente
+                    ? p.ordem
+                    : st === "ausente"
+                      ? "!"
+                      : st === "adiado"
+                        ? "↦"
+                        : p.ordem}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-slate-800">
@@ -430,7 +497,10 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
 
               {/* instrução que o CLIENTE mandou no WhatsApp (fast-path da MAPA) */}
               {p.instrucao_cliente && (
-                <p className="mt-2 rounded-lg bg-sky-50 px-3 py-2 text-xs font-medium text-sky-800">
+                <p className="mt-2 rounded-lg border border-red-300 bg-sky-50 px-3 py-2 text-xs font-medium text-sky-800">
+                  <span className="mr-1 animate-pulse text-sm font-extrabold text-red-600" aria-hidden>
+                    ❗
+                  </span>
                   💬 Cliente avisou: “{p.instrucao_cliente}”
                 </p>
               )}
@@ -543,6 +613,7 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
         })}
         </ul>
       </div>
+      </div>{/* fim do GATE — libera quando a rota é avisada */}
 
     </div>
   )

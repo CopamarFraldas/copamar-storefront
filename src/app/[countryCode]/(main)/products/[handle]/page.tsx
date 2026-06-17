@@ -8,6 +8,7 @@ import { getProductPrice } from "@lib/util/get-product-price"
 import { isProductOutOfStock } from "@lib/util/stock"
 import { extrairSpecs } from "@lib/util/specs"
 import { getSiteUrl } from "@lib/util/seo"
+import { inferMarca, extrairGtin13 } from "@lib/util/product-filters"
 import {
   JsonLd,
   productSchema,
@@ -150,7 +151,10 @@ export default async function ProductPage(props: Props) {
   const url = `${site}/${params.countryCode}/products/${pricedProduct.handle}`
   const { cheapestPrice } = getProductPrice({ product: pricedProduct })
   const v0 = pricedProduct.variants?.[0]
-  const gtin = (v0 as any)?.barcode || (v0?.sku && /^\d{13}$/.test(v0.sku) ? v0.sku : undefined)
+  // GTIN-13 do SKU (lida com pack "<gtin>-<mult>" e GTIN-14 c/ zero à esquerda)
+  const gtin = (v0 as any)?.barcode || extrairGtin13(v0?.sku)
+  // marca via título (mesma inferência do filtro /store) — collection vem vazia
+  const marca = inferMarca(pricedProduct.title || "")
   const esgotado = isProductOutOfStock(pricedProduct)
   const ldProduto = productSchema({
     name: pricedProduct.title,
@@ -163,7 +167,7 @@ export default async function ProductPage(props: Props) {
       .map((u) => (String(u).startsWith("http") ? String(u) : `${getSiteUrl()}${u}`)) as string[],
     sku: v0?.sku || undefined,
     gtin,
-    brand: pricedProduct.collection?.title || undefined,
+    brand: marca !== "Outras" ? marca : pricedProduct.collection?.title || undefined,
     url,
     price: cheapestPrice?.calculated_price_number,
     currency: "BRL",

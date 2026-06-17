@@ -15,6 +15,7 @@ import TamanhosIrmaos from "@modules/products/components/tamanhos-irmaos"
 import BreadcrumbPdp from "@modules/products/components/breadcrumb-pdp"
 import SecoesProduto from "@modules/products/components/secoes-produto"
 import BeneficiosCompra from "@modules/products/components/beneficios-compra"
+import SeloAbsorcao from "@modules/common/components/selo-absorcao"
 import Spin360 from "@modules/products/components/spin-360"
 import { getProductPrice } from "@lib/util/get-product-price"
 
@@ -82,6 +83,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <ProductOnboardingCta />
           {/* tamanhos irmãos (P·M·G·EG) — religa os produtos da mesma família */}
           <TamanhosIrmaos product={product} countryCode={countryCode} />
+          {/* nível de absorção (#87) — bloco rico; null se não houver nível validado */}
+          <SeloAbsorcao product={product} variante="pdp" />
           <Suspense
             fallback={
               <ProductActions

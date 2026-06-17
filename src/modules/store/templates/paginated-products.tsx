@@ -86,7 +86,7 @@ export default async function PaginatedProducts({
     <>
       <ul
         id={gridId}
-        className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
+        className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 large:grid-cols-5 gap-x-6 gap-y-8"
         data-testid="products-list"
       >
         {products.map((p) => {
@@ -98,6 +98,8 @@ export default async function PaginatedProducts({
               data-marca={inferMarca(p.title || "")}
               data-genero={inferGenero(p.title || "", p.categories)}
               data-tipo={inferTipo(p.title || "", p.categories)}
+              data-absorcao={((p.metadata || {}) as any).absorcao_gotas ?? ""}
+              data-noturno={((p.metadata || {}) as any).uso_noturno === true || ((p.metadata || {}) as any).uso_noturno === "true" ? "1" : ""}
             >
               <ProductPreview product={p} region={region} />
             </li>

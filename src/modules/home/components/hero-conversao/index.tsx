@@ -14,6 +14,8 @@ const MARCAS: { nome: string; logo: string | null; zoom?: boolean }[] = [
   // zoom: logos mais "quadradas" (TENA tem os arcos) precisam de mais altura
   // que o max-h padrão pra ter a mesma presença visual dos wordmarks
   { nome: "TENA", logo: "/logos/tena.png", zoom: true },
+  // logo oficial da Abena (wordmark branco sobre azul) — arquivo escolhido pelo
+  // Marco 15/06 ("Abena Logo.png" do Drive); wordmark, então sem zoom como os outros
   { nome: "Abena", logo: "/logos/abena.png" },
   { nome: "Adultcare (Incofral)", logo: "/logos/adultcare.png" },
   { nome: "Biofral", logo: "/logos/biofral.png" },
@@ -50,7 +52,7 @@ export default function HeroConversao() {
             <div className="mt-6 flex flex-col gap-3 small:flex-row small:justify-start justify-center sm:flex-row">
               <LocalizedClientLink
                 href="/store"
-                className="inline-flex items-center justify-center rounded-large bg-copamar-cta px-6 py-3 font-semibold text-white transition-colors hover:bg-copamar-cta-dark"
+                className="inline-flex items-center justify-center rounded-large bg-copamar-cta px-6 py-3 font-semibold text-[#0a2e6b] transition-colors hover:bg-copamar-cta-dark"
               >
                 Comprar agora
               </LocalizedClientLink>

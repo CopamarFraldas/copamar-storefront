@@ -49,7 +49,7 @@ const CategoriesSectionClient = ({ cards }: { cards: Card[] }) => {
                 )}
               </div>
               <h3 className="text-xl font-semibold text-center text-ui-fg-base mb-2">{c.name}</h3>
-              <span className="inline-block rounded-full bg-orange-500 text-white text-xs font-medium px-2.5 py-1">
+              <span className="inline-block rounded-full bg-copamar-cta text-[#0a2e6b] text-xs font-medium px-2.5 py-1">
                 {c.count} produtos
               </span>
             </LocalizedClientLink>

@@ -38,8 +38,12 @@ module.exports = {
           primary: "#1251b8",
           "primary-dark": "#0d3d8a",
           "primary-light": "#4a7bc8",
+          // CTA = LARANJA VIVO da marca (Marco 16/06: preferiu o laranja vivo de
+          // volta nos botões). Vivo reprova com texto branco (2,7:1) → os botões
+          // usam texto AZUL ESCURO da copamar #0a2e6b (navy, AA 5,1:1 ✅). Branco
+          // (2,5:1) e azul padrão #1251b8 (3,3:1) reprovam no vivo. Passou por #b35309/azul.
           cta: "#ef7e1a",
-          "cta-dark": "#c9651a",
+          "cta-dark": "#e06f10", // hover, AA ~5,4:1 c/ texto escuro
           success: "#10b981",
           text: "#525252",
           "bg-light": "#f4f4f5",

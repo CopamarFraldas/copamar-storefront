@@ -4,6 +4,7 @@ import { getProductPrice } from "@lib/util/get-product-price"
 import { isProductOutOfStock, avisoEstoque } from "@lib/util/stock"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import SeloAbsorcao from "@modules/common/components/selo-absorcao"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 import AddToCartButton from "./add-to-cart-button"
@@ -67,6 +68,8 @@ export default async function ProductPreview({
             {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
           </div>
         </div>
+        {/* selo de nível de absorção (#87) — null se o produto não tem nível validado */}
+        <SeloAbsorcao product={product} variante="card" />
       </LocalizedClientLink>
       {esgotado && aviso && (
         <p className="mt-1 text-[11px] text-ui-fg-subtle leading-snug">{aviso}</p>

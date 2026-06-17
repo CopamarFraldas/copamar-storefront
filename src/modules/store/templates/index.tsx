@@ -2,10 +2,8 @@ import { Suspense } from "react"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import FiltrosLoja from "@modules/store/components/filtros-loja"
-import RefinementList from "@modules/store/components/refinement-list"
+import SortDropdown from "@modules/store/components/sort-dropdown"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import SidebarColapsavel from "@modules/store/components/sidebar-colapsavel"
-
 import PaginatedProducts from "./paginated-products"
 
 const StoreTemplate = ({
@@ -21,21 +19,11 @@ const StoreTemplate = ({
   const sort = sortBy || "created_at"
 
   return (
-    <div
-      className="flex flex-col small:flex-row small:items-start py-6 content-container"
-      data-testid="category-container"
-    >
-      {/* sidebar: ordenar + FILTROS multi-seleção — só na loja (Marco 11/06).
-          COLAPSÁVEL no desktop ("‹ Ocultar filtros" → botão fino + grid cheio);
-          a coluna sticky com rolagem própria vive no SidebarColapsavel. */}
-      <SidebarColapsavel>
-        <RefinementList sortBy={sort} />
-        <div className="small:px-0 small:pb-8 small:ml-[1.675rem]">
-          <FiltrosLoja gridId="store-grid" />
-        </div>
-      </SidebarColapsavel>
-      <div className="w-full">
-        <div className="mb-8">
+    <div className="py-6 content-container" data-testid="category-container">
+      {/* título + ORDENAR no mesmo bloco (Marco 16/06: o sort ficava largado num
+          vão vazio; agora é um dropdown compacto ao lado do título) */}
+      <div className="mb-5 flex flex-col gap-3 small:flex-row small:items-end small:justify-between">
+        <div>
           {/* #56: H1 com as keywords reais (era "Todos os produtos", genérico) */}
           <h1 className="text-2xl-semi" data-testid="store-page-title">
             Fraldas Geriátricas no Atacado — Catálogo Completo
@@ -44,16 +32,24 @@ const StoreTemplate = ({
             Direto das fábricas, com preço de atacado. Entrega para todo o Brasil.
           </p>
         </div>
-        <Suspense fallback={<SkeletonProductGrid />}>
-          <PaginatedProducts
-            sortBy={sort}
-            page={pageNumber}
-            countryCode={countryCode}
-            gridId="store-grid"
-            lojaBoost
-          />
-        </Suspense>
+        <div className="shrink-0">
+          <SortDropdown sortBy={sort} />
+        </div>
       </div>
+
+      {/* Filtros = GAVETA deslizante (aba na borda esquerda, desktop e mobile —
+          Marco 16/06); o grid usa a LARGURA INTEIRA. */}
+      <FiltrosLoja gridId="store-grid" />
+
+      <Suspense fallback={<SkeletonProductGrid />}>
+        <PaginatedProducts
+          sortBy={sort}
+          page={pageNumber}
+          countryCode={countryCode}
+          gridId="store-grid"
+          lojaBoost
+        />
+      </Suspense>
     </div>
   )
 }

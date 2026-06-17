@@ -39,8 +39,11 @@ async function enviarWhatsApp(
   celularCliente: string | null | undefined,
   texto: string,
   pedido?: string
-) {
-  if (!WPP_URL || !WPP_KEY || !texto) return
+): Promise<boolean> {
+  // retorna TRUE só se o gateway aceitou (status ok). Quem chama em lote usa isso
+  // pra travar/logar APENAS no sucesso (rota 15/06: o #6 ganhou trava+log sem o
+  // cliente receber, porque o envio era best-effort e não checava o status).
+  if (!WPP_URL || !WPP_KEY || !texto) return false
   const cel = (celularCliente || "").replace(/\D/g, "")
   let number = ""
   let text = texto
@@ -51,17 +54,26 @@ async function enviarWhatsApp(
     const ref = pedido ? `pedido #${pedido} · ` : ""
     text = `🔬 *SHADOW* — ${ref}iria pro cliente ${celularCliente || "(sem celular)"}\n\n${texto}`
   } else {
-    return // nenhum modo ligado
+    return false // nenhum modo ligado
   }
   try {
-    await fetch(WPP_URL, {
+    // TIMEOUT: um gateway pendurado não pode travar o lote inteiro (foi o que
+    // deixou 7 sem aviso na rota 15/06 — o envio do meio engasgou e parou a fila)
+    const ctrl = new AbortController()
+    const to = setTimeout(() => ctrl.abort(), 12000)
+    const res = await fetch(WPP_URL, {
       method: "POST",
       headers: { apikey: WPP_KEY, "Content-Type": "application/json" },
       body: JSON.stringify({ number, text }),
+      signal: ctrl.signal,
     })
+    clearTimeout(to)
+    if (!res.ok) return false
     if (LIVE && cel) await logAvisoProativo(number, texto)
+    return true
   } catch {
     /* não derruba a ação se o WhatsApp falhar */
+    return false
   }
 }
 
@@ -365,7 +377,7 @@ export async function registrarStatus(input: {
  * manda pra cada cliente pendente com celular — UMA VEZ por dia: a coluna
  * aviso_sai_hoje_em trava re-disparo (apertar 2x não duplica; go-live 11/06).
  */
-export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: number; ja_avisada?: boolean }> {
+export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: number; ja_avisada?: boolean; falhas?: number }> {
   const rota = await getRota()
   const alvos = rota.filter((p) => p.status === "pendente" && p.celular && !p.aviso_sai_hoje_em)
   if (!alvos.length) {
@@ -381,15 +393,22 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
       if (g) g.push(p)
       else grupos.set(k, [p])
     }
+    // UMA passada: tenta cada grupo 1x. O RETRY-ATÉ-ENVIAR é por ROUNDS no
+    // cliente (Marco 16/06) — ele re-chama esta action, que só pega os SEM trava
+    // (aviso_sai_hoje_em). Cada chamada fica curta e os que falharam voltam em
+    // `falhas` pro cliente retentar até zerar (ou bater o teto).
     let enviados = 0
+    let falhas = 0
     for (const grupo of grupos.values()) {
       const p = grupo[0]
-      await enviarWhatsApp(
-        p.celular,
-        mensagemCliente("sai_hoje", p.nome_cliente, grupo.length),
-        grupo.map((x) => x.numero_pedido).join("/")
-      )
-      // marca o aviso (trava) — TODOS os pedidos do grupo de uma vez
+      const msg = mensagemCliente("sai_hoje", p.nome_cliente, grupo.length)
+      const ref = grupo.map((x) => x.numero_pedido).join("/")
+      const ok = await enviarWhatsApp(p.celular, msg, ref)
+      if (!ok) {
+        falhas++
+        continue // sem trava → entra na próxima rodada do cliente
+      }
+      // marca o aviso (trava) — TODOS os pedidos do grupo — SÓ no sucesso confirmado
       try {
         const nums = grupo.map((x) => `"${x.numero_pedido}"`).join(",")
         await fetch(
@@ -402,9 +421,9 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
         )
       } catch { /* trava é best-effort */ }
       enviados++
-      await new Promise((r) => setTimeout(r, 1000)) // pausa entre envios (anti-spam)
+      await new Promise((r) => setTimeout(r, 700)) // pausa entre envios (anti-spam)
     }
-    return { enviados, total: grupos.size }
+    return { enviados, total: grupos.size, falhas }
   }
   // shadow: 1 exemplo + nota do volume (sem gravar a trava — é ensaio)
   const ex = alvos[0]

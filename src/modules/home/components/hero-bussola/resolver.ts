@@ -29,6 +29,11 @@ export type Produto = {
   preco: number
   spin360: string | null
   poster: string
+  // #87 Fase C — dado REAL de absorção (enriquecido por handle do Medusa).
+  // Opcional: produto sem match real cai no `nivel` legado (fallback).
+  absorcao_gotas?: number
+  uso_noturno?: boolean
+  formato?: string
 }
 
 export const CATALOGO = catalogoRaw as Produto[]

@@ -87,6 +87,21 @@ const Addresses = ({
 
             <IdentificacaoFiscal cart={cart} />
 
+            {/* Opt-in de marketing (#97) — DESMARCADO por padrão (LGPD) */}
+            <label className="flex items-start gap-x-2 mt-6 text-small-regular text-ui-fg-subtle select-none cursor-pointer">
+              <input
+                type="checkbox"
+                name="marketing_consent"
+                defaultChecked={false}
+                className="mt-0.5"
+                data-testid="marketing-consent-checkbox"
+              />
+              <span>
+                Quero receber ofertas e novidades da Copamar por e-mail e
+                WhatsApp. (opcional)
+              </span>
+            </label>
+
             <SubmitButton className="mt-6" data-testid="submit-address-button">
               Continuar para entrega
             </SubmitButton>

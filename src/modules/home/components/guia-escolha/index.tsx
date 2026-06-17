@@ -86,7 +86,7 @@ const GuiaEscolha = () => (
         href={WHATS_ESPECIALISTA}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-auto inline-flex w-full items-center justify-center rounded-large bg-copamar-cta px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-copamar-cta-dark"
+        className="mt-auto inline-flex w-full items-center justify-center rounded-large bg-copamar-cta px-5 py-2.5 text-sm font-semibold text-[#0a2e6b] transition hover:bg-copamar-cta-dark"
       >
         Falar com especialista
       </a>

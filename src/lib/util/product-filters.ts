@@ -21,6 +21,23 @@ export function inferMarca(titulo: string): string {
   return "Outras"
 }
 
+/**
+ * Extrai o GTIN-13 (EAN-13) de um SKU pro JSON-LD (Marco 15/06). Lida com os
+ * SKUs "compostos" do catálogo: sufixo de pack "<gtin>-<multiplicador>" e
+ * GTIN-14 com zero à esquerda ("0"+EAN13). Valida o dígito verificador GS1 —
+ * só retorna se for um EAN-13 REAL (senão undefined, melhor não emitir).
+ */
+export function extrairGtin13(raw?: string | null): string | undefined {
+  if (!raw) return undefined
+  let base = String(raw).split("-")[0] // tira "-12", "-6" (multiplicador de pack)
+  if (base.length === 14 && base.startsWith("0")) base = base.slice(1) // GTIN-14 → EAN-13
+  if (!/^\d{13}$/.test(base)) return undefined
+  const d = base.split("").map(Number)
+  const soma = d.slice(0, 12).reduce((s, n, i) => s + n * (i % 2 === 0 ? 1 : 3), 0)
+  const dv = (10 - (soma % 10)) % 10
+  return dv === d[12] ? base : undefined
+}
+
 export function inferGenero(
   titulo: string,
   categorias?: HttpTypes.StoreProductCategory[] | null

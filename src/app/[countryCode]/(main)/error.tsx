@@ -28,7 +28,7 @@ export default function MainError({
       </p>
       <button
         onClick={() => reset()}
-        className="inline-flex items-center justify-center rounded-large bg-copamar-cta px-6 py-3 font-semibold text-white transition-colors hover:bg-copamar-cta-dark"
+        className="inline-flex items-center justify-center rounded-large bg-copamar-cta px-6 py-3 font-semibold text-[#0a2e6b] transition-colors hover:bg-copamar-cta-dark"
       >
         Tentar de novo
       </button>

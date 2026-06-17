@@ -64,7 +64,7 @@ export default function RedefinirSenhaForm({
         </p>
         <LocalizedClientLink
           href="/account"
-          className="mt-6 inline-block rounded-large bg-copamar-cta px-6 py-3 font-semibold text-white transition-colors hover:bg-copamar-cta-dark"
+          className="mt-6 inline-block rounded-large bg-copamar-cta px-6 py-3 font-semibold text-[#0a2e6b] transition-colors hover:bg-copamar-cta-dark"
         >
           Entrar na minha conta
         </LocalizedClientLink>

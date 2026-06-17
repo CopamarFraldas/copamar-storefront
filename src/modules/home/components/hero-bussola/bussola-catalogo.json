@@ -8,11 +8,14 @@
   "tamanhos": [
    "G"
   ],
-  "nivel": "intenso",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 164.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000267-0-01KSRK0VNPRVSKVCDJ5RAMJS7N.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000267-0-01KSRK0VNPRVSKVCDJ5RAMJS7N.jpg",
+  "absorcao_gotas": 5,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-abena-slip-m4-premium-21-unidades",
@@ -23,11 +26,14 @@
   "tamanhos": [
    "M"
   ],
-  "nivel": "intenso",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 164.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000168-0-01KSMY62SDJ2Y763T5PPXVJ73Q.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000168-0-01KSMY62SDJ2Y763T5PPXVJ73Q.jpg",
+  "absorcao_gotas": 5,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-abena-slip-xl4-premium-c-12-un",
@@ -38,11 +44,14 @@
   "tamanhos": [
    "EG"
   ],
-  "nivel": "intenso",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 164.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000304-0-01KSRK0WQYANZ3WY3GAG17KK7T.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000304-0-01KSRK0WQYANZ3WY3GAG17KK7T.jpg",
+  "absorcao_gotas": 5,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-absorv-g-c-50",
@@ -57,7 +66,10 @@
   "fardo": true,
   "preco": 69.7,
   "spin360": null,
-  "poster": "https://copamarfraldas.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/g/e/generic_g.webp"
+  "poster": "https://copamarfraldas.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/g/e/generic_g.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-absorv-m-c-50",
@@ -72,7 +84,10 @@
   "fardo": true,
   "preco": 69.7,
   "spin360": null,
-  "poster": "https://copamarfraldas.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/g/e/generica-m-8eorl15nku_.webp"
+  "poster": "https://copamarfraldas.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/g/e/generica-m-8eorl15nku_.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-absorv-xg-c-46",
@@ -87,7 +102,10 @@
   "fardo": true,
   "preco": 69.7,
   "spin360": null,
-  "poster": "https://copamarfraldas.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/g/e/generica-xg-8jmcm1z6bc_.webp"
+  "poster": "https://copamarfraldas.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/g/e/generica-xg-8jmcm1z6bc_.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-biofral-classic-eg-c-24",
@@ -102,7 +120,10 @@
   "fardo": true,
   "preco": 73.2,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979850-0-01KSMY70CH0V3VNRVZ0RVWF99Z.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979850-0-01KSMY70CH0V3VNRVZ0RVWF99Z.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-biofral-classic-grande-c-28",
@@ -117,7 +138,10 @@
   "fardo": true,
   "preco": 73.2,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979843-0-01KSMY71QXE36SMK9KXKHTWC1P.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979843-0-01KSMY71QXE36SMK9KXKHTWC1P.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-biofral-classic-media-c-32",
@@ -132,7 +156,10 @@
   "fardo": true,
   "preco": 73.2,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979836-0-01KSMY7315AR174YJ52BZH7T5G.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979836-0-01KSMY7315AR174YJ52BZH7T5G.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-eg-adultcare-plus-com-21",
@@ -143,11 +170,14 @@
   "tamanhos": [
    "EG"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 66.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605462-0-01KSMY6CHCGRZ9AN8QTS0JH1EB.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605462-0-01KSMY6CHCGRZ9AN8QTS0JH1EB.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-g-adultcare-plus-com-24",
@@ -158,11 +188,14 @@
   "tamanhos": [
    "G"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 66.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605363-0-01KSMY6DBRWHVBNKGYJ2KK4BQQ.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605363-0-01KSMY6DBRWHVBNKGYJ2KK4BQQ.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-m-adultcare-plus-com-26",
@@ -173,11 +206,14 @@
   "tamanhos": [
    "M"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 66.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605356-0-01KSMY6E79Q86K5DGN7PHEN5DT.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605356-0-01KSMY6E79Q86K5DGN7PHEN5DT.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-noturna-vitalidade-eg-c-26",
@@ -188,11 +224,14 @@
   "tamanhos": [
    "EG"
   ],
-  "nivel": "noturno",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 54.65,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230037-0-01KSMWWX7KNHWD2ST3H3KKVN0S.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230037-0-01KSMWWX7KNHWD2ST3H3KKVN0S.webp",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-noturna-vitalidade-g-c-30",
@@ -203,11 +242,14 @@
   "tamanhos": [
    "G"
   ],
-  "nivel": "noturno",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 54.65,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230020-0-01KSMWWZ52N1BV02E25P16ART4.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230020-0-01KSMWWZ52N1BV02E25P16ART4.webp",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-noturna-vitalidade-m-c-30",
@@ -218,11 +260,14 @@
   "tamanhos": [
    "M"
   ],
-  "nivel": "noturno",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 54.65,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230013-0-01KSMWWY6J0WC5KDVZ8V8HZYJZ.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230013-0-01KSMWWY6J0WC5KDVZ8V8HZYJZ.webp",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-noturna-vitalidade-p-c-30",
@@ -233,11 +278,14 @@
   "tamanhos": [
    "P"
   ],
-  "nivel": "noturno",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 54.65,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/0630941686331-0-01KSMY5HS416N8N8396BWDCR5W.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/0630941686331-0-01KSMY5HS416N8N8396BWDCR5W.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-noturna-vitalidade-sxg-c-24",
@@ -248,11 +296,14 @@
   "tamanhos": [
    "XXG"
   ],
-  "nivel": "noturno",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 54.65,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230044-0-01KSMY5GZTQZ90TPY5SCA28SX2.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230044-0-01KSMY5GZTQZ90TPY5SCA28SX2.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-tena-confort-eg-c-18",
@@ -263,11 +314,14 @@
   "tamanhos": [
    "EG"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 67.4,
   "spin360": "/produtos/tena/confort/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770902612-0-01KSMWX6AJWZY95EN2VCC79QY4.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770902612-0-01KSMWX6AJWZY95EN2VCC79QY4.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-tena-confort-g-20-unidades",
@@ -278,11 +332,14 @@
   "tamanhos": [
    "G"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 67.4,
   "spin360": "/produtos/tena/confort/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770902605-0-01KSMWX79KRJ7FSME713N424XW.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770902605-0-01KSMWX79KRJ7FSME713N424XW.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-tena-confort-m-26-unidades",
@@ -293,11 +350,14 @@
   "tamanhos": [
    "M"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 67.4,
   "spin360": "/produtos/tena/confort/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770900267-0-01KSMWX8811NB7TT0WA03HZ411.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770900267-0-01KSMWX8811NB7TT0WA03HZ411.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-tena-confort-p-c-30",
@@ -308,11 +368,14 @@
   "tamanhos": [
    "P"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 67.4,
   "spin360": "/produtos/tena/confort/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770900250-0-01KSMY6YZBMEQDMCJ960MCEEC2.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770900250-0-01KSMY6YZBMEQDMCJ960MCEEC2.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-vita-plus-c-46-eg",
@@ -327,7 +390,10 @@
   "fardo": true,
   "preco": 71.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230549-0-01KSMWX2ZNCJ9CNY5DFEAED7QG.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230549-0-01KSMWX2ZNCJ9CNY5DFEAED7QG.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-vita-plus-c-50-grande",
@@ -342,7 +408,10 @@
   "fardo": true,
   "preco": 71.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230532-0-01KSMWX41AS1SPS2VTK0GER2VK.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230532-0-01KSMWX41AS1SPS2VTK0GER2VK.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-geriatrica-vita-plus-c-50-media",
@@ -357,7 +426,10 @@
   "fardo": true,
   "preco": 71.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230525-0-01KSMWX51ZW4Q817TH2JQAHRA5.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230525-0-01KSMWX51ZW4Q817TH2JQAHRA5.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-slip-noturna-grande-c-32-unidades",
@@ -372,7 +444,10 @@
   "fardo": true,
   "preco": 141.99,
   "spin360": "/produtos/tena/slip-noturna/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983406-0-01KSMWW9FMZW6TS1SP3BDKN8AN.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983406-0-01KSMWW9FMZW6TS1SP3BDKN8AN.webp",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-slip-noturna-media-c-32-unidades",
@@ -387,7 +462,10 @@
   "fardo": true,
   "preco": 141.99,
   "spin360": "/produtos/tena/slip-noturna/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983390-0-01KSMWWB4RY00WTTQKD1WVPCDN.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983390-0-01KSMWWB4RY00WTTQKD1WVPCDN.webp",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-tena-plus-size-care-xxg-c-8",
@@ -398,11 +476,14 @@
   "tamanhos": [
    "XXG"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 76.1,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982263-0-01KSMY5WQ0XYD2TZ2YSXVHF8TF.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982263-0-01KSMY5WQ0XYD2TZ2YSXVHF8TF.jpg",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-tena-slip-dermacare-grande-c-32",
@@ -413,11 +494,14 @@
   "tamanhos": [
    "G"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 134.99,
   "spin360": "/produtos/tena/slip-dermacare/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983383-0-01KSMWWC4RK4YGN982KH3W607Z.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983383-0-01KSMWWC4RK4YGN982KH3W607Z.webp",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "fralda-tena-slip-dermacare-media-c-32",
@@ -428,11 +512,14 @@
   "tamanhos": [
    "M"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 134.99,
   "spin360": "/produtos/tena/slip-dermacare/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983376-0-01KSMWWD38MKM6YFFAGG1KVA1S.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983376-0-01KSMWWD38MKM6YFFAGG1KVA1S.webp",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "tena-slip-dermacare-eg-c-24-unidades",
@@ -443,11 +530,14 @@
   "tamanhos": [
    "EG"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 103.4,
   "spin360": "/produtos/tena/slip-dermacare/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983666-0-01KSMWWT84AK31T9R29VDF1TEA.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983666-0-01KSMWWT84AK31T9R29VDF1TEA.webp",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "tena-slip-noturna-eg-c-24-unidades",
@@ -462,7 +552,10 @@
   "fardo": true,
   "preco": 108.7,
   "spin360": "/produtos/tena/slip-noturna/360",
-  "poster": "https://copamarfraldas.com.br/media/catalog/product/t/e/tena_slip_noturna_eg_24.webp"
+  "poster": "https://copamarfraldas.com.br/media/catalog/product/t/e/tena_slip_noturna_eg_24.webp",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Fralda com fita (slip)"
  },
  {
   "handle": "calcinha-descartavel-roupa-intima-tena-pants-mulher-p-m-c-16",
@@ -478,7 +571,10 @@
   "fardo": true,
   "preco": 70.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983321-0-01KSMWWEZZHGKRZ8C54K3AKCK2.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983321-0-01KSMWWEZZHGKRZ8C54K3AKCK2.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "max-care-pants-p-m-c-28",
@@ -494,7 +590,10 @@
   "fardo": true,
   "preco": 80.2,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898039561486-0-01KSMWWQCHAK95053NJDEGPZC1.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898039561486-0-01KSMWWQCHAK95053NJDEGPZC1.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-absorvente-abena-pants-l3-premium-15-unidades",
@@ -505,11 +604,14 @@
   "tamanhos": [
    "G"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 136.2,
   "spin360": null,
-  "poster": "https://copamarfraldas.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/l/3/l3-2.jpg"
+  "poster": "https://copamarfraldas.com.br/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/l/3/l3-2.jpg",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-absorvente-abena-pants-m3-premium-15-unidades",
@@ -520,11 +622,14 @@
   "tamanhos": [
    "M"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 136.2,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000908-0-01KSMY65Z5ETTXY9FE9HAB642V.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000908-0-01KSMY65Z5ETTXY9FE9HAB642V.jpg",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-absorvente-abena-pants-s2-premium-16-unidades",
@@ -535,11 +640,14 @@
   "tamanhos": [
    "P"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 136.2,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000809-0-01KSMY67WMK1PJ98SYXPME6TCW.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571000809-0-01KSMY67WMK1PJ98SYXPME6TCW.jpg",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-absorvente-abena-pants-xl2-premium-16-unidades",
@@ -550,11 +658,14 @@
   "tamanhos": [
    "EG"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 136.2,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571001004-0-01KSMY6417C6TFJH6K1QJKJ5KH.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571001004-0-01KSMY6417C6TFJH6K1QJKJ5KH.jpg",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-plena-g-eg-c-14",
@@ -570,7 +681,10 @@
   "fardo": true,
   "preco": 41.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898204640015-0-01KSMWWGY8T705MY5GSVZVJ2DN.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898204640015-0-01KSMWWGY8T705MY5GSVZVJ2DN.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-plena-p-m-c-14",
@@ -586,7 +700,10 @@
   "fardo": true,
   "preco": 41.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898204640008-0-01KSMWWK35P2A5HJGBQ5SMNKXC.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898204640008-0-01KSMWWK35P2A5HJGBQ5SMNKXC.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-plena-xxg-c-12",
@@ -601,7 +718,10 @@
   "fardo": true,
   "preco": 59.9,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898204640046-0-01KSMWWNEEMPM5EGDDNFR872AP.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898204640046-0-01KSMWWNEEMPM5EGDDNFR872AP.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-tena-pants-mulher-nude-g-eg-c-16",
@@ -617,7 +737,10 @@
   "fardo": true,
   "preco": 70.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983338-0-01KSMWWE1SNRYAW21GHVMT28JQ.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983338-0-01KSMWWE1SNRYAW21GHVMT28JQ.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "roupa-intima-tena-pants-xxl-com-8-unidades",
@@ -628,11 +751,14 @@
   "tamanhos": [
    "XXG"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 75.2,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982270-0-01KSMY5VW29T16JM4BXA9G0K3B.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982270-0-01KSMY5VW29T16JM4BXA9G0K3B.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "tena-pants-confort-g-eg-c-32",
@@ -644,11 +770,14 @@
    "G",
    "EG"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 115.9,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982843-0-01KSMWX11NX9MJDPXAF096YDXP.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982843-0-01KSMWX11NX9MJDPXAF096YDXP.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "tena-pants-confort-p-m-c-32",
@@ -660,11 +789,14 @@
    "P",
    "M"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 115.9,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982836-0-01KSMWX202S622154VG3R20YCA.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982836-0-01KSMWX202S622154VG3R20YCA.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "tena-pants-confort-c-16-p-m",
@@ -692,11 +824,14 @@
    "G",
    "EG"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 128,
   "spin360": "/produtos/tena/pants-dermacare/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983536-0-01KSMY5S6GKPCCFW9KAMA76SKG.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983536-0-01KSMY5S6GKPCCFW9KAMA76SKG.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "tena-pants-dermacare-c-32-p-m",
@@ -708,11 +843,14 @@
    "P",
    "M"
   ],
-  "nivel": "moderado",
+  "nivel": "noturno",
   "fardo": true,
   "preco": 128,
   "spin360": "/produtos/tena/pants-dermacare/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983529-0-01KSMY5QQD71ZRSM6Q9M3RMZB6.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983529-0-01KSMY5QQD71ZRSM6Q9M3RMZB6.jpg",
+  "absorcao_gotas": 3,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "tena-pants-men-g-eg-c-16",
@@ -728,7 +866,10 @@
   "fardo": true,
   "preco": 76.8,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982201-0-01KSMY5ZP75641BMDD10F3Z5CD.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982201-0-01KSMY5ZP75641BMDD10F3Z5CD.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "tena-pants-men-p-m-c-16",
@@ -744,7 +885,10 @@
   "fardo": true,
   "preco": 76.8,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982195-0-01KSMY5YCW6ETC9C9J8DPZ4X34.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982195-0-01KSMY5YCW6ETC9C9J8DPZ4X34.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Pants"
  },
  {
   "handle": "tena-pants-noturna-g-eg-c-32",
@@ -760,7 +904,10 @@
   "fardo": true,
   "preco": 145.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983550-0-01KSMY5PDFV0J80AV5TQHP7DQ8.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983550-0-01KSMY5PDFV0J80AV5TQHP7DQ8.jpg",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "tena-pants-noturna-p-m-c-32",
@@ -776,7 +923,10 @@
   "fardo": true,
   "preco": 145.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983543-0-01KSMY5N4CT21PB14D25METAE3.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983543-0-01KSMY5N4CT21PB14D25METAE3.jpg",
+  "absorcao_gotas": 4,
+  "uso_noturno": true,
+  "formato": "Pants"
  },
  {
   "handle": "absorvente-abena-light-extra-3-c-10-unidades",
@@ -787,11 +937,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "leve",
+  "nivel": "moderado",
   "fardo": false,
   "preco": 24.8,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571001226-0-01KSMWWM7BX34SCNWW6YTW9QKR.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571001226-0-01KSMWWM7BX34SCNWW6YTW9QKR.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-feminino-drylady-c-8",
@@ -806,7 +959,10 @@
   "fardo": false,
   "preco": 12.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7894513000007-0-01KSMY6A3N6WMYMESVA2ZVHEVA.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7894513000007-0-01KSMY6A3N6WMYMESVA2ZVHEVA.jpg",
+  "absorcao_gotas": 1,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-masculino-abena-man-formula-2-c-15",
@@ -817,11 +973,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "intenso",
+  "nivel": "moderado",
   "fardo": false,
   "preco": 38.3,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571001141-0-01KSMWWS977E2GKDQW2KYV2JDV.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571001141-0-01KSMWWS977E2GKDQW2KYV2JDV.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-masculino-dryman-c-10",
@@ -832,11 +991,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "leve",
+  "nivel": "moderado",
   "fardo": false,
   "preco": 17,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7894513142066-0-01KSMY6AZBYA6748YGE402J6PR.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7894513142066-0-01KSMY6AZBYA6748YGE402J6PR.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-masculino-dryman-c-120",
@@ -847,11 +1009,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "leve",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 188.4,
   "spin360": null,
-  "poster": "/produtos/dryman-120-fardo.webp"
+  "poster": "/produtos/dryman-120-fardo.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-tena-men-protetor-masculino-noturno-level-3-c-48",
@@ -862,11 +1027,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "noturno",
+  "nivel": "moderado",
   "fardo": true,
   "preco": 195.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7322540016413-6-0-01KSMWWHYGGPFX68PF1Y7ZA2JR.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7322540016413-6-0-01KSMWWHYGGPFX68PF1Y7ZA2JR.webp",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "tena-lady-discreet-dia-e-noite-c-12",
@@ -877,11 +1045,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "intenso",
+  "nivel": "noturno",
   "fardo": false,
   "preco": 38.9,
   "spin360": "/produtos/tena/lady-dianoite/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770981747-0-01KSMY6112ZVASHXHJ3YTSGSXZ.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770981747-0-01KSMY6112ZVASHXHJ3YTSGSXZ.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": true,
+  "formato": "Absorvente"
  },
  {
   "handle": "tena-lady-discreet-extra-c-20",
@@ -896,7 +1067,10 @@
   "fardo": false,
   "preco": 44.8,
   "spin360": "/produtos/tena/lady-extra/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7322541589244-0-01KSMY6BQP7HRQ8FSMAQ7XDDNE.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7322541589244-0-01KSMY6BQP7HRQ8FSMAQ7XDDNE.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "tena-lady-discreet-max-night-com-14-unidades",
@@ -911,7 +1085,10 @@
   "fardo": false,
   "preco": 48,
   "spin360": "/produtos/tena/lady-maxnight/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770980313-0-01KSMY6TXD8EGH85H7SHDE8SXP.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770980313-0-01KSMY6TXD8EGH85H7SHDE8SXP.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": true,
+  "formato": "Absorvente"
  },
  {
   "handle": "tena-lady-discreet-normal-com-16-unidades",
@@ -926,7 +1103,10 @@
   "fardo": false,
   "preco": 24.5,
   "spin360": "/produtos/tena/lady-normal/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982829-0-01KSMY6VREGG02ARDXZBTART8H.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982829-0-01KSMY6VREGG02ARDXZBTART8H.jpg",
+  "absorcao_gotas": 1,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "tena-men-level-2-active-fit-c-10-unidades",
@@ -941,7 +1121,10 @@
   "fardo": false,
   "preco": 31,
   "spin360": "/produtos/tena/men/360",
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7322540016413-1-01KSMY6PJHWNWPJ0F5WC29G8SH.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7322540016413-1-01KSMY6PJHWNWPJ0F5WC29G8SH.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "tena-men-level-2-active-fit-c-60-unidades",
@@ -967,11 +1150,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "noturno",
+  "nivel": "moderado",
   "fardo": false,
   "preco": 33.6,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982683-0-01KSMY5XFPDCBVNRAS5BQDGWSF.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770982683-0-01KSMY5XFPDCBVNRAS5BQDGWSF.jpg",
+  "absorcao_gotas": 2,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-biofral-maxi-geriatric-com-20-unidades",
@@ -982,11 +1168,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "moderado",
+  "nivel": "leve",
   "fardo": true,
   "preco": 22,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979881-0-01KSMY6SJSYGP20HYX3CJS4ZEF.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979881-0-01KSMY6SJSYGP20HYX3CJS4ZEF.jpg",
+  "absorcao_gotas": 1,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-comfort-life-c-20",
@@ -1012,11 +1201,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "moderado",
+  "nivel": "leve",
   "fardo": true,
   "preco": 23.5,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605349-0-01KSMY6Y71BZB0BB84KB1S9PED.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605349-0-01KSMY6Y71BZB0BB84KB1S9PED.jpg",
+  "absorcao_gotas": 1,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-geriatrico-adultcare-c-20-unidades",
@@ -1027,11 +1219,14 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "moderado",
+  "nivel": "leve",
   "fardo": true,
   "preco": 22,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605158-0-01KSMY6WMRRM829WJQ24316M89.jpg"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605158-0-01KSMY6WMRRM829WJQ24316M89.jpg",
+  "absorcao_gotas": 1,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  },
  {
   "handle": "absorvente-geriatrico-adultcare-c-40-unidades",
@@ -1042,10 +1237,13 @@
   "tamanhos": [
    "unico"
   ],
-  "nivel": "moderado",
+  "nivel": "leve",
   "fardo": true,
   "preco": 42.99,
   "spin360": null,
-  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605806-0-01KSMWW8FZ81WGBGWEY9YW6B2Y.webp"
+  "poster": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896104605806-0-01KSMWW8FZ81WGBGWEY9YW6B2Y.webp",
+  "absorcao_gotas": 1,
+  "uso_noturno": false,
+  "formato": "Absorvente"
  }
 ]

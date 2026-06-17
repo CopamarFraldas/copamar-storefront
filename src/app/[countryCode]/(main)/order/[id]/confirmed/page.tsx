@@ -1,5 +1,6 @@
 import { retrieveOrder } from "@lib/data/orders"
 import GcrOptin from "@modules/order/components/gcr-optin"
+import MarketingConsentRegister from "@modules/order/components/marketing-consent-register"
 import GoogleAdsConversion from "@modules/order/components/google-ads-conversion"
 import OrderCompletedTemplate from "@modules/order/templates/order-completed-template"
 import { Metadata } from "next"
@@ -62,6 +63,18 @@ export default async function OrderConfirmedPage(props: Props) {
         orderId={String(order.display_id ?? order.id)}
         email={order.email ?? ""}
         createdAt={String(order.created_at ?? "")}
+      />
+      {/* opt-in de marketing (#97): registra no n8n SÓ se o cliente marcou no checkout */}
+      <MarketingConsentRegister
+        orderId={String(order.display_id ?? order.id)}
+        email={order.email ?? ""}
+        nome={`${order.shipping_address?.first_name ?? ""} ${
+          order.shipping_address?.last_name ?? ""
+        }`.trim()}
+        telefone={order.shipping_address?.phone ?? ""}
+        documento={String((order.metadata as any)?.fiscal_documento ?? "")}
+        consent={(order.metadata as any)?.marketing_consent === "true"}
+        ts={String((order.metadata as any)?.marketing_consent_ts ?? "")}
       />
       <OrderCompletedTemplate order={order} />
     </>

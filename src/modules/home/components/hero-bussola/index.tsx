@@ -278,7 +278,7 @@ export default function HeroBussola({ embed = false }: { embed?: boolean }) {
             <p className="hidden text-center text-xs font-medium text-white/90 small:block">
               Nota {RATING} em {COUNT} avaliações &nbsp;·&nbsp; 20 anos cuidando de
               famílias &nbsp;·&nbsp;{" "}
-              <span className="font-semibold text-emerald-300">Frete grátis acima de R$50</span>{" "}
+              <span className="font-semibold text-emerald-300">Frete grátis na Grande SP acima de R$50</span>{" "}
               &nbsp;·&nbsp; Embalagem 100% discreta
             </p>
             <p className="text-center text-xs font-medium text-white/90 small:hidden">
