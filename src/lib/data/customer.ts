@@ -37,8 +37,12 @@ export const retrieveCustomer =
         method: "GET",
         query: {
           // metadata+phone: detecta migrado/celular_confirmado e mostra o número
-          // atual na tela "Confirme seu WhatsApp" (migração, Marco 10/06)
-          fields: "*orders,metadata,phone",
+          // atual na tela "Confirme seu WhatsApp" (migração, Marco 10/06).
+          // ⚠️ fields explícito SUBSTITUI os defaults — por isso listamos também
+          // first_name/last_name/email/company_name/*addresses; sem eles o customer
+          // volta sem nome/email/endereços e quebra "Olá {nome}", o nav (vira
+          // "Entrar" logado) e o .filter de addresses no checkout/perfil. Bug 17/06.
+          fields: "*orders,*addresses,metadata,phone,first_name,last_name,email,company_name",
         },
         headers,
         next,
