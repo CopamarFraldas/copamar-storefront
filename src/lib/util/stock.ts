@@ -13,7 +13,7 @@ export function isProductOutOfStock(product: HttpTypes.StoreProduct): boolean {
   return variants.every((v) => {
     if (!v.manage_inventory) return false
     if (v.allow_backorder) return false
-    return (v.inventory_quantity || 0) === 0
+    return (v.inventory_quantity || 0) <= 0 // <=0: estoque negativo também é esgotado
   })
 }
 

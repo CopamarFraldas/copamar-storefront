@@ -15,6 +15,8 @@ import {
   deleteCustomerAddress,
   updateCustomerAddress,
 } from "@lib/data/customer"
+import EnderecoFields from "./endereco-fields"
+import { derivaEndereco } from "@lib/util/endereco"
 
 type EditAddressProps = {
   region: HttpTypes.StoreRegion
@@ -154,45 +156,19 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 defaultValue={address.company || undefined}
                 data-testid="company-input"
               />
-              <Input
-                label="Endereço"
-                name="address_1"
-                required
-                autoComplete="address-line1"
-                defaultValue={address.address_1 || undefined}
-                data-testid="address-1-input"
-              />
-              <Input
-                label="Apto, sala, etc."
-                name="address_2"
-                autoComplete="address-line2"
-                defaultValue={address.address_2 || undefined}
-                data-testid="address-2-input"
-              />
-              <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                <Input
-                  label="CEP"
-                  name="postal_code"
-                  required
-                  autoComplete="postal-code"
-                  defaultValue={address.postal_code || undefined}
-                  data-testid="postal-code-input"
-                />
-                <Input
-                  label="Cidade"
-                  name="city"
-                  required
-                  autoComplete="locality"
-                  defaultValue={address.city || undefined}
-                  data-testid="city-input"
-                />
-              </div>
-              <Input
-                label="Estado"
-                name="province"
-                autoComplete="address-level1"
-                defaultValue={address.province || undefined}
-                data-testid="state-input"
+              <EnderecoFields
+                defaults={{
+                  postal_code: address.postal_code || "",
+                  // deriva dos 2 formatos (novo c/ metadata + migrado): senão o
+                  // endereço migrado duplicava o número e jogava o bairro no
+                  // complemento ao salvar (auditoria 18/06).
+                  address_1: derivaEndereco(address).logradouro,
+                  numero: derivaEndereco(address).numero,
+                  bairro: derivaEndereco(address).bairro,
+                  address_2: derivaEndereco(address).complemento,
+                  city: address.city || "",
+                  province: address.province || "",
+                }}
               />
               <CountrySelect
                 name="country_code"

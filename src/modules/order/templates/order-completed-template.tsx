@@ -7,6 +7,7 @@ import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
 import OnboardingCta from "@modules/order/components/onboarding-cta"
 import OrderDetails from "@modules/order/components/order-details"
+import RetiradaAviso from "@modules/order/components/retirada-aviso"
 import ShippingDetails from "@modules/order/components/shipping-details"
 import PaymentDetails from "@modules/order/components/payment-details"
 import { HttpTypes } from "@medusajs/types"
@@ -33,6 +34,7 @@ export default async function OrderCompletedTemplate({
           {/* hero caloroso + ciente da forma de pagamento (boleto re-exibido)
               + nº do pedido em destaque (Marco 04/06) */}
           <ConfirmationHero order={order} />
+          <RetiradaAviso order={order} />
           <OrderDetails order={order} hideNumero />
           <Heading level="h2" className="flex flex-row text-3xl-regular">
             Resumo

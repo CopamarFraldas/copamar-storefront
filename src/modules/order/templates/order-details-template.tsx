@@ -7,6 +7,8 @@ import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
 import OrderDetails from "@modules/order/components/order-details"
 import OrderSummary from "@modules/order/components/order-summary"
+import RastreioEntrega from "@modules/order/components/rastreio-entrega"
+import AcoesPedido from "@modules/order/components/acoes-pedido"
 import ShippingDetails from "@modules/order/components/shipping-details"
 import React from "react"
 
@@ -34,6 +36,16 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
         data-testid="order-details-container"
       >
         <OrderDetails order={order} showStatus />
+        <RastreioEntrega
+          orderId={order.id}
+          blingOrderId={(order.metadata as any)?.bling_order_id}
+          createdAt={order.created_at as any}
+        />
+        <AcoesPedido
+          orderId={order.id}
+          displayId={order.display_id}
+          countryCode={(order.shipping_address?.country_code as any) || "br"}
+        />
         <Items order={order} />
         <ShippingDetails order={order} />
         <OrderSummary order={order} />

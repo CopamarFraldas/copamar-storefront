@@ -1,125 +1,138 @@
 "use client"
 
-import { RadioGroup } from "@headlessui/react"
-import { isStripeLike, isPagBank, isPagHiperBoleto, paymentInfoMap } from "@lib/constants"
-import { initiatePaymentSession, setDescontoPix } from "@lib/data/cart"
-import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
-import { Button, Container, Heading, Text, clx } from "@medusajs/ui"
+import { isPagBank, isPagHiperBoleto, isManual, paymentInfoMap } from "@lib/constants"
+import { setDescontoPix } from "@lib/data/cart"
+import { CheckCircleSolid } from "@medusajs/icons"
+import { Heading, Text, clx } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
-import PaymentContainer, {
-  StripeCardContainer,
-} from "@modules/checkout/components/payment-container"
 import PagBankPix from "@modules/checkout/components/pagbank-pix"
 import PagBankCard from "@modules/checkout/components/pagbank-card"
 import PagHiperBoleto from "@modules/checkout/components/paghiper-boleto"
+import PagarNaLoja from "@modules/checkout/components/pagar-na-loja"
 import Divider from "@modules/common/components/divider"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
+
+/**
+ * Pagamento — 3 FORMAS ACHATADAS (Marco 18/06): PIX · Cartão · Boleto, cada uma
+ * direta (sem sub-menu). Antes o PagBank era 1 opção que abria um sub-toggle
+ * PIX|Cartão — confundia. PIX e Cartão são o MESMO provider PagBank (data.method
+ * diferente); Boleto é o PagHiper. Cada painel conduz até a confirmação sozinho.
+ */
+type Opcao = "pix" | "card" | "boleto" | "loja" | ""
 
 const Payment = ({
   cart,
   availablePaymentMethods,
+  availableShippingMethods,
 }: {
   cart: any
   availablePaymentMethods: any[]
+  availableShippingMethods?: any[]
 }) => {
   const activeSession = cart.payment_collection?.payment_sessions?.find(
-    (paymentSession: any) => paymentSession.status === "pending"
+    (s: any) => s.status === "pending"
+  )
+  const [error, setError] = useState<string | null>(null)
+
+  // provider ids reais: PagBank (PIX+Cartão) e PagHiper (Boleto)
+  const pagbankId =
+    availablePaymentMethods?.find((m) => isPagBank(m.id))?.id || ""
+  const boletoId =
+    availablePaymentMethods?.find((m) => isPagHiperBoleto(m.id))?.id || ""
+  const lojaId =
+    availablePaymentMethods?.find((m) => isManual(m.id))?.id || ""
+
+  // RETIRADA NA LOJA: detecta pelo TIPO do fulfillment set (pickup) do frete
+  // escolhido — robusto a renome (não depende do nome "Retirar na loja").
+  const selectedShippingOptionId =
+    cart?.shipping_methods?.[(cart?.shipping_methods?.length ?? 0) - 1]
+      ?.shipping_option_id
+  const isPickup = !!availableShippingMethods?.some(
+    (o: any) =>
+      o.id === selectedShippingOptionId &&
+      o.service_zone?.fulfillment_set?.type === "pickup"
   )
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [cardBrand, setCardBrand] = useState<string | null>(null)
-  const [cardComplete, setCardComplete] = useState(false)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-    activeSession?.provider_id ?? ""
+  // estado inicial: se a sessão ativa é boleto, marca boleto; senão começa vazio
+  // (o provider PagBank não distingue PIX/Cartão, então o cliente re-escolhe).
+  const [opcao, setOpcao] = useState<Opcao>(
+    activeSession?.provider_id && isPagHiperBoleto(activeSession.provider_id)
+      ? "boleto"
+      : ""
   )
-  // dentro do PagBank o cliente escolhe PIX ou Cartão (mesmo provider, data diferente)
-  const [pagbankMethod, setPagbankMethod] = useState<"pix" | "card">("pix")
 
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
-
   const isOpen = searchParams.get("step") === "payment"
-
-  const setPaymentMethod = async (method: string) => {
-    setError(null)
-    setSelectedPaymentMethod(method)
-    if (isStripeLike(method)) {
-      await initiatePaymentSession(cart, {
-        provider_id: method,
-      })
-    }
-  }
 
   const paidByGiftcard =
     cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
-
   const paymentReady =
-    (activeSession && cart?.shipping_methods.length !== 0) || paidByGiftcard
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set(name, value)
-
-      return params.toString()
-    },
-    [searchParams]
-  )
+    (activeSession && cart?.shipping_methods?.length !== 0) || paidByGiftcard
 
   const handleEdit = () => {
-    router.push(pathname + "?" + createQueryString("step", "payment"), {
-      scroll: false,
-    })
-  }
-
-  const handleSubmit = async () => {
-    setIsLoading(true)
-    try {
-      const shouldInputCard =
-        isStripeLike(selectedPaymentMethod) && !activeSession
-
-      const checkActiveSession =
-        activeSession?.provider_id === selectedPaymentMethod
-
-      if (!checkActiveSession) {
-        await initiatePaymentSession(cart, {
-          provider_id: selectedPaymentMethod,
-        })
-      }
-
-      if (!shouldInputCard) {
-        return router.push(
-          pathname + "?" + createQueryString("step", "review"),
-          {
-            scroll: false,
-          }
-        )
-      }
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setIsLoading(false)
-    }
+    const params = new URLSearchParams(searchParams)
+    params.set("step", "payment")
+    router.push(pathname + "?" + params.toString(), { scroll: false })
   }
 
   useEffect(() => {
     setError(null)
   }, [isOpen])
 
-  // 5% à vista de verdade (Marco 09/06): a promoção PIX5 entra no PIX e no
-  // BOLETO e sai no cartão. Como é promoção do Medusa, o desconto vale no
-  // TOTAL (QR/boleto, resumo, pedido, NF) — não é só texto de marketing.
+  // se trocar pra retirada, cartão/boleto não valem mais (e "loja" não vale fora
+  // da retirada) — reseta a opção pra não ficar um painel órfão selecionado.
+  useEffect(() => {
+    if (isPickup && (opcao === "card" || opcao === "boleto")) setOpcao("")
+    if (!isPickup && opcao === "loja") setOpcao("")
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPickup])
+
+  // 5% à vista (Marco 09/06 + 18/06): PIX, BOLETO e PAGAR-NA-LOJA ganham; cartão
+  // não. Promoção do Medusa → vale no TOTAL. NÃO é cumulativo (é o mesmo 5%).
   useEffect(() => {
     if (!isOpen) return
-    const querDesconto = Boolean(
-      (isPagBank(selectedPaymentMethod) && pagbankMethod === "pix") ||
-        isPagHiperBoleto(selectedPaymentMethod)
-    )
-    setDescontoPix(querDesconto).catch(() => {})
-  }, [isOpen, selectedPaymentMethod, pagbankMethod])
+    setDescontoPix(
+      opcao === "pix" || opcao === "boleto" || opcao === "loja"
+    ).catch(() => {})
+  }, [isOpen, opcao])
+
+  // formas achatadas. RETIRADA → PIX + Pagar na loja; ENTREGA → PIX/Cartão/Boleto.
+  const OPCOES = (
+    isPickup
+      ? ([
+          { key: "pix", titulo: "PIX", sub: "5% de desconto · aprovação na hora" },
+          { key: "loja", titulo: "Pagar na loja", sub: "5% de desconto · paga na retirada" },
+        ] as { key: Exclude<Opcao, "">; titulo: string; sub: string }[])
+      : ([
+          { key: "pix", titulo: "PIX", sub: "5% de desconto · aprovação na hora" },
+          { key: "card", titulo: "Cartão de crédito", sub: "em até 3x" },
+          { key: "boleto", titulo: "Boleto bancário", sub: "5% de desconto · vence em 3 dias" },
+        ] as { key: Exclude<Opcao, "">; titulo: string; sub: string }[])
+  ).filter((o) =>
+    o.key === "boleto" ? !!boletoId : o.key === "loja" ? !!lojaId : !!pagbankId
+  )
+
+  const fiscalDoc = cart?.metadata?.fiscal_documento as string
+  const defaultHolder = [
+    cart?.billing_address?.first_name,
+    cart?.billing_address?.last_name,
+  ]
+    .filter(Boolean)
+    .join(" ")
+
+  const tituloDe = (k: Opcao) =>
+    k === "pix"
+      ? "PIX"
+      : k === "card"
+      ? "Cartão de crédito"
+      : k === "boleto"
+      ? "Boleto bancário"
+      : k === "loja"
+      ? "Pagar na loja"
+      : ""
 
   return (
     <div className="bg-ui-bg-base">
@@ -149,35 +162,87 @@ const Payment = ({
           </Text>
         )}
       </div>
+
       <div>
         <div className={isOpen ? "block" : "hidden"}>
-          {!paidByGiftcard && availablePaymentMethods?.length && (
+          {!paidByGiftcard && OPCOES.length > 0 && (
             <>
-              <RadioGroup
-                value={selectedPaymentMethod}
-                onChange={(value: string) => setPaymentMethod(value)}
-              >
-                {availablePaymentMethods.map((paymentMethod) => (
-                  <div key={paymentMethod.id}>
-                    {isStripeLike(paymentMethod.id) ? (
-                      <StripeCardContainer
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                        paymentInfoMap={paymentInfoMap}
-                        setCardBrand={setCardBrand}
-                        setError={setError}
-                        setCardComplete={setCardComplete}
-                      />
-                    ) : (
-                      <PaymentContainer
-                        paymentInfoMap={paymentInfoMap}
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                      />
+              {/* 3 FORMAS DIRETAS — PIX · Cartão · Boleto (sem sub-menu) */}
+              <div className="grid gap-3" data-testid="payment-options">
+                {OPCOES.map((o) => (
+                  <button
+                    key={o.key}
+                    type="button"
+                    onClick={() => {
+                      setError(null)
+                      setOpcao(o.key)
+                    }}
+                    className={clx(
+                      "flex items-center justify-between rounded-lg border p-4 text-left transition-colors",
+                      {
+                        "border-copamar-primary ring-2 ring-copamar-primary/30 bg-copamar-bg-light dark:bg-ui-bg-subtle":
+                          opcao === o.key,
+                        "border-ui-border-base hover:border-ui-border-interactive":
+                          opcao !== o.key,
+                      }
                     )}
-                  </div>
+                    data-testid={`payment-opcao-${o.key}`}
+                  >
+                    <span className="flex flex-col">
+                      <span className="text-base font-medium text-ui-fg-base">
+                        {o.titulo}
+                      </span>
+                      <span className="text-sm text-ui-fg-subtle">{o.sub}</span>
+                    </span>
+                    <span
+                      className={clx(
+                        "ml-3 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2",
+                        {
+                          "border-copamar-primary": opcao === o.key,
+                          "border-ui-border-base": opcao !== o.key,
+                        }
+                      )}
+                    >
+                      {opcao === o.key && (
+                        <span className="h-2.5 w-2.5 rounded-full bg-copamar-primary" />
+                      )}
+                    </span>
+                  </button>
                 ))}
-              </RadioGroup>
+              </div>
+
+              <ErrorMessage
+                error={error}
+                data-testid="payment-method-error-message"
+              />
+
+              {/* painel da forma escolhida — conduz até a confirmação sozinho */}
+              {opcao === "pix" && (
+                <div className="mt-6">
+                  <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    ✅ 5% de desconto no PIX aplicado no total
+                  </p>
+                  <PagBankPix cartId={cart.id} fiscalDoc={fiscalDoc} />
+                </div>
+              )}
+              {opcao === "card" && (
+                <div className="mt-6">
+                  <PagBankCard
+                    cartId={cart.id}
+                    fiscalDoc={fiscalDoc}
+                    defaultHolder={defaultHolder}
+                  />
+                </div>
+              )}
+              {opcao === "boleto" && (
+                <div className="mt-6">
+                  <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    ✅ 5% de desconto no boleto aplicado no total
+                  </p>
+                  <PagHiperBoleto cartId={cart.id} fiscalDoc={fiscalDoc} />
+                </div>
+              )}
+              {opcao === "loja" && <PagarNaLoja cart={cart} />}
             </>
           )}
 
@@ -194,91 +259,9 @@ const Payment = ({
               </Text>
             </div>
           )}
-
-          <ErrorMessage
-            error={error}
-            data-testid="payment-method-error-message"
-          />
-
-          {/* PagBank: painel próprio com seletor PIX | Cartão. Conduz até a
-              confirmação sozinho — não usa o botão de revisão. */}
-          {isPagBank(selectedPaymentMethod) && !paidByGiftcard ? (
-            <div className="mt-6">
-              <div className="mb-5 inline-flex rounded-lg border border-ui-border-base bg-ui-bg-subtle p-1">
-                {(["pix", "card"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setPagbankMethod(m)}
-                    className={clx(
-                      "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
-                      {
-                        "bg-ui-bg-base text-ui-fg-base shadow-sm":
-                          pagbankMethod === m,
-                        "text-ui-fg-subtle hover:text-ui-fg-base":
-                          pagbankMethod !== m,
-                      }
-                    )}
-                    data-testid={`pagbank-tab-${m}`}
-                  >
-                    {m === "pix" ? "PIX" : "Cartão de crédito"}
-                  </button>
-                ))}
-              </div>
-              {pagbankMethod === "pix" ? (
-                <>
-                  <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                    ✅ 5% de desconto no PIX aplicado no total
-                  </p>
-                  <PagBankPix
-                    cartId={cart.id}
-                    fiscalDoc={cart?.metadata?.fiscal_documento as string}
-                  />
-                </>
-              ) : (
-                <PagBankCard
-                  cartId={cart.id}
-                  fiscalDoc={cart?.metadata?.fiscal_documento as string}
-                  defaultHolder={[
-                    cart?.billing_address?.first_name,
-                    cart?.billing_address?.last_name,
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                />
-              )}
-            </div>
-          ) : isPagHiperBoleto(selectedPaymentMethod) && !paidByGiftcard ? (
-            // Boleto PagHiper (#52): painel próprio (linha digitável/PDF) que
-            // conduz até a confirmação — não usa o botão de revisão, igual ao PagBank.
-            <div className="mt-6">
-              <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                ✅ 5% de desconto no boleto aplicado no total
-              </p>
-              <PagHiperBoleto
-                cartId={cart.id}
-                fiscalDoc={cart?.metadata?.fiscal_documento as string}
-              />
-            </div>
-          ) : (
-            <Button
-              size="large"
-              className="mt-6"
-              onClick={handleSubmit}
-              isLoading={isLoading}
-              disabled={
-                (isStripeLike(selectedPaymentMethod) && !cardComplete) ||
-                (!selectedPaymentMethod && !paidByGiftcard)
-              }
-              data-testid="submit-payment-button"
-            >
-              {!activeSession && isStripeLike(selectedPaymentMethod)
-                ? "Digitar dados do cartão"
-                : "Continuar para revisão"}
-            </Button>
-          )}
         </div>
 
+        {/* resumo colapsado */}
         <div className={isOpen ? "hidden" : "block"}>
           {cart && paymentReady && activeSession ? (
             <div className="flex items-start gap-x-1 w-full">
@@ -290,29 +273,10 @@ const Payment = ({
                   className="txt-medium text-ui-fg-subtle"
                   data-testid="payment-method-summary"
                 >
-                  {paymentInfoMap[activeSession?.provider_id]?.title ||
+                  {tituloDe(opcao) ||
+                    paymentInfoMap[activeSession?.provider_id]?.title ||
                     activeSession?.provider_id}
                 </Text>
-              </div>
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  Dados do pagamento
-                </Text>
-                <div
-                  className="flex gap-2 txt-medium text-ui-fg-subtle items-center"
-                  data-testid="payment-details-summary"
-                >
-                  <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
-                    {paymentInfoMap[selectedPaymentMethod]?.icon || (
-                      <CreditCard />
-                    )}
-                  </Container>
-                  <Text>
-                    {isStripeLike(selectedPaymentMethod) && cardBrand
-                      ? cardBrand
-                      : "Outra etapa aparecerá"}
-                  </Text>
-                </div>
               </div>
             </div>
           ) : paidByGiftcard ? (

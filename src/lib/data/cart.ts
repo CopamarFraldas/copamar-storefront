@@ -3,6 +3,7 @@
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { isValidCpf, isValidCnpj } from "@lib/util/cpf"
+import { sanitizaEndereco } from "@lib/util/endereco"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -393,38 +394,42 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       throw new Error("No existing cart found when setting addresses")
     }
 
+    // Monta o endereço a partir do form: address_1 = "logradouro, número" (display
+    // em todo lugar), address_2 = complemento (ex. "apto 11"), e metadata
+    // estruturado {logradouro, numero, bairro} que o bling-push usa pra montar o
+    // endereço da NF-e (cobrança) e da etiqueta de entrega no Bling.
+    const montaEndereco = (p: string) => {
+      const bairro = String(formData.get(`${p}.bairro`) || "").trim()
+      // conserta campos embaralhados (nº da rua no campo Endereço; apto no Número)
+      const { logradouro, numero, complemento } = sanitizaEndereco({
+        logradouro: String(formData.get(`${p}.address_1`) || ""),
+        numero: String(formData.get(`${p}.numero`) || ""),
+        complemento: String(formData.get(`${p}.address_2`) || ""),
+      })
+      return {
+        first_name: formData.get(`${p}.first_name`),
+        last_name: formData.get(`${p}.last_name`),
+        address_1: numero ? `${logradouro}, ${numero}` : logradouro,
+        address_2: complemento,
+        company: formData.get(`${p}.company`),
+        postal_code: formData.get(`${p}.postal_code`),
+        city: formData.get(`${p}.city`),
+        country_code: formData.get(`${p}.country_code`),
+        province: formData.get(`${p}.province`),
+        phone: formData.get(`${p}.phone`),
+        metadata: { logradouro, numero, bairro },
+      }
+    }
+
     const data = {
-      shipping_address: {
-        first_name: formData.get("shipping_address.first_name"),
-        last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
-        address_2: "",
-        company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
-        country_code: formData.get("shipping_address.country_code"),
-        province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
-      },
+      shipping_address: montaEndereco("shipping_address"),
       email: formData.get("email"),
     } as any
 
     const sameAsBilling = formData.get("same_as_billing")
     if (sameAsBilling === "on") data.billing_address = data.shipping_address
-
     if (sameAsBilling !== "on")
-      data.billing_address = {
-        first_name: formData.get("billing_address.first_name"),
-        last_name: formData.get("billing_address.last_name"),
-        address_1: formData.get("billing_address.address_1"),
-        address_2: "",
-        company: formData.get("billing_address.company"),
-        postal_code: formData.get("billing_address.postal_code"),
-        city: formData.get("billing_address.city"),
-        country_code: formData.get("billing_address.country_code"),
-        province: formData.get("billing_address.province"),
-        phone: formData.get("billing_address.phone"),
-      }
+      data.billing_address = montaEndereco("billing_address")
 
     // IDENTIFICAÇÃO FISCAL (faturamento) — documento que vai pro contato Bling
     // (tipo F/J) + NF-e. É independente do documento do PAGADOR (titular do

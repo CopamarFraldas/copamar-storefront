@@ -123,6 +123,20 @@ body {
   overflow-x: clip;
 }
 
+/* iOS auto-zoom: focar um input com font-size < 16px faz o Safari dar zoom na
+   página inteira — e aí ela "desliza" pros lados (a "gelatina"). O componente
+   Input usa txt-compact-medium (14px). O fix de 05/06 só pegou busca/CEP; aqui
+   garante 16px em TODO campo de formulário no mobile, matando o zoom na raiz —
+   a tela do checkout fica "dura" (Marco 18/06). Só mobile: desktop mantém o
+   tamanho do design. */
+@media (max-width: 1023px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* iframe do store widget do Google (#42): com color-scheme dark no site, o
    Chrome força um BACKPLATE BRANCO em iframe transparente cujo conteúdo não
    declara dark → "quadrado branco" em volta da pílula 4,9★ (Marco 05/06).

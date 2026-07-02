@@ -38,7 +38,7 @@ export default async function ProductPreview({
     // O botão "Adicionar" precisa ficar FORA do <a> (botão dentro de link é HTML
     // inválido + warning de hidratação). Então o link envolve só a área
     // navegável (foto/título/preço) e o AddToCartButton vira irmão dele.
-    <div className="group" data-testid="product-wrapper">
+    <div className="group flex h-full flex-col" data-testid="product-wrapper">
       <LocalizedClientLink href={`/products/${product.handle}`} className="block">
         {/* wrapper relative pra posicionar o selo "ESGOTADO" sobre a thumbnail */}
         <div className="relative">
@@ -60,21 +60,36 @@ export default async function ProductPreview({
             </>
           )}
         </div>
-        <div className="flex txt-compact-medium mt-4 justify-between">
-          <Text className="text-ui-fg-subtle" data-testid="product-title">
+        {/* STACK vertical (mobile-safe): nome em cima, bloco de preço embaixo —
+            cada um na própria linha. O layout antigo era flex-row justify-between
+            (nome à esq / preço à dir): na coluna estreita do mobile o nome quebrava
+            em várias linhas e o preço (maior) caía no MEIO dele, e o verde "à vista"
+            (dentro de um flex-row) vazava pro card vizinho. Agora: flex-col com o
+            preço empilhado (principal sobre o verde) e título com clamp p/ alinhar. */}
+        <div className="flex flex-col gap-y-1 mt-4 min-w-0">
+          <Text
+            className="text-ui-fg-subtle txt-compact-medium small:text-base medium:text-lg line-clamp-2 min-h-[2.5em]"
+            data-testid="product-title"
+          >
             {product.title}
           </Text>
-          <div className="flex items-center gap-x-2">
-            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
-          </div>
+          {cheapestPrice && (
+            <div className="flex flex-col min-w-0">
+              <PreviewPrice price={cheapestPrice} />
+            </div>
+          )}
         </div>
         {/* selo de nível de absorção (#87) — null se o produto não tem nível validado */}
         <SeloAbsorcao product={product} variante="card" />
       </LocalizedClientLink>
-      {esgotado && aviso && (
-        <p className="mt-1 text-[11px] text-ui-fg-subtle leading-snug">{aviso}</p>
-      )}
-      {!esgotado && <AddToCartButton product={product} />}
+      {/* bloco de baixo ANCORADO no rodapé (mt-auto) → botões alinham entre os
+          cards mesmo com nomes de tamanhos diferentes (Marco 30/06) */}
+      <div className="mt-auto pt-2">
+        {esgotado && aviso && (
+          <p className="text-[11px] text-ui-fg-subtle leading-snug">{aviso}</p>
+        )}
+        {!esgotado && <AddToCartButton product={product} />}
+      </div>
     </div>
   )
 }

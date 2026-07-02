@@ -20,8 +20,28 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState("")
 
+  // Bloqueia alterar o cupom enquanto o PIX está em andamento (QR na tela). Mudar
+  // o total nessa hora apaga a sessão de pagamento e o pedido não fecha (29/06).
+  // O componente PIX liga/desliga o flag copamar_pix_qr_ativo (sessionStorage).
+  const [pixLock, setPixLock] = React.useState(false)
+  React.useEffect(() => {
+    const ler = () =>
+      setPixLock(
+        typeof window !== "undefined" &&
+          window.sessionStorage.getItem("copamar_pix_qr_ativo") === "1"
+      )
+    ler()
+    window.addEventListener("copamar-pix-qr", ler)
+    window.addEventListener("storage", ler)
+    return () => {
+      window.removeEventListener("copamar-pix-qr", ler)
+      window.removeEventListener("storage", ler)
+    }
+  }, [])
+
   const { promotions = [] } = cart
   const removePromotionCode = async (code: string) => {
+    if (pixLock) return
     const validPromotions = promotions.filter(
       (promotion) => promotion.code !== code
     )
@@ -32,6 +52,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   }
 
   const addPromotionCode = async (formData: FormData) => {
+    if (pixLock) return
     setErrorMessage("")
 
     const code = formData.get("code")
@@ -60,14 +81,20 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
       <div className="txt-medium">
         <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
           <Label className="flex gap-x-1 my-2 items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              type="button"
-              className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="add-discount-button"
-            >
-              Adicionar cupom
-            </button>
+            {pixLock ? (
+              <span className="txt-small text-ui-fg-muted flex items-center gap-1">
+                🔒 Cupom travado durante o pagamento PIX
+              </span>
+            ) : (
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                type="button"
+                className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+                data-testid="add-discount-button"
+              >
+                Adicionar cupom
+              </button>
+            )}
 
             {/* <Tooltip content="Você pode adicionar vários códigos de promoção">
               <InformationCircleSolid color="var(--fg-muted)" />

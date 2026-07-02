@@ -32,7 +32,7 @@ function IconeWhats() {
   )
 }
 
-export default function BotaoWhatsApp() {
+export default function BotaoWhatsApp({ secundario = false }: { secundario?: boolean }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -56,7 +56,13 @@ export default function BotaoWhatsApp() {
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-large bg-[#25D366] px-6 py-3 font-semibold text-white transition-opacity hover:opacity-90 small:w-auto"
+        className={
+          secundario
+            ? // SECUNDÁRIO (hero): outline/ghost verde, menor — de-enfatiza vs "Comprar agora"
+              "inline-flex w-auto items-center justify-center gap-2 rounded-large border-2 border-[#25D366] bg-transparent px-4 py-2 text-sm font-semibold text-[#25D366] transition-colors hover:bg-[#25D366]/10 small:px-5 small:py-2.5"
+            : // PADRÃO: verde sólido cheio
+              "inline-flex w-full items-center justify-center gap-2 rounded-large bg-[#25D366] px-6 py-3 font-semibold text-white transition-opacity hover:opacity-90 small:w-auto"
+        }
       >
         <IconeWhats /> Falar no WhatsApp
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden className={`transition-transform ${open ? "rotate-180" : ""}`}>

@@ -2,16 +2,12 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
 
 export const retrieveOrder = async (id: string) => {
   const headers = {
     ...(await getAuthHeaders()),
-  }
-
-  const next = {
-    ...(await getCacheOptions("orders")),
   }
 
   return sdk.client
@@ -21,11 +17,13 @@ export const retrieveOrder = async (id: string) => {
         fields:
           // *customer (07/06): a confirmação saúda QUEM COMPROU (não o
           // destinatário da entrega)
-          "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product,*customer",
+          // display_id/email/+total: SEM eles a conversão do Ads ia com value=0 e
+          // transaction_id errado, e EC/GCR sem e-mail (fields substitui o default).
+          "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product,*customer,+metadata,*shipping_methods,+payment_collections.status,shipping_address.phone,billing_address.phone,display_id,email,+total,+item_total",
       },
       headers,
-      next,
-      cache: "force-cache",
+      // no-store: detalhe do pedido sempre ao vivo (status/entrega mudam). Fix 02/07.
+      cache: "no-store",
     })
     .then(({ order }) => order)
     .catch((err) => medusaError(err))
@@ -40,10 +38,6 @@ export const listOrders = async (
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("orders")),
-  }
-
   return sdk.client
     .fetch<HttpTypes.StoreOrderListResponse>(`/store/orders`, {
       method: "GET",
@@ -55,8 +49,9 @@ export const listOrders = async (
         ...filters,
       },
       headers,
-      next,
-      cache: "force-cache",
+      // no-store: histórico do cliente sempre ao vivo. force-cache guardava
+      // resposta vazia e "sumia" o histórico (48 clientes, fix 02/07).
+      cache: "no-store",
     })
     .then(({ orders }) => orders)
     .catch((err) => medusaError(err))

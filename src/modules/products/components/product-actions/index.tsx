@@ -63,6 +63,20 @@ export default function ProductActions({
     })
   }, [product.variants, options])
 
+  // publica a seleção (variante + quantidade) pro consultor de frete (FreteCep)
+  // reagir na MESMA página — eles são IRMÃOS no layout, então um evento
+  // desacopla sem erguer estado. Marco 23/06: o frete da PDP travava em 1
+  // unidade e não mudava ao alterar a quantidade.
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const variantId = selectedVariant?.id ?? product.variants?.[0]?.id
+    window.dispatchEvent(
+      new CustomEvent("copamar:pdp-frete", {
+        detail: { variantId, quantity: quantidade },
+      })
+    )
+  }, [selectedVariant, quantidade, product.variants])
+
   // update the options when a variant is selected
   const setOptionValue = (optionId: string, value: string) => {
     setOptions((prev) => ({
@@ -194,7 +208,7 @@ export default function ProductActions({
           const todasEsgotadas = variants.length > 0 && variants.every((v) => {
             if (!v.manage_inventory) return false
             if (v.allow_backorder) return false
-            return (v.inventory_quantity || 0) === 0
+            return (v.inventory_quantity || 0) <= 0 // negativo também = esgotado
           })
           const variantEscolhidaEsgotada = !!selectedVariant && !inStock
           const mostrar = todasEsgotadas || variantEscolhidaEsgotada

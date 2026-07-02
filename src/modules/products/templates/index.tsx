@@ -97,8 +97,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
             <ProductActionsWrapper id={product.id} region={region} />
           </Suspense>
           {/* consultor de frete por CEP (nº1 + parte do nº4 da PDP) — cotação
-              real com o peso da variante; lista completa de modalidades. */}
-          <FreteCep variantId={product.variants?.[0]?.id} />
+              real com o peso da variante; lista completa de modalidades.
+              ouvirPdp: reage à variante/quantidade do ProductActions (recota ao
+              mudar a quantidade — antes travava em 1 unidade, Marco 23/06). */}
+          <FreteCep variantId={product.variants?.[0]?.id} ouvirPdp />
           {/* benefícios/confiança — preenche e enriquece o box (Marco 09/06) */}
           <BeneficiosCompra />
         </div>

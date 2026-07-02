@@ -182,7 +182,7 @@ export async function registrarEntrega(
       const up = await fetch(`${SUPA}/storage/v1/object/comprovantes/${path}`, {
         method: "POST",
         headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": foto.type || "image/jpeg" },
-        body: Buffer.from(await foto.arrayBuffer()),
+        body: new Uint8Array(await foto.arrayBuffer()),
       })
       // grava o PATH (não a URL pública): a exibição gera signed URL via
       // fotoComprovante() — pronto pro bucket privado no go-live (LGPD)
@@ -261,7 +261,7 @@ export async function registrarTentativa(
       const up = await fetch(`${SUPA}/storage/v1/object/comprovantes/${path}`, {
         method: "POST",
         headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": foto.type || "image/jpeg" },
-        body: Buffer.from(await foto.arrayBuffer()),
+        body: new Uint8Array(await foto.arrayBuffer()),
       })
       if (up.ok) foto_path = path
     } catch {
@@ -399,10 +399,10 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
     // `falhas` pro cliente retentar até zerar (ou bater o teto).
     let enviados = 0
     let falhas = 0
-    for (const grupo of grupos.values()) {
+    for (const grupo of Array.from(grupos.values())) {
       const p = grupo[0]
       const msg = mensagemCliente("sai_hoje", p.nome_cliente, grupo.length)
-      const ref = grupo.map((x) => x.numero_pedido).join("/")
+      const ref = grupo.map((x: { numero_pedido: string }) => x.numero_pedido).join("/")
       const ok = await enviarWhatsApp(p.celular, msg, ref)
       if (!ok) {
         falhas++
@@ -410,7 +410,7 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
       }
       // marca o aviso (trava) — TODOS os pedidos do grupo — SÓ no sucesso confirmado
       try {
-        const nums = grupo.map((x) => `"${x.numero_pedido}"`).join(",")
+        const nums = grupo.map((x: { numero_pedido: string }) => `"${x.numero_pedido}"`).join(",")
         await fetch(
           `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&numero_pedido=in.(${encodeURIComponent(nums)})`,
           {

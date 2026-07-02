@@ -2,6 +2,7 @@
 
 import { Table, Text, clx } from "@medusajs/ui"
 import { updateLineItem } from "@lib/data/cart"
+import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import QuantityInput from "@modules/cart/components/quantity-input"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -126,14 +127,14 @@ const Item = ({ item, type = "full", currencyCode, disponivel }: ItemProps) => {
           })}
         >
           {type === "preview" && (
-            <span className="flex gap-x-1 ">
-              <Text className="text-ui-fg-subtle">{item.quantity}x </Text>
-              <LineItemUnitPrice
-                item={item}
-                style="tight"
-                currencyCode={currencyCode}
-              />
-            </span>
+            <Text className="text-ui-fg-subtle">
+              {item.quantity}x
+              {item.quantity > 1 &&
+                ` ${convertToLocale({
+                  amount: (item.total ?? 0) / item.quantity,
+                  currency_code: currencyCode,
+                })}`}
+            </Text>
           )}
           <LineItemPrice
             item={item}

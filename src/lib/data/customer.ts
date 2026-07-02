@@ -1,15 +1,15 @@
 "use server"
 
 import { sdk } from "@lib/config"
-import { LOGIN_MIGRADO, SENHA_REDEFINIDA, TOKEN_EXPIRADO } from "@lib/util/migracao-constants"
+import { LOGIN_MIGRADO, SENHA_REDEFINIDA, TOKEN_EXPIRADO, CPF_JA_CADASTRADO, EMAIL_JA_CADASTRADO } from "@lib/util/migracao-constants"
 import medusaError from "@lib/util/medusa-error"
-import { isValidCpf, isValidCnpj } from "@lib/util/cpf"
+import { isValidCpf, isValidCnpj, isValidCpfOrCnpj } from "@lib/util/cpf"
+import { sanitizaEndereco } from "@lib/util/endereco"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import {
   getAuthHeaders,
-  getCacheOptions,
   getCacheTag,
   getCartId,
   removeAuthToken,
@@ -28,10 +28,9 @@ export const retrieveCustomer =
       ...authHeaders,
     }
 
-    const next = {
-      ...(await getCacheOptions("customers")),
-    }
-
+    // Dado por-usuário mutável fora de banda (pedido anexado server-side:
+    // recuperação PIX, GET/manual, Bling) → NÃO cachear. O force-cache guardava
+    // *orders vazio e o painel sub-reportava pedidos do cliente (fix 02/07).
     return await sdk.client
       .fetch<{ customer: HttpTypes.StoreCustomer }>(`/store/customers/me`, {
         method: "GET",
@@ -42,11 +41,11 @@ export const retrieveCustomer =
           // first_name/last_name/email/company_name/*addresses; sem eles o customer
           // volta sem nome/email/endereços e quebra "Olá {nome}", o nav (vira
           // "Entrar" logado) e o .filter de addresses no checkout/perfil. Bug 17/06.
-          fields: "*orders,*addresses,metadata,phone,first_name,last_name,email,company_name",
+          // +created_at (Marco 18/06): "Cliente Copamar desde {ano}" no painel.
+          fields: "*orders,*addresses,metadata,phone,first_name,last_name,email,company_name,created_at",
         },
         headers,
-        next,
-        cache: "force-cache",
+        cache: "no-store",
       })
       .then(({ customer }) => customer)
       .catch(() => null)
@@ -70,11 +69,34 @@ export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
 
 export async function signup(_currentState: unknown, formData: FormData) {
   const password = formData.get("password") as string
-  const customerForm = {
+  // CPF/CNPJ no cadastro: valida o dígito verificador (rejeita lixo) e grava no
+  // metadata. Casa o cliente com o Bling (histórico de pedidos) + pré-preenche a
+  // nota fiscal no checkout (não re-pede no fim da compra). Valida SE veio (o
+  // form de cadastro manda sempre; o fluxo de convidado/checkout passa o doc
+  // fiscal já validado) — assim não quebra chamadas sem cpf.
+  const cpfDigits = ((formData.get("cpf") as string) || "").replace(/\D/g, "")
+  if (cpfDigits && !isValidCpfOrCnpj(cpfDigits)) {
+    return "CPF/CNPJ inválido — confira os números."
+  }
+  // CPF/CNPJ JÁ cadastrado (cliente importado do site antigo, Marco 19/06): NÃO
+  // cria conta nova — devolve o sentinela pra UI orientar a fazer login (lá cai
+  // no fluxo de "definir nova senha"). Fail-open: se a checagem falhar, segue o
+  // cadastro normal (o backend tem unicidade de e-mail como backstop).
+  if (cpfDigits) {
+    try {
+      const chk = await sdk.client.fetch<{ existe: boolean }>(
+        "/store/migracao/cpf-check",
+        { method: "POST", body: { cpf: cpfDigits } }
+      )
+      if (chk?.existe) return CPF_JA_CADASTRADO
+    } catch {}
+  }
+  const customerForm: Record<string, any> = {
     email: formData.get("email") as string,
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
     phone: formData.get("phone") as string,
+    ...(cpfDigits ? { metadata: { cpf: cpfDigits } } : {}),
   }
 
   let registered = false
@@ -118,6 +140,13 @@ export async function signup(_currentState: unknown, formData: FormData) {
       try {
         await removeAuthToken()
       } catch {}
+    }
+    // E-mail já tem conta (Marco 19/06): só quando o REGISTRO falhou
+    // (registered=false) com erro de "já existe" — devolve o sentinela pra UI
+    // mostrar "faça login" em vez do erro técnico ("identity already exists").
+    const msg = String(error?.message || error)
+    if (!registered && /exist|already|registered|identity/i.test(msg)) {
+      return EMAIL_JA_CADASTRADO
     }
     return error.toString()
   }
@@ -173,11 +202,19 @@ export async function signupAndSetAddress(
     signupForm.set("last_name", (formData.get("shipping_address.last_name") as string) || "")
     signupForm.set("phone", (formData.get("shipping_address.phone") as string) || "")
     signupForm.set("password", accountPassword)
+    // doc fiscal já validado acima → grava como CPF/CNPJ no cadastro também
+    signupForm.set("cpf", fiscalDocDigits)
 
     const res = await signup(null, signupForm)
     if (typeof res === "string") {
       // erro no registro → não prossegue pro próximo passo
-      return /exist|already|registered|identity/i.test(res)
+      if (res === CPF_JA_CADASTRADO) {
+        // CPF já tem conta (importada): não trava a COMPRA — orienta a logar ou
+        // seguir como convidado (desmarcando "criar conta"). Dúvidas: telefone.
+        return "Esse CPF já tem conta na Copamar. Faça login para usar sua conta, ou desmarque “criar conta” para seguir como convidado. Dúvidas: (11) 95205-0000."
+      }
+      return res === EMAIL_JA_CADASTRADO ||
+        /exist|already|registered|identity/i.test(res)
         ? "Este e-mail já tem conta. Faça login ou siga sem criar conta (desmarque a opção)."
         : res
     }
@@ -351,12 +388,20 @@ export const addCustomerAddress = async (
   const isDefaultBilling = (currentState.isDefaultBilling as boolean) || false
   const isDefaultShipping = (currentState.isDefaultShipping as boolean) || false
 
+  const bairro = ((formData.get("bairro") as string) || "").trim()
+  // conserta campos embaralhados (nº da rua no campo Endereço; apto no Número)
+  const { logradouro, numero, complemento } = sanitizaEndereco({
+    logradouro: (formData.get("address_1") as string) || "",
+    numero: (formData.get("numero") as string) || "",
+    complemento: (formData.get("address_2") as string) || "",
+  })
   const address = {
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
     company: formData.get("company") as string,
-    address_1: formData.get("address_1") as string,
-    address_2: formData.get("address_2") as string,
+    // address_1 = "logradouro, número" (display); metadata estruturado p/ Bling.
+    address_1: numero ? `${logradouro}, ${numero}` : logradouro,
+    address_2: complemento,
     city: formData.get("city") as string,
     postal_code: formData.get("postal_code") as string,
     province: formData.get("province") as string,
@@ -364,6 +409,7 @@ export const addCustomerAddress = async (
     phone: formData.get("phone") as string,
     is_default_billing: isDefaultBilling,
     is_default_shipping: isDefaultShipping,
+    metadata: { logradouro, numero, bairro },
   }
 
   const headers = {
@@ -412,16 +458,24 @@ export const updateCustomerAddress = async (
     return { success: false, error: "ID do endereço é obrigatório" }
   }
 
+  const bairro = ((formData.get("bairro") as string) || "").trim()
+  // conserta campos embaralhados (nº da rua no campo Endereço; apto no Número)
+  const { logradouro, numero, complemento } = sanitizaEndereco({
+    logradouro: (formData.get("address_1") as string) || "",
+    numero: (formData.get("numero") as string) || "",
+    complemento: (formData.get("address_2") as string) || "",
+  })
   const address = {
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
     company: formData.get("company") as string,
-    address_1: formData.get("address_1") as string,
-    address_2: formData.get("address_2") as string,
+    address_1: numero ? `${logradouro}, ${numero}` : logradouro,
+    address_2: complemento,
     city: formData.get("city") as string,
     postal_code: formData.get("postal_code") as string,
     province: formData.get("province") as string,
     country_code: formData.get("country_code") as string,
+    metadata: { logradouro, numero, bairro },
   } as HttpTypes.StoreUpdateCustomerAddress
 
   const phone = formData.get("phone") as string

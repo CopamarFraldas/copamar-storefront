@@ -64,6 +64,14 @@ const Addresses = ({
       </div>
       {isOpen ? (
         <form action={formAction}>
+          {/* same_as_billing via input NATIVO: o Checkbox visual é <button
+              type="button"> e NÃO entra no FormData. Sem isto, o servidor recebia
+              sempre null → endereço de cobrança ia vazio/errado (revisão 18/06). */}
+          <input
+            type="hidden"
+            name="same_as_billing"
+            value={sameAsBilling ? "on" : "off"}
+          />
           <div className="pb-8">
             <ShippingAddress
               customer={customer}
@@ -81,11 +89,11 @@ const Addresses = ({
                   Endereço de cobrança
                 </Heading>
 
-                <BillingAddress cart={cart} />
+                <BillingAddress cart={cart} customer={customer} />
               </div>
             )}
 
-            <IdentificacaoFiscal cart={cart} />
+            <IdentificacaoFiscal cart={cart} customer={customer} />
 
             {/* Opt-in de marketing (#97) — DESMARCADO por padrão (LGPD) */}
             <label className="flex items-start gap-x-2 mt-6 text-small-regular text-ui-fg-subtle select-none cursor-pointer">

@@ -55,6 +55,13 @@ export default async function OrderConfirmedPage(props: Props) {
       <GoogleAdsConversion
         value={Number(order.total) || 0}
         transactionId={String(order.display_id ?? order.id)}
+        email={order.email ?? undefined}
+        phone={
+          (order as any).shipping_address?.phone ??
+          (order as any).billing_address?.phone ??
+          order.customer?.phone ??
+          undefined
+        }
         newCustomer={novo}
       />
       {/* opt-in do Google Customer Reviews (garimpo #7): mantém a coleta de

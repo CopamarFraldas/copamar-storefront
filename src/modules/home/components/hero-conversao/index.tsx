@@ -31,7 +31,28 @@ const PROVA = [
 ]
 
 
-export default function HeroConversao() {
+/**
+ * Busca os banners gerenciados no admin (/store/banners). Server-side, cache 30s.
+ * Falha/vazio → null → a esteira usa o fallback hardcoded (cutover-safe).
+ */
+async function getBanners() {
+  try {
+    const base = process.env.MEDUSA_BACKEND_URL || "http://medusa-backend:9000"
+    const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || ""
+    const r = await fetch(`${base}/store/banners`, {
+      headers: { "x-publishable-api-key": pk },
+      next: { revalidate: 30 },
+    })
+    if (!r.ok) return null
+    const d = await r.json()
+    return d?.banners?.length ? d : null
+  } catch {
+    return null
+  }
+}
+
+export default async function HeroConversao() {
+  const bannersData = await getBanners()
   return (
     <>
       <div className="content-container py-10 small:py-14">
@@ -49,14 +70,17 @@ export default function HeroConversao() {
               Fraldas geriátricas, absorventes e produtos para incontinência com
               entrega rápida e atendimento especializado.
             </p>
-            <div className="mt-6 flex flex-col gap-3 small:flex-row small:justify-start justify-center sm:flex-row">
+            {/* Hierarquia (Marco 30/06): "Comprar agora" PRIMÁRIO e maior (ação
+                principal, laranja sólido), empilhado VERTICAL; WhatsApp SECUNDÁRIO
+                menor (outline) embaixo. O olho vai primeiro no Comprar agora. */}
+            <div className="mt-6 flex flex-col items-center gap-3 small:items-start">
               <LocalizedClientLink
                 href="/store"
-                className="inline-flex items-center justify-center rounded-large bg-copamar-cta px-6 py-3 font-semibold text-[#0a2e6b] transition-colors hover:bg-copamar-cta-dark"
+                className="inline-flex w-full items-center justify-center rounded-large bg-[#d9601c] px-6 py-2.5 text-base font-bold text-white shadow-sm transition-colors hover:bg-[#c0540f] small:w-auto small:px-14 small:py-3 small:text-2xl small:font-extrabold"
               >
                 Comprar agora
               </LocalizedClientLink>
-              <BotaoWhatsApp />
+              <BotaoWhatsApp secundario />
             </div>
             <ul className="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2 small:justify-start">
               {PROVA.map((p) => (
@@ -117,7 +141,7 @@ export default function HeroConversao() {
         </div>
       </div>
       {/* Versão D fundida: banner rolante full-width abaixo das marcas (Marco 09/06) */}
-      <BannerEsteira altura={200} duracao={90} />
+      <BannerEsteira altura={200} duracao={90} banners={bannersData?.banners} marcaSlides={bannersData?.marca_slides} />
     </>
   )
 }

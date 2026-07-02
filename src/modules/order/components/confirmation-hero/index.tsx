@@ -22,15 +22,18 @@ const ConfirmationHero = ({ order }: { order: HttpTypes.StoreOrder }) => {
   const saudacao = nome ? `, ${nome}` : ""
 
   // pagamento do boleto (provider paghiper) + estado
-  const payments = (order.payment_collections ?? []).flatMap(
-    (pc: any) => pc.payments ?? []
-  )
+  const pcs = (order.payment_collections ?? []) as any[]
+  const payments = pcs.flatMap((pc: any) => pc.payments ?? [])
   const boleto = payments.find((p: any) =>
     String(p?.provider_id ?? "").includes("paghiper-boleto")
   )
-  const pago = ["captured", "partially_captured"].includes(
-    String(order.payment_status)
-  )
+  // PAGO = payment_collection COMPLETA (order.payment_status não resolve no fetch
+  // → usar isso, senão tudo cai em "pagamento aprovado").
+  const pago = pcs.some((pc: any) => String(pc?.status) === "completed")
+  // RETIRADA não-paga ("Pagar na loja"): autorizado mas não capturado.
+  const sm: any = (order.shipping_methods ?? [])[0]
+  const retiradaNaoPaga =
+    !!sm?.name && /retir/i.test(String(sm.name)) && !pago && !boleto
   const aguardandoBoleto = Boolean(boleto) && !pago
   const d: any = boleto?.data ?? {}
 
@@ -46,6 +49,14 @@ const ConfirmationHero = ({ order }: { order: HttpTypes.StoreOrder }) => {
             <span className="text-lg font-normal text-ui-fg-subtle">
               Falta só um passo: pague o boleto abaixo pra gente preparar o seu
               envio.
+            </span>
+          </>
+        ) : retiradaNaoPaga ? (
+          <>
+            <span>Pedido recebido{saudacao}! 🎉</span>
+            <span className="text-lg font-normal text-ui-fg-subtle">
+              Está reservado pra você — é só passar na loja (Santo André) pra
+              retirar e pagar.
             </span>
           </>
         ) : (

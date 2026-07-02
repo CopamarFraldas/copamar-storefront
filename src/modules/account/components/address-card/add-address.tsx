@@ -11,6 +11,7 @@ import Modal from "@modules/common/components/modal"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import { HttpTypes } from "@medusajs/types"
 import { addCustomerAddress } from "@lib/data/customer"
+import EnderecoFields from "./endereco-fields"
 
 const AddAddress = ({
   region,
@@ -86,41 +87,7 @@ const AddAddress = ({
                 autoComplete="organization"
                 data-testid="company-input"
               />
-              <Input
-                label="Endereço"
-                name="address_1"
-                required
-                autoComplete="address-line1"
-                data-testid="address-1-input"
-              />
-              <Input
-                label="Apto, sala, etc."
-                name="address_2"
-                autoComplete="address-line2"
-                data-testid="address-2-input"
-              />
-              <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                <Input
-                  label="CEP"
-                  name="postal_code"
-                  required
-                  autoComplete="postal-code"
-                  data-testid="postal-code-input"
-                />
-                <Input
-                  label="Cidade"
-                  name="city"
-                  required
-                  autoComplete="locality"
-                  data-testid="city-input"
-                />
-              </div>
-              <Input
-                label="Estado"
-                name="province"
-                autoComplete="address-level1"
-                data-testid="state-input"
-              />
+              <EnderecoFields />
               <CountrySelect
                 region={region}
                 name="country_code"

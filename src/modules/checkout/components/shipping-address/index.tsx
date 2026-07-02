@@ -7,6 +7,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
 import { fetchCep, isValidCep } from "@lib/util/viacep"
+import { derivaEndereco } from "@lib/util/endereco"
 
 const ShippingAddress = ({
   customer,
@@ -19,16 +20,22 @@ const ShippingAddress = ({
   checked: boolean
   onChange: () => void
 }) => {
+  const sa: any = cart?.shipping_address || {}
+  const saE = derivaEndereco(sa) // novo (metadata) OU migrado (address_1 mushed + bairro no address_2)
   const [formData, setFormData] = useState<Record<string, any>>({
-    "shipping_address.first_name": cart?.shipping_address?.first_name || "",
-    "shipping_address.last_name": cart?.shipping_address?.last_name || "",
-    "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
-    "shipping_address.company": cart?.shipping_address?.company || "",
-    "shipping_address.postal_code": cart?.shipping_address?.postal_code || "",
-    "shipping_address.city": cart?.shipping_address?.city || "",
-    "shipping_address.country_code": cart?.shipping_address?.country_code || "",
-    "shipping_address.province": cart?.shipping_address?.province || "",
-    "shipping_address.phone": cart?.shipping_address?.phone || "",
+    "shipping_address.first_name": sa.first_name || "",
+    "shipping_address.last_name": sa.last_name || "",
+    // address_1 mostra só o LOGRADOURO (rua); número/bairro/complemento têm campo próprio.
+    "shipping_address.address_1": saE.logradouro,
+    "shipping_address.numero": saE.numero,
+    "shipping_address.bairro": saE.bairro,
+    "shipping_address.address_2": saE.complemento,
+    "shipping_address.company": sa.company || "",
+    "shipping_address.postal_code": sa.postal_code || "",
+    "shipping_address.city": sa.city || "",
+    "shipping_address.country_code": sa.country_code || "",
+    "shipping_address.province": sa.province || "",
+    "shipping_address.phone": sa.phone || "",
     email: cart?.email || "",
   })
 
@@ -55,7 +62,10 @@ const ShippingAddress = ({
         ...prevState,
         "shipping_address.first_name": address?.first_name || "",
         "shipping_address.last_name": address?.last_name || "",
-        "shipping_address.address_1": address?.address_1 || "",
+        "shipping_address.address_1": derivaEndereco(address).logradouro,
+        "shipping_address.numero": derivaEndereco(address).numero,
+        "shipping_address.bairro": derivaEndereco(address).bairro,
+        "shipping_address.address_2": derivaEndereco(address).complemento,
         "shipping_address.company": address?.company || "",
         "shipping_address.postal_code": address?.postal_code || "",
         "shipping_address.city": address?.city || "",
@@ -105,6 +115,7 @@ const ShippingAddress = ({
     setFormData((prev: Record<string, any>) => ({
       ...prev,
       "shipping_address.address_1": r.logradouro || prev["shipping_address.address_1"],
+      "shipping_address.bairro": r.bairro || prev["shipping_address.bairro"],
       "shipping_address.city": r.localidade || prev["shipping_address.city"],
       "shipping_address.province": r.uf || prev["shipping_address.province"],
       "shipping_address.country_code": prev["shipping_address.country_code"] || "br",
@@ -151,7 +162,7 @@ const ShippingAddress = ({
             : "Digite o CEP que preenchemos o endereço pra você."}
         </span>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
         <Input
           label="Nome"
           name="shipping_address.first_name"
@@ -171,13 +182,39 @@ const ShippingAddress = ({
           data-testid="shipping-last-name-input"
         />
         <Input
-          label="Endereço"
+          label="Endereço (só a rua, sem número)"
           name="shipping_address.address_1"
           autoComplete="address-line1"
           value={formData["shipping_address.address_1"]}
           onChange={handleChange}
           required
           data-testid="shipping-address-input"
+        />
+        <Input
+          label="Número (da rua, ex: 388)"
+          name="shipping_address.numero"
+          placeholder="ex: 388"
+          value={formData["shipping_address.numero"]}
+          onChange={handleChange}
+          required
+          data-testid="shipping-numero-input"
+        />
+        <Input
+          label="Bairro"
+          name="shipping_address.bairro"
+          value={formData["shipping_address.bairro"]}
+          onChange={handleChange}
+          required
+          data-testid="shipping-bairro-input"
+        />
+        <Input
+          label="Complemento — apto/bloco (ex: apto 21)"
+          name="shipping_address.address_2"
+          placeholder="ex: apto 21, bloco B"
+          autoComplete="address-line2"
+          value={formData["shipping_address.address_2"]}
+          onChange={handleChange}
+          data-testid="shipping-complemento-input"
         />
         <Input
           label="Empresa"
@@ -223,7 +260,7 @@ const ShippingAddress = ({
           data-testid="billing-address-checkbox"
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 small:grid-cols-2 gap-4 mb-4">
         <Input
           label="E-mail"
           name="email"
@@ -254,7 +291,7 @@ const ShippingAddress = ({
             data-testid="create-account-checkbox"
           />
           {createAccount && (
-            <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 small:grid-cols-2 gap-4">
               <Input
                 label="Senha"
                 name="account_password"

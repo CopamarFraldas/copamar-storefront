@@ -26,14 +26,9 @@ export const listCartPaymentMethods = async (regionId: string) => {
     )
     .then(({ payment_providers }) =>
       payment_providers
-        // "Pagamento manual" (pp_system_default) é ferramenta de teste do
-        // Medusa — nunca mostrar pro cliente (Marco 09/06). Pra reabilitar em
-        // staging: NEXT_PUBLIC_SHOW_MANUAL_PAYMENT=true.
-        .filter(
-          (p) =>
-            p.id !== "pp_system_default" ||
-            process.env.NEXT_PUBLIC_SHOW_MANUAL_PAYMENT === "true"
-        )
+        // "Pagar na loja" = provider manual (pp_system_default). Flui pro
+        // storefront, MAS o componente de pagamento só o exibe na RETIRADA NA
+        // LOJA (gate por fulfillment type=pickup) — nunca aparece na entrega.
         .sort((a, b) => {
           return a.id > b.id ? 1 : -1
         })

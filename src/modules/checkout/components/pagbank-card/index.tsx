@@ -130,12 +130,22 @@ const PagBankCard = ({
     setStage("paid")
     setFinalizeError(null)
     setTimeout(() => {
-      placeOrder().catch((e) =>
+      placeOrder().catch((e) => {
+        // NEXT_REDIRECT = sucesso: o placeOrder concluiu e navega via redirect do
+        // Next (não é erro). Sem este guard, o digest "NEXT_REDIRECT" vazava como
+        // erro vermelho na tela antes do redirect. Re-lança pra o Next concluir a
+        // navegação (mesmo padrão já usado no boleto).
+        if (
+          String(e?.message || "").includes("NEXT_REDIRECT") ||
+          e?.digest?.includes?.("NEXT_REDIRECT")
+        ) {
+          throw e
+        }
         setFinalizeError(
           e?.message ||
             "Não foi possível finalizar o pedido. Seu pagamento está seguro — conclua de novo."
         )
-      )
+      })
     }, 1200)
   }
 

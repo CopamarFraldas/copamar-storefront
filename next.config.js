@@ -44,6 +44,34 @@ const nextConfig = {
         destination: r.destination,
         statusCode: 301,
       })),
+      // Descontinuados sem 301 (Merchant "página indisponível", Marco 18/06):
+      // produtos soft-deletados cujo HANDLE NOVO /br/products/* dá 404 (os .html
+      // antigos já caem no catch-all). Tena Men Lv3 já tem 301 no mapa → não mexer.
+      // → categoria relevante (ad/SEO/Merchant não cai em 404).
+      {
+        source: "/br/products/fralda-geriatrica-comfort-life-basic-g-50-unidades",
+        destination: "/br/categories/fraldas-geriatricas",
+        statusCode: 301,
+      },
+      {
+        source: "/br/products/absorvente-geriatrico-geriaplus-c-50-azul",
+        destination: "/br/categories/absorvente-geriatrico",
+        statusCode: 301,
+      },
+      // ── 12 das 14 .html legítimas do Search Console 404 (validado c/ Marco 01/07;
+      //    as outras 2 lady-discreet→tena-pants-mulher já estavam no mapa). O resto
+      //    do export (984) é lixo de sessão ?___SID / dropdown-toggle → 404 limpo. ──
+      // EXISTE (produto atual; contagem/tamanho antigo descontinuado):
+      { source: "/fralda-geriatrica-tena-slip-noturna-24-unidades-grande.html", destination: "/br/products/fralda-slip-noturna-grande-c-32-unidades", statusCode: 301 },
+      { source: "/tena-pants-noturna-g-eg-com-16-unidades.html", destination: "/br/products/tena-pants-noturna-g-eg-c-32", statusCode: 301 },
+      { source: "/tena-pants-noturna-g-eg-com-24-unidades.html", destination: "/br/products/tena-pants-noturna-g-eg-c-32", statusCode: 301 },
+      // DESCONTINUADO, ou slug sem tamanho → categoria (alvo seguro):
+      { source: "/fralda-geriatrica-tena-slip-noturna-24-unidades.html", destination: "/br/categories/fraldas-geriatricas-tena", statusCode: 301 },
+      { source: "/fralda-geriatrica-comfort-life-super-premium-776.html", destination: "/br/categories/fraldas-geriatricas-outras", statusCode: 301 },
+      { source: "/fralda-geriatrica-eg-comfort-life-super-premium-com-16.html", destination: "/br/categories/fraldas-geriatricas-outras", statusCode: 301 },
+      { source: "/fralda-de-vestir.html", destination: "/br/categories/roupa-intima", statusCode: 301 },
+      { source: "/fralda-geriatrica-de-vestir-sensaty-eg.html", destination: "/br/categories/roupa-intima", statusCode: 301 },
+      { source: "/fralda-personal-baby-:slug*", destination: "/br/categories/fralda-infantil", statusCode: 301 },
       // redes de segurança pro cutover (garimpo #2/#5): NENHUMA URL antiga vira
       // 404 seco. Query strings (?p=, ?dir=, ?q=...) são ignoradas no match e
       // preservadas no destino por padrão do Next (garimpo #3). Estas wildcard
@@ -52,7 +80,8 @@ const nextConfig = {
       { source: "/catalogsearch/:path*", destination: "/br/search", statusCode: 301 },
       { source: "/marcas/:path*", destination: "/br", statusCode: 301 },
       { source: "/blog/:path*", destination: "/br/blog", statusCode: 301 },
-      { source: "/:path*.html", destination: "/br", statusCode: 301 },
+      // `/:path*.html → /br` REMOVIDO 01/07 (era soft-404 em massa = penalidade SEO).
+      // .html não-mapeado agora dá 404 limpo; os 14 legítimos estão cobertos acima/no mapa.
     ]
   },
 

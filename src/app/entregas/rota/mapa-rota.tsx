@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { Parada, StatusParada } from "../_lib/dados"
 
 /**
@@ -25,18 +25,31 @@ export default function MapaRota({
   const rotaRef = useRef<any>(null)
   const euRef = useRef<any>(null)
   const ajustouRef = useRef(false)
+  // nº do pedido da ÚLTIMA "próxima" enquadrada — pra dar panTo SÓ quando a próxima
+  // parada muda (antes recentralizava a cada render e brigava com o gesto do Dedé).
+  const proximaRef = useRef<string | null>(null)
   // o leaflet carrega async — este sinal dispara a pintura dos pinos DEPOIS
   // que o mapa existe (sem ele, os pinos rodavam antes e nunca apareciam)
   const [pronto, setPronto] = useState(0)
 
-  const comCoord = paradas.filter((p) => p.dest_lat && p.dest_long)
+  // memoizado: sem isso o array novo a cada render entrava nas deps do efeito e
+  // disparava panTo em TODA interação (auditoria 18/06).
+  const comCoord = useMemo(
+    () => paradas.filter((p) => p.dest_lat && p.dest_long),
+    [paradas]
+  )
 
   // monta o mapa 1x
   useEffect(() => {
     let vivo = true
     if (!divRef.current || comCoord.length === 0) return
     ;(async () => {
-      const L = (await import("leaflet")).default
+      let L: any
+      try {
+        L = (await import("leaflet")).default
+      } catch {
+        return // sem leaflet (ex. dep não materializada) → não derruba a página
+      }
       if (!vivo || !divRef.current || mapRef.current) return
       LRef.current = L
       const map = L.map(divRef.current, { zoomControl: false, attributionControl: false })
@@ -120,8 +133,12 @@ export default function MapaRota({
     if (!ajustouRef.current && comCoord.length) {
       map.fitBounds(comCoord.map((p) => [p.dest_lat!, p.dest_long!]) as any, { padding: [30, 30] })
       ajustouRef.current = true
-    } else if (proxima) {
+      proximaRef.current = proxima?.numero_pedido ?? null
+    } else if (proxima && proxima.numero_pedido !== proximaRef.current) {
+      // recentraliza SÓ quando a PRÓXIMA parada REALMENTE mudou (Dedé concluiu uma)
+      // — não em todo render, pra não brigar com o gesto de arrastar o mapa.
       map.panTo([proxima.dest_lat!, proxima.dest_long!], { animate: true })
+      proximaRef.current = proxima.numero_pedido
     }
   }, [status, comCoord, pronto])
 

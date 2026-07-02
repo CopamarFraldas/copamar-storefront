@@ -64,6 +64,10 @@ export default async function Footer() {
             </Text>
             <ConfigurarCookiesButton />
           </div>
+          {/* crédito do desenvolvedor (Marco 30/06) */}
+          <Text className="txt-compact-xsmall text-ui-fg-muted">
+            Site desenvolvido por Marco Aurellio Berco Nascimento.
+          </Text>
         </div>
       </div>
     </footer>

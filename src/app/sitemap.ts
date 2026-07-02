@@ -16,6 +16,13 @@ const BASE = `${SITE_URL}/${CC}`
 // revalida de hora em hora (produtos/artigos podem mudar)
 export const revalidate = 3600
 
+// <image:loc> EXIGE URL ABSOLUTA — o Search Console rejeita relativa (4 inválidas
+// 18/06: thumbnails locais da mídia oficial /produtos/*.webp Tena/DryMan vinham
+// sem domínio). Prefixa SITE_URL quando não for http(s). A imagem mora em /public,
+// na RAIZ (não sob /br) → usa SITE_URL, não BASE.
+const imgAbs = (u: string): string =>
+  /^https?:\/\//i.test(u) ? u : `${SITE_URL}${u.startsWith("/") ? "" : "/"}${u}`
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
@@ -90,8 +97,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: p.updated_at ? new Date(p.updated_at) : now,
         changeFrequency: "weekly" as const,
         priority: 0.6,
-        // imagem do produto no sitemap (Google Imagens / rich results)
-        ...(p.thumbnail ? { images: [p.thumbnail] } : {}),
+        // imagem do produto no sitemap (Google Imagens / rich results) — ABSOLUTA
+        ...(p.thumbnail ? { images: [imgAbs(p.thumbnail)] } : {}),
       }))
   } catch {
     // sem produtos no sitemap se o fetch falhar; páginas principais permanecem

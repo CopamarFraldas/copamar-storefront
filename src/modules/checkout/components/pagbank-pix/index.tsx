@@ -62,6 +62,15 @@ const PagBankPix = ({
     try {
       await placeOrder()
     } catch (e: any) {
+      // NEXT_REDIRECT = sucesso: o placeOrder navega via redirect() do Next.
+      // Re-lança pra o Next concluir a navegação (mesmo padrão do boleto) — sem
+      // isso o digest pintava de vermelho na tela antes de redirecionar.
+      if (
+        String(e?.message || "").includes("NEXT_REDIRECT") ||
+        e?.digest?.includes?.("NEXT_REDIRECT")
+      ) {
+        throw e
+      }
       setFinalizeError(
         e?.message || "Não foi possível finalizar o pedido. Tente novamente."
       )
@@ -141,6 +150,25 @@ const PagBankPix = ({
       if (pollRef.current) clearInterval(pollRef.current)
     }
   }, [stage, orderId])
+
+  // Trava o cupom enquanto o PIX está em andamento. Mexer no carrinho (remover/
+  // aplicar cupom) DEPOIS do QR gerado muda o total e APAGA a sessão de pagamento
+  // → o PIX cai mas o pedido não fecha (incidente 29/06). O DiscountCode lê este
+  // flag e bloqueia alterações enquanto o QR está na tela (qr) ou pagando (paid).
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const KEY = "copamar_pix_qr_ativo"
+    if (stage === "qr" || stage === "paid") {
+      window.sessionStorage.setItem(KEY, "1")
+    } else {
+      window.sessionStorage.removeItem(KEY)
+    }
+    window.dispatchEvent(new Event("copamar-pix-qr"))
+    return () => {
+      window.sessionStorage.removeItem(KEY)
+      window.dispatchEvent(new Event("copamar-pix-qr"))
+    }
+  }, [stage])
 
   const copiar = async () => {
     if (!qrText) return

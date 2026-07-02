@@ -206,6 +206,22 @@ const Shipping: React.FC<ShippingProps> = ({
     setError(null)
   }, [isOpen])
 
+  // Frete Próprio Copamar pré-selecionado por padrão (Marco 18/06): quando os
+  // preços calculados resolvem e o cliente ainda NÃO escolheu, seleciona o frete
+  // próprio se ele cobre o CEP. O cliente troca livre depois — o guard
+  // shippingMethodId só deixa rodar quando está null (não atropela escolha feita
+  // nem visita anterior). Identifica pelo provider (robusto a renome).
+  useEffect(() => {
+    if (shippingMethodId) return
+    if (isLoadingPrices) return
+    const proprio = _shippingMethods?.find(
+      (sm) => (sm as any).provider_id === "frete-proprio_copamar"
+    )
+    if (!proprio || typeof calculatedPricesMap[proprio.id] !== "number") return
+    handleSetShippingMethod(proprio.id, "shipping")
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingPrices, calculatedPricesMap, shippingMethodId])
+
   return (
     <div className="bg-ui-bg-base">
       <div className="flex flex-row items-center justify-between mb-6">
@@ -463,8 +479,11 @@ const Shipping: React.FC<ShippingProps> = ({
             </div>
           )}
 
-          {/* escolha de embalagem (Marco 08/06) — após o frete, antes de pagar */}
-          <EscolhaEmbalagem inicial={(cart.metadata as any)?.embalagem} />
+          {/* escolha de embalagem (Marco 08/06) — após o frete, antes de pagar.
+              Some na retirada na loja: embalagem discreta não faz sentido presencial */}
+          {showPickupOptions !== PICKUP_OPTION_ON && (
+            <EscolhaEmbalagem inicial={(cart.metadata as any)?.embalagem} />
+          )}
 
           <div>
             <ErrorMessage

@@ -21,6 +21,8 @@ export const metadata: Metadata = {
   },
   description:
     "Distribuidora atacadista especializada em fraldas geriátricas. 20 anos de tradição. Parcelamento 3x sem juros, 5% desconto à vista. Entregas para todo o Brasil.",
+  authors: [{ name: "Marco Aurellio Berco Nascimento" }],
+  creator: "Marco Aurellio Berco Nascimento",
   keywords: [
     "fralda geriátrica",
     "fralda para idoso",
@@ -65,6 +67,14 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className="bg-ui-bg-base text-ui-fg-base">
+        {/* crédito do desenvolvedor — comentário visível em "ver código-fonte" */}
+        <div
+          aria-hidden
+          dangerouslySetInnerHTML={{
+            __html:
+              "<!--\n  ✦ Site desenvolvido por Marco Aurellio Berco Nascimento ✦\n-->",
+          }}
+        />
         <link rel="preconnect" href={R2_HOST} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={R2_HOST} />
         {/* Google Ads gtag + Consent Mode v2 (#65) — todas as páginas */}

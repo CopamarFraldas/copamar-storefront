@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Button, clx } from "@medusajs/ui"
-import React, { Fragment, useMemo } from "react"
+import React, { Fragment, useMemo, useState, useEffect } from "react"
 
 import useToggleState from "@lib/hooks/use-toggle-state"
 import ChevronDown from "@modules/common/icons/chevron-down"
@@ -36,6 +36,17 @@ const MobileActions: React.FC<MobileActionsProps> = ({
 }) => {
   const { state, open, close } = useToggleState()
 
+  // esconde a barra "Adicionar" quando o carrinho (drawer) abre — senão ela vaza
+  // por cima do "Finalizar compra". Reusa o event bus do float do WhatsApp.
+  const [drawerAberto, setDrawerAberto] = useState(false)
+  useEffect(() => {
+    const onDrawer = (e: Event) =>
+      setDrawerAberto(!!(e as CustomEvent).detail?.aberto)
+    window.addEventListener("copamar-drawer", onDrawer as EventListener)
+    return () =>
+      window.removeEventListener("copamar-drawer", onDrawer as EventListener)
+  }, [])
+
   const price = getProductPrice({
     product: product,
     variantId: variant?.id,
@@ -57,6 +68,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
       <div
         className={clx("lg:hidden inset-x-0 bottom-0 fixed z-50", {
           "pointer-events-none": !show,
+          "!hidden": drawerAberto,
         })}
       >
         <Transition

@@ -54,7 +54,7 @@ export default function SeloAbsorcao({
             <Gota key={i} on={on} />
           ))}
         </span>
-        <span className="txt-compact-xsmall" aria-hidden="true">
+        <span className="txt-compact-xsmall small:text-sm medium:text-base" aria-hidden="true">
           Nível {a.nivel}/5
         </span>
         {a.noturno && (

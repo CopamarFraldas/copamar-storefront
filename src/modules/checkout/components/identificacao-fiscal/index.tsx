@@ -18,14 +18,22 @@ import { maskCpfCnpj, isValidCpf, isValidCnpj } from "@lib/util/cpf"
  */
 const IdentificacaoFiscal = ({
   cart,
+  customer,
 }: {
   cart: HttpTypes.StoreCart | null
+  customer?: HttpTypes.StoreCustomer | null
 }) => {
   const meta = (cart?.metadata || {}) as Record<string, any>
+  // Pré-preenche do CADASTRO do cliente (metadata.cpf) quando o carrinho ainda
+  // não tem doc fiscal — quem cadastrou o CPF não re-digita aqui no checkout.
+  const cpfCadastro = String((customer?.metadata as any)?.cpf || "")
+  const docInicial = String(meta.fiscal_documento || "") || cpfCadastro
   const [tipo, setTipo] = useState<"F" | "J">(
-    meta.fiscal_tipo === "J" ? "J" : "F"
+    meta.fiscal_tipo === "J" || docInicial.replace(/\D/g, "").length === 14
+      ? "J"
+      : "F"
   )
-  const [doc, setDoc] = useState(maskCpfCnpj(meta.fiscal_documento || ""))
+  const [doc, setDoc] = useState(maskCpfCnpj(docInicial))
   const [razao, setRazao] = useState((meta.razao_social as string) || "")
   const [ie, setIe] = useState((meta.inscricao_estadual as string) || "")
   const [isento, setIsento] = useState(
@@ -80,7 +88,7 @@ const IdentificacaoFiscal = ({
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
         <Input
           label={tipo === "F" ? "CPF" : "CNPJ"}
           name="fiscal_documento"

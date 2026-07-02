@@ -10,6 +10,10 @@ import { useEffect, useRef, useState } from "react"
  *
  * - compact (home): destaca o resultado e esconde a lista atrás de "ver opções".
  * - completo (PDP): já mostra a lista.
+ * - ouvirPdp (PDP): escuta a seleção de VARIANTE + QUANTIDADE do ProductActions
+ *   (evento "copamar:pdp-frete", são irmãos no layout) e RECOTA quando muda —
+ *   antes o frete da PDP travava em 1 unidade (Marco 23/06). Manda quantity pro
+ *   /store/frete, que cota N unidades.
  * O CEP fica salvo (localStorage) e é reaproveitado entre páginas.
  */
 type Opcao = {
@@ -44,19 +48,32 @@ const prazoTxt = (p: number | null) =>
 const FreteCep = ({
   variantId,
   compact = false,
+  ouvirPdp = false,
 }: {
   variantId?: string
   compact?: boolean
+  /** PDP: reagir à variante/quantidade escolhidas no ProductActions */
+  ouvirPdp?: boolean
 }) => {
   const [cep, setCep] = useState("")
   const [res, setRes] = useState<Resultado | null>(null)
   const [loading, setLoading] = useState(false)
   const [verOpcoes, setVerOpcoes] = useState(!compact)
+  const [qtd, setQtd] = useState(1) // só pra rótulo "para N unidades"
   const reqRef = useRef(0)
+  const cepRef = useRef("") // último CEP válido (pra recotar ao mudar a qtd)
+  const vidRef = useRef<string | undefined>(variantId)
+  const qtyRef = useRef(1)
+  const sigRef = useRef("") // assinatura da última cotação (evita repique inútil)
+  const debRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const consultar = async (cepRaw: string) => {
     const digits = cepRaw.replace(/\D/g, "")
     if (digits.length !== 8) return
+    cepRef.current = digits
+    const vid = vidRef.current
+    const q = Math.max(1, qtyRef.current || 1)
+    sigRef.current = `${digits}|${vid || ""}|${q}`
     setLoading(true)
     setRes(null)
     setVerOpcoes(!compact)
@@ -65,13 +82,18 @@ const FreteCep = ({
       try {
         localStorage.setItem(CEP_KEY, digits)
       } catch {}
-      const r = await fetch(
-        `/api/frete-cep?cep=${digits}${
-          variantId ? `&variant_id=${variantId}` : ""
-        }`
-      )
+      const params = new URLSearchParams({ cep: digits })
+      if (vid) params.set("variant_id", vid)
+      if (q > 1) params.set("quantity", String(q))
+      // no-store: a cotação tem que refletir a quantidade atual (sem cache)
+      const r = await fetch(`/api/frete-cep?${params.toString()}`, {
+        cache: "no-store",
+      })
       const d = await r.json()
-      if (id === reqRef.current) setRes(d)
+      if (id === reqRef.current) {
+        setRes(d)
+        setQtd(q)
+      }
     } catch {
       if (id === reqRef.current) setRes({ sem_cotacao: true })
     } finally {
@@ -81,6 +103,7 @@ const FreteCep = ({
 
   // recupera o CEP salvo e já calcula ao montar
   useEffect(() => {
+    vidRef.current = variantId
     let salvo = ""
     try {
       salvo = localStorage.getItem(CEP_KEY) || ""
@@ -92,8 +115,31 @@ const FreteCep = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variantId])
 
+  // PDP: escuta a seleção (variante + quantidade) e recota com debounce
+  useEffect(() => {
+    if (!ouvirPdp) return
+    const onSel = (e: Event) => {
+      const d = (e as CustomEvent).detail || {}
+      if (d.variantId) vidRef.current = d.variantId
+      if (d.quantity) qtyRef.current = Math.max(1, Number(d.quantity) || 1)
+      // só recota com CEP válido em tela e se algo de fato mudou
+      if (cepRef.current.length !== 8) return
+      const novaSig = `${cepRef.current}|${vidRef.current || ""}|${qtyRef.current}`
+      if (novaSig === sigRef.current) return
+      if (debRef.current) clearTimeout(debRef.current)
+      debRef.current = setTimeout(() => consultar(cepRef.current), 500)
+    }
+    window.addEventListener("copamar:pdp-frete", onSel)
+    return () => {
+      window.removeEventListener("copamar:pdp-frete", onSel)
+      if (debRef.current) clearTimeout(debRef.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ouvirPdp])
+
   const opcoes = res?.opcoes || []
   const temLista = opcoes.length > 0
+  const sufixoQtd = qtd > 1 ? ` · ${qtd} unidades` : ""
 
   return (
     <div
@@ -155,7 +201,9 @@ const FreteCep = ({
         <div className="mt-3">
           {res.gratis ? (
             <p className="flex items-center gap-x-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-              ✅ Frete grátis no seu endereço!
+              ✅ {(res as any).gratis_minimo
+                ? `Entrega Copamar grátis acima de R$ ${(res as any).gratis_minimo} (abaixo, R$ 9,90)`
+                : "Frete grátis no seu endereço!"}
               {opcoes[0]?.prazo ? (
                 <span className="font-normal">· {prazoTxt(opcoes[0].prazo)}</span>
               ) : null}
@@ -180,6 +228,9 @@ const FreteCep = ({
                     · {prazoTxt(opcoes[0].prazo)}
                   </span>
                 ) : null}
+                {sufixoQtd && (
+                  <span className="text-ui-fg-subtle">{sufixoQtd}</span>
+                )}
                 {res.estimativa && (
                   <span className="text-ui-fg-subtle"> (estimado)</span>
                 )}

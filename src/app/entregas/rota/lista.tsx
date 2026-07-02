@@ -14,7 +14,13 @@ import MapaRota from "./mapa-rota"
  * Ausente. MVP visual: o status muda LOCAL — a persistência (banco que o Marco
  * escolher + WhatsApp + regra 3x/+3 dias úteis) é a Fase 1B.
  */
-export default function ListaRota({ paradas }: { paradas: Parada[] }) {
+export default function ListaRota({
+  paradas,
+  motoristaNome = "Dedé",
+}: {
+  paradas: Parada[]
+  motoristaNome?: string
+}) {
   const [status, setStatus] = useState<Record<string, StatusParada>>(
     Object.fromEntries(paradas.map((p) => [p.numero_pedido, p.status]))
   )
@@ -304,7 +310,7 @@ export default function ListaRota({ paradas }: { paradas: Parada[] }) {
        <div className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs/4 opacity-80">Rota de hoje · Dedé</p>
+            <p className="text-xs/4 opacity-80">Rota de hoje · {motoristaNome}</p>
             <h1 className="text-xl font-bold">{paradas.length} entregas</h1>
           </div>
           <div className="flex items-center gap-2">

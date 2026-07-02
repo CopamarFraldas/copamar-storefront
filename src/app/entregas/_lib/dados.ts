@@ -66,14 +66,20 @@ function normaliza(p: any): Parada {
  * falsas em produção (auditoria 11/06). O JSON anonimizado fica só pra dev sem
  * banco configurado. Dado real de cliente vive no Supabase, não no git.
  */
-export async function getRota(): Promise<Parada[]> {
+export async function getRota(motoristaId?: string | null): Promise<Parada[]> {
   if (!SUPA || !KEY) {
     // dev sem banco: rota demo anonimizada
     return (rotaJson as any[]).map(normaliza).sort((a, b) => a.ordem - b.ordem)
   }
   try {
+    // multi-motorista (24/06): a PÁGINA passa o motorista logado → rota só dele
+    // (Lalamove tem motorista próprio, então não cai na rota de ninguém). Sem id
+    // (ex.: "avisar a rota" do admin) = todas as paradas do dia.
+    const filtroMot = motoristaId
+      ? `&motorista=eq.${encodeURIComponent(motoristaId)}`
+      : ""
     const r = await fetch(
-      `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&order=ordem`,
+      `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}${filtroMot}&order=ordem`,
       { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }, cache: "no-store" }
     )
     if (r.ok) {
@@ -157,7 +163,12 @@ export function mensagemCliente(status: string, nome?: string | null, qtd = 1): 
     case "entregue":
       return `${oi}Seu pedido da Copamar foi *entregue* agora 💙 Obrigado pela confiança! Qualquer coisa, é só chamar.`
     case "ausente":
-      return `${oi}Passamos para entregar seu pedido da Copamar, mas não encontramos ninguém pra receber 🚪 Vamos tentar de novo em breve. Se quiser combinar um horário melhor, é só responder aqui!`
+      // Marco 22/06: setar expectativa de ~2 dias. Os carros revezam as regiões
+      // a cada dia (1 dia zona sul, outro zona leste), então só voltamos à mesma
+      // região em 2 dias úteis (ex.: ausência na segunda → nova tentativa quarta).
+      // "úteis" pra não prometer fim de semana; + rede de segurança = avisamos
+      // quando sair de novo (casa com o aviso "sai_hoje" da manhã).
+      return `${oi}Passamos para entregar seu pedido da Copamar, mas não encontramos ninguém pra receber 🚪 Como nossos carros revezam as regiões da cidade a cada dia, a próxima tentativa é *daqui a 2 dias úteis* — e a gente te avisa por aqui assim que ele sair de novo 🙌 Se quiser combinar um horário melhor, é só responder!`
     case "adiado":
       return `${oi}Tivemos um contratempo na nossa rota de hoje e o seu pedido da Copamar precisou ser remarcado 🙏 Já está reagendado — e *quando ele sair pra entrega de novo, a gente te avisa por aqui*. Desculpe o transtorno; qualquer coisa, é só responder! 💙`
     default:

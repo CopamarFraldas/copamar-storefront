@@ -1,4 +1,4 @@
-import { Button } from "@medusajs/ui"
+import { Badge, Button } from "@medusajs/ui"
 import { useMemo } from "react"
 
 import Thumbnail from "@modules/products/components/thumbnail"
@@ -8,6 +8,17 @@ import { HttpTypes } from "@medusajs/types"
 
 type OrderCardProps = {
   order: HttpTypes.StoreOrder
+}
+
+const STATUS_BADGE: Record<
+  string,
+  { txt: string; cor: "green" | "orange" | "red" | "grey" }
+> = {
+  pending: { txt: "Em processamento", cor: "orange" },
+  completed: { txt: "Concluído", cor: "green" },
+  canceled: { txt: "Cancelado", cor: "red" },
+  archived: { txt: "Arquivado", cor: "grey" },
+  requires_action: { txt: "Requer ação", cor: "orange" },
 }
 
 const OrderCard = ({ order }: OrderCardProps) => {
@@ -25,8 +36,15 @@ const OrderCard = ({ order }: OrderCardProps) => {
 
   return (
     <div className="bg-ui-bg-base flex flex-col" data-testid="order-card">
-      <div className="uppercase text-large-semi mb-1">
-        #<span data-testid="order-display-id">{order.display_id}</span>
+      <div className="flex items-center gap-2 mb-1">
+        <div className="uppercase text-large-semi">
+          #<span data-testid="order-display-id">{order.display_id}</span>
+        </div>
+        {STATUS_BADGE[order.status as string] && (
+          <Badge size="2xsmall" color={STATUS_BADGE[order.status as string].cor}>
+            {STATUS_BADGE[order.status as string].txt}
+          </Badge>
+        )}
       </div>
       <div className="flex items-center divide-x divide-gray-200 text-small-regular text-ui-fg-base">
         <span className="pr-2" data-testid="order-created-at">

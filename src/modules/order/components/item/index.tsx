@@ -1,9 +1,9 @@
 import { HttpTypes } from "@medusajs/types"
 import { Table, Text } from "@medusajs/ui"
 
+import { convertToLocale } from "@lib/util/money"
 import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
-import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import Thumbnail from "@modules/products/components/thumbnail"
 
 type ItemProps = {
@@ -36,16 +36,22 @@ const Item = ({ item, currencyCode }: ItemProps) => {
 
       <Table.Cell className="!pr-0">
         <span className="!pr-0 flex flex-col items-end h-full justify-center">
-          <span className="flex gap-x-1 ">
-            <Text className="text-ui-fg-subtle">
-              <span data-testid="product-quantity">{item.quantity}</span>x{" "}
-            </Text>
-            <LineItemUnitPrice
-              item={item}
-              style="tight"
-              currencyCode={currencyCode}
-            />
-          </span>
+          {/* Quantidade × preço unitário só pra 2+ unidades (pra 1, o total
+              abaixo já é o preço). LineItemPrice é o ÚNICO que mostra
+              desconto/riscado — senão o riscado e o preço com desconto
+              apareciam DUAS vezes por item (Marco 18/06). */}
+          {item.quantity > 1 && (
+            <span className="flex gap-x-1 text-ui-fg-subtle text-small-regular">
+              <span data-testid="product-quantity">{item.quantity}</span>
+              <span>×</span>
+              <span data-testid="product-unit-price">
+                {convertToLocale({
+                  amount: (item.total ?? 0) / item.quantity,
+                  currency_code: currencyCode,
+                })}
+              </span>
+            </span>
+          )}
 
           <LineItemPrice
             item={item}

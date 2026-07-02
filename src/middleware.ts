@@ -147,9 +147,12 @@ export async function middleware(request: NextRequest) {
   const queryString = request.nextUrl.search ? request.nextUrl.search : ""
 
   // If no country code is set, we redirect to the relevant region.
+  // 308 (permanente) — canonicaliza / → /br e consolida autoridade no /br (SEO,
+  // Marco 01/07). Antes era 307 (temporário); a canônica já apontava /br, o 308
+  // reforça o sinal de duplicado. Só o locale-prefix; o resto do fluxo é intacto.
   if (!urlHasCountryCode && countryCode) {
     redirectUrl = `${request.nextUrl.origin}/${countryCode}${redirectPath}${queryString}`
-    response = NextResponse.redirect(`${redirectUrl}`, 307)
+    response = NextResponse.redirect(`${redirectUrl}`, 308)
   } else if (!urlHasCountryCode && !countryCode) {
     // Handle case where no valid country code exists (empty regions)
     return new NextResponse(

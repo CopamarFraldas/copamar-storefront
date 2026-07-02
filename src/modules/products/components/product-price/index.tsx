@@ -2,6 +2,7 @@ import { clx } from "@medusajs/ui"
 
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
+import PrecoAVista from "../preco-a-vista"
 
 export default function ProductPrice({
   product,
@@ -24,11 +25,15 @@ export default function ProductPrice({
   return (
     <div className="flex flex-col text-ui-fg-base">
       <span
-        className={clx("text-xl-semi", {
+        className={clx("text-3xl sm:text-4xl font-bold leading-tight", {
           "text-ui-fg-interactive": selectedPrice.price_type === "sale",
         })}
       >
-        {!variant && "A partir de "}
+        {!variant && (
+          <span className="text-base font-normal text-ui-fg-subtle">
+            A partir de{" "}
+          </span>
+        )}
         <span
           data-testid="product-price"
           data-value={selectedPrice.calculated_price_number}
@@ -36,6 +41,11 @@ export default function ProductPrice({
           {selectedPrice.calculated_price}
         </span>
       </span>
+      <PrecoAVista
+        amount={selectedPrice.calculated_price_number}
+        currency_code={selectedPrice.currency_code}
+        full
+      />
       {selectedPrice.price_type === "sale" && (
         <>
           <p>
