@@ -11,6 +11,8 @@
  * estava no ar antes (cutover-safe).
  */
 
+import Image from "next/image"
+
 type BannerInput = { image_url: string; link?: string }
 type SlideInput = { badge: string; titulo: string; sub: string }
 
@@ -106,19 +108,25 @@ export default function BannerEsteira({
           it.tipo === "banner" ? (
             it.b.link ? (
               <a key={i} href={it.b.link} className="block shrink-0" aria-label="Ver oferta">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={it.b.image_url} alt="" draggable={false} className="block w-auto select-none" style={{ height: altura }} />
+                {/* next/image #101: width/height 0 + width:auto porque cada banner
+                    tem proporção própria (e os do admin são upload livre) — mesmo
+                    layout do <img> cru de antes (sem CLS novo), mas com lazy-load
+                    e AVIF/WebP redimensionado. sizes ≈ maior largura renderizada
+                    (aspecto ~3,2 × altura 200-240). */}
+                <Image src={it.b.image_url} alt="" width={0} height={0} sizes="680px" draggable={false} className="block w-auto select-none" style={{ height: altura, width: "auto" }} />
               </a>
             ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 key={i}
                 src={it.b.image_url}
                 alt=""
+                width={0}
+                height={0}
+                sizes="680px"
                 aria-hidden="true"
                 draggable={false}
                 className="block w-auto shrink-0 select-none"
-                style={{ height: altura }}
+                style={{ height: altura, width: "auto" }}
               />
             )
           ) : (

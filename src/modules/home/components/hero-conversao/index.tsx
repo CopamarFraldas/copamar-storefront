@@ -1,3 +1,4 @@
+import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ProdutosEsteira from "@modules/home/components/produtos-esteira"
 import BotaoWhatsApp from "@modules/home/components/botao-whatsapp"
@@ -95,11 +96,17 @@ export default async function HeroConversao() {
           <div className="relative">
             <div className="relative aspect-[4/3] overflow-hidden rounded-large bg-[#f4ecdd] ring-1 ring-black/5">
               {/* foto real (Pexels, licença livre p/ uso comercial) */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {/* Elemento LCP da home (#101): priority injeta o <link rel=preload>
+                  e o optimizer serve AVIF/WebP no tamanho do slot em vez do JPG
+                  1200px inteiro. fill = mesmo absolute inset-0 de antes (o pai
+                  aspect-[4/3] segura o layout → zero CLS). */}
+              <Image
                 src="/hero/idoso-cuidado.jpg"
                 alt="Pessoa idosa sorrindo, bem cuidada"
-                className="absolute inset-0 h-full w-full object-cover object-center"
+                fill
+                priority
+                sizes="(max-width: 1023px) 100vw, 676px"
+                className="object-cover object-center"
               />
               {/* chip de prova social flutuando */}
               <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-copamar-primary shadow-md">
@@ -129,8 +136,10 @@ export default async function HeroConversao() {
               className="flex h-12 w-28 items-center justify-center rounded-large border border-ui-border-base bg-white px-3"
             >
               {m.logo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={m.logo} alt={m.nome} className={`${m.zoom ? "max-h-10" : "max-h-7"} w-auto max-w-full object-contain`} />
+                // width/height nominais do slot (caixa fixa h-12 w-28 → sem CLS);
+                // h-auto/w-auto + max-h preservam o dimensionamento visual antigo,
+                // e o optimizer encolhe os PNGs (alguns têm >900px de largura)
+                <Image src={m.logo} alt={m.nome} width={112} height={48} className={`${m.zoom ? "max-h-10" : "max-h-7"} h-auto w-auto max-w-full object-contain`} />
               ) : (
                 <span className="text-base font-bold tracking-tight text-copamar-primary/80">
                   {m.nome}

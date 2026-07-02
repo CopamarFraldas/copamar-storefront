@@ -1,6 +1,7 @@
 "use client"
 
 import { addToCart } from "@lib/data/cart"
+import { ga4AddToCart } from "@lib/util/ga4"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -165,6 +166,17 @@ export default function ProductActions({
       quantity: (fardoVariant && fardoN > 0 ? fardoN : 1) * qtd,
       countryCode,
     })
+
+    // GA4 add_to_cart (funil, auditoria 02/07) — reporta a ESCOLHA da PDP
+    // (variante e preço que o cliente viu), mesmo quando o fardo vira N
+    // unidades da UNIDADE no carrinho
+    ga4AddToCart({
+      item_id: selectedVariant.sku || product.handle || product.id,
+      item_name: product.title ?? "",
+      price: (selectedVariant as any)?.calculated_price?.calculated_amount,
+      quantity: qtd,
+    })
+
     setQuantidade(1)
 
     setIsAdding(false)

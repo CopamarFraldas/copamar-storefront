@@ -7,6 +7,8 @@ import { notFound } from "next/navigation"
 export const metadata: Metadata = {
   title: "Carrinho",
   description: "Ver seu carrinho",
+  // carrinho é estado privado do usuário — nunca indexar (auditoria 02/07)
+  robots: { index: false, follow: false },
 }
 
 export default async function Cart() {

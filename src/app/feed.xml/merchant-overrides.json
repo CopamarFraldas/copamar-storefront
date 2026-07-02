@@ -9,13 +9,15 @@
     "description": "Protetor de cama descartável ABENA Abri-Soft Superdry, 80 x 180 cm, cor azul claro. Núcleo com fluff de celulose e polímero superabsorvente (SAP), com capacidade de absorção de até 1600 ml. Bordas seladas nas laterais, abas para encaixe sob o colchão e superfície macia em não tecido. Pacote com 30 unidades."
   },
   "fralda-slip-noturna-grande-c-32-unidades": {
-    "description": "Fralda Tena Slip Noturna, tamanho G, unissex, com fitas adesivas. Núcleo de dupla camada com polímeros superabsorventes e proteção por até 12 horas. Barreiras antivazamento e elásticos nas costas, camada interna com Aloe Vera, cobertura externa têxtil macia, controle de odor e fechamento MultiFix com microganchos reposicionáveis. Pacote com 32 unidades."
+    "description": "Fralda Tena Slip Noturna, tamanho G, unissex, com fitas adesivas. Núcleo de dupla camada com polímeros superabsorventes e proteção por até 12 horas. Barreiras antivazamento e elásticos nas costas, camada interna com Aloe Vera, cobertura externa têxtil macia, controle de odor e fechamento MultiFix com microganchos reposicionáveis. Pacote com 32 unidades.",
+    "brand": "TENA"
   },
   "protetor-de-colchao-gerialife-c-6-unidades": {
     "description": "Protetor de colchão descartável Gerialife, tamanho único 80 x 62 cm (área absorvente de aprox. 65 x 45 cm). Núcleo com polímeros superabsorventes e fibra de celulose, capacidade de até cerca de 1.000 ml, e camada inferior impermeável de polietileno. Composição com solução antimicrobiana. Pacote com 6 unidades."
   },
   "fralda-slip-noturna-media-c-32-unidades": {
-    "description": "Fralda Tena Slip Noturna, tamanho M (cintura aprox. 73 a 122 cm), com fitas adesivas. Núcleo de dupla camada com polímeros superabsorventes e proteção por até 12 horas. Camada interna com Aloe Vera, barreiras antivazamento e elástico nas costas, cobertura externa têxtil e fechamento MultiFix com microganchos. Pacote com 32 unidades."
+    "description": "Fralda Tena Slip Noturna, tamanho M (cintura aprox. 73 a 122 cm), com fitas adesivas. Núcleo de dupla camada com polímeros superabsorventes e proteção por até 12 horas. Camada interna com Aloe Vera, barreiras antivazamento e elástico nas costas, cobertura externa têxtil e fechamento MultiFix com microganchos. Pacote com 32 unidades.",
+    "brand": "TENA"
   },
   "fralda-tena-slip-dermacare-media-c-32": {
     "description": "Fralda Tena Slip Dermacare, tamanho M (cintura aprox. 73 a 122 cm), unissex, com fitas adesivas. Núcleo de dupla camada com polímeros superabsorventes (gel) e indicador de umidade que muda de cor. Tecido macio e respirável com Aloe Vera, barreiras antivazamento com elásticos nas costas e pernas e fitas MultiFix. Pacote com 32 unidades."
@@ -60,10 +62,6 @@
   "tena-pants-confort-c-16-p-m": {
     "description": "Roupa íntima descartável de vestir Tena, linha Confort, modelo Pants, unissex. Núcleo de absorção rápida com canais profundos e polímeros superabsorventes (gel), neutralizador de odores, cobertura macia tipo algodão com microventilação, barreiras elásticas antivazamento, elásticos na cintura e nas pernas e laterais rasgáveis. Tamanho P/M (cintura de 80 a 112 cm), pacote com 16 unidades."
   },
-  "absorvente-comfort-life-c-20": {
-    "description": "Absorvente adulto unissex Comfort Life (fabricante CAHE). Núcleo com fibra de celulose e polímeros superabsorventes (poliacrilato de sódio), camadas de distribuição interna, barreiras laterais antivazamento, cobertura interna em TNT de polipropileno com Aloe Vera e formato anatômico. Pacote com 20 unidades. EAN 7898902458707.",
-    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/07898902458707-0-01KSMWWW8HG5839PC6V1DD9ZFG-sq.jpg"
-  },
   "fralda-geriatrica-noturna-vitalidade-sxg-c-24": {
     "description": "Fralda geriátrica Vitalidade (fabricante Kairos), linha Noturna, de absorção intensa. Núcleo com fibra de celulose e gel superabsorvente, camada interna com Aloe Vera, barreiras antivazamento laterais, formato anatômico, fitas reposicionáveis e camada externa de polietileno. Tamanho SXG (acima de 110 kg, cintura até 165 cm), pacote com 24 unidades. EAN 7898773230044."
   },
@@ -83,14 +81,17 @@
     "description": "Toalha umedecida Tena Dermacare (Essity) para higiene corporal de adultos, pacote com 40 unidades. Fórmula sem álcool etílico e dermatologicamente testada, hipoalergênica, com fragrância suave. Enriquecida com glicerina, extrato de camomila e aloe vera. Textura macia e resistente."
   },
   "luva-de-procedimento-vinil-s-po-p": {
-    "description": "Luva de procedimento Descarpack de vinil (PVC) sem pó, tamanho P, caixa com 100 unidades. Sem látex na composição, hipoalergênica, de superfície lisa, ambidestra, descartável de uso único e não estéril. Tamanho P: comprimento mínimo de 240 mm e largura da palma de 75 a 85 mm."
+    "description": "Luva de procedimento Descarpack de vinil (PVC) sem pó, tamanho P, caixa com 100 unidades. Sem látex na composição, hipoalergênica, de superfície lisa, ambidestra, descartável de uso único e não estéril. Tamanho P: comprimento mínimo de 240 mm e largura da palma de 75 a 85 mm.",
+    "brand": "Descarpack"
   },
   "luva-nitrilica-s-po-preta-media": {
-    "description": "Luva nitrílica Descarpack preta sem pó, tamanho M, caixa com 100 unidades. Borracha nitrílica sintética, livre de látex, acabamento microtexturizado, boa resistência química, ambidestra, descartável de uso único e não estéril. Tamanho M: comprimento mínimo de 240 mm e largura da palma de 85 a 95 mm. Possui C.A."
+    "description": "Luva nitrílica Descarpack preta sem pó, tamanho M, caixa com 100 unidades. Borracha nitrílica sintética, livre de látex, acabamento microtexturizado, boa resistência química, ambidestra, descartável de uso único e não estéril. Tamanho M: comprimento mínimo de 240 mm e largura da palma de 85 a 95 mm. Possui C.A.",
+    "brand": "Descarpack"
   },
   "luva-nitrilica-s-po-preta-grande": {
     "description": "Luva nitrílica Descarpack preta sem pó, tamanho G, caixa com 100 unidades. Copolímero de butadieno e acrilonitrila (borracha nitrílica sintética), sem látex, acabamento microtexturizado, ambidestra, descartável de uso único e não estéril. Tamanho G: comprimento mínimo de 240 mm e largura da palma de 95 a 105 mm. C.A. 41.211, registro ANVISA nº 10330660267.",
-    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283816394-0-01KSMY5M9XE8ND19FWWX189N2Q-sq.jpg"
+    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283816394-0-01KSMY5M9XE8ND19FWWX189N2Q-sq.jpg",
+    "brand": "Descarpack"
   },
   "tena-pants-noturna-p-m-c-32": {
     "description": "Tena Pants Noturna, roupa íntima descartável unissex no formato de vestir, tamanho P/M, pacote com 32 unidades. Tecnologia Acquidry com núcleo de alta absorção e canais, barreiras antivazamento laterais, controle de odor, laterais removíveis e cós elástico com ajuste anatômico. Polímeros superabsorventes. Tamanho P/M: cintura de aproximadamente 80 a 112 cm e peso de 30 a 70 kg."
@@ -172,24 +173,30 @@
   },
   "luva-nitrilica-grande-sem-po-rosa": {
     "description": "Luva nitrílica (borracha sintética, sem látex) tamanho G, na cor rosa. Sem pó (powder-free), ambidestra, texturizada nas pontas dos dedos para melhor pegada. Não estéril, descartável de uso único, para procedimentos não cirúrgicos.",
-    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283817612-0-01KSMY6GKFYVB2QBDKW9M4H3WB-sq.jpg"
+    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283817612-0-01KSMY6GKFYVB2QBDKW9M4H3WB-sq.jpg",
+    "brand": "Descarpack"
   },
   "luva-nitrilica-sem-po-azul-grande": {
     "description": "Luva nitrílica (borracha sintética, sem látex) tamanho G, na cor azul. Sem pó (powder-free), ambidestra, descartável de uso único e não estéril. Punho com acabamento enrolado e microtextura nas pontas dos dedos para aderência. Embalagem com 100 unidades.",
-    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283814604-0-01KSMY6HD8J6SZTFZ9RJ8D9VRE-sq.jpg"
+    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283814604-0-01KSMY6HD8J6SZTFZ9RJ8D9VRE-sq.jpg",
+    "brand": "Descarpack"
   },
   "luva-descartavel-vinilica-tpe-grande": {
     "description": "Luva descartável Descarpack de TPE (elastômero termoplástico), tamanho G, sem látex, sem pó e atóxica. Ambidestra, com textura suave, resistente a rasgos e perfurações. Uso único. Pacote com 100 unidades (50 pares).",
-    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283818152-0-01KSMY6J5GFQ2KN2PBSCZQ9DP5-sq.jpg"
+    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283818152-0-01KSMY6J5GFQ2KN2PBSCZQ9DP5-sq.jpg",
+    "brand": "Descarpack"
   },
   "luva-de-procedimento-vinil-m": {
-    "description": "Luva de procedimento Descarpack em vinil (PVC), tamanho M, sem látex e sem pó, hipoalergênica. Ambidestra, descartável de uso único, não estéril, atóxica e apirogênica, para procedimentos não cirúrgicos. Comprimento mínimo de 240 mm e largura da palma entre 85 e 95 mm. Caixa com 100 unidades (50 pares)."
+    "description": "Luva de procedimento Descarpack em vinil (PVC), tamanho M, sem látex e sem pó, hipoalergênica. Ambidestra, descartável de uso único, não estéril, atóxica e apirogênica, para procedimentos não cirúrgicos. Comprimento mínimo de 240 mm e largura da palma entre 85 e 95 mm. Caixa com 100 unidades (50 pares).",
+    "brand": "Descarpack"
   },
   "luva-de-procedimento-vinil-grande": {
-    "description": "Luva de procedimento em vinil (PVC), tamanho G (grande), sem látex na composição. Não estéril, ambidestra, descartável de uso único, para procedimentos não invasivos. Fabricada conforme a norma NBR ISO 11193-2."
+    "description": "Luva de procedimento em vinil (PVC), tamanho G (grande), sem látex na composição. Não estéril, ambidestra, descartável de uso único, para procedimentos não invasivos. Fabricada conforme a norma NBR ISO 11193-2.",
+    "brand": "Descarpack"
   },
   "luva-de-procedimento-vinil-p": {
-    "description": "Luva de procedimento em vinil (PVC), tamanho P (pequeno), sem látex. Não estéril, ambidestra, descartável de uso único, para procedimentos não invasivos. Caixa com 100 unidades."
+    "description": "Luva de procedimento em vinil (PVC), tamanho P (pequeno), sem látex. Não estéril, ambidestra, descartável de uso único, para procedimentos não invasivos. Caixa com 100 unidades.",
+    "brand": "Descarpack"
   },
   "tena-men-level-2-active-fit-c-10-unidades": {
     "description": "Protetor masculino Tena Men Active Fit nível 2 (Level 2), de formato anatômico em concha, fino e discreto (aprox. 4 mm). Fixa-se na cueca por fita adesiva e conta com núcleo de alta absorção. Embalagem com 10 unidades, cada protetor embrulhado individualmente."
@@ -267,16 +274,20 @@
     "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/produto-BFVDAD459C-1-01KVDP7MB2717K830J9CW7K41K-sq.jpg"
   },
   "luva-nitrilica-sem-po-azul-media": {
-    "description": "Luva nitrílica descartável sem pó, cor azul, tamanho M. Material em nitrilo (borracha sintética), livre de látex. Ambidestra, não estéril e de uso único, indicada para procedimentos não cirúrgicos."
+    "description": "Luva nitrílica descartável sem pó, cor azul, tamanho M. Material em nitrilo (borracha sintética), livre de látex. Ambidestra, não estéril e de uso único, indicada para procedimentos não cirúrgicos.",
+    "brand": "Descarpack"
   },
   "luva-descartavel-vinilica-tpe-media": {
-    "description": "Luva descartável Descarpack de TPE (elastômero termoplástico), sem pó, tamanho M, pacote com 100 unidades. Sem látex. Ambidestra, não estéril e de uso único, indicada para procedimentos não cirúrgicos de baixo risco."
+    "description": "Luva descartável Descarpack de TPE (elastômero termoplástico), sem pó, tamanho M, pacote com 100 unidades. Sem látex. Ambidestra, não estéril e de uso único, indicada para procedimentos não cirúrgicos de baixo risco.",
+    "brand": "Descarpack"
   },
   "luva-de-procedimento-latex-c-100-grande": {
-    "description": "Luva de procedimento Descarpack em látex 100% natural, tamanho G, caixa com 100 unidades (50 pares). Lubrificada com pó bioabsorvível, ambidestra, não estéril e de uso único, indicada para procedimentos não cirúrgicos. Comprimento de cerca de 240 mm e largura de palma entre 95 e 105 mm. Padrão de qualidade 1.5 AQL."
+    "description": "Luva de procedimento Descarpack em látex 100% natural, tamanho G, caixa com 100 unidades (50 pares). Lubrificada com pó bioabsorvível, ambidestra, não estéril e de uso único, indicada para procedimentos não cirúrgicos. Comprimento de cerca de 240 mm e largura de palma entre 95 e 105 mm. Padrão de qualidade 1.5 AQL.",
+    "brand": "Descarpack"
   },
   "luva-de-procedimento-latex-c-100-media": {
-    "description": "Luva de procedimento descartável em látex de borracha natural, tamanho M, caixa com 100 unidades (50 pares). Modelo ambidestro com formato anatômico, não estéril e de uso único, indicada para procedimentos não cirúrgicos. Largura da palma entre 90 e 99 mm."
+    "description": "Luva de procedimento descartável em látex de borracha natural, tamanho M, caixa com 100 unidades (50 pares). Modelo ambidestro com formato anatômico, não estéril e de uso único, indicada para procedimentos não cirúrgicos. Largura da palma entre 90 e 99 mm.",
+    "brand": "Descarpack"
   },
   "lencol-descartavel-adultcare-grande-com-5": {
     "description": "Lençol descartável Adultcare tamanho G (Grande), medindo 148 cm x 82 cm com área absorvente de 80 cm x 47 cm. Possui núcleo com gel superabsorvente, barreira impermeável na parte de baixo, inibidor de odor e aloe vera na cobertura. Pacote com 5 unidades.",
@@ -299,6 +310,16 @@
     "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7322540016413-6-0-01KSMWWHYGGPFX68PF1Y7ZA2JR-sq.jpg"
   },
   "luva-nitrilica-sem-po-rosa-media": {
-    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283817605-0-01KSMY6FV0W3F2YCR1SMMM5VCE-sq.jpg"
+    "image": "https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/merchant/7898283817605-0-01KSMY6FV0W3F2YCR1SMMM5VCE-sq.jpg",
+    "brand": "Descarpack"
+  },
+  "luva-de-procedimento-vinil-s-po-m": {
+    "brand": "Descarpack"
+  },
+  "luva-de-procedimento-vinil-s-po-g": {
+    "brand": "Descarpack"
+  },
+  "luva-de-procedimento-latex-c-100-pequena": {
+    "brand": "Descarpack"
   }
 }

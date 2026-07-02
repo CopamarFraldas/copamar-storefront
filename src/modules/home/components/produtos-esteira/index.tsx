@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 /**
@@ -75,10 +76,14 @@ export default function ProdutosEsteira({
             className="shrink-0 transition-transform hover:scale-105"
             style={{ marginRight: 8 }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            {/* next/image #101: o slot é um quadrado fixo de {altura}px, mas as
+                fontes são as fotos CHEIAS do R2 (tinha até 379KB) — o optimizer
+                serve o thumb em AVIF/WebP no tamanho certo, com lazy-load. */}
+            <Image
               src={p.img}
               alt={p.nome}
+              width={altura}
+              height={altura}
               draggable={false}
               className="rounded-rounded bg-white object-contain p-1 shadow-md ring-1 ring-black/5"
               style={{ height: altura, width: altura }}

@@ -1,6 +1,7 @@
 "use client"
 
 import { useReducer, useState } from "react"
+import Image from "next/image"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Palco360 from "./palco-360"
@@ -207,8 +208,9 @@ function LinhaProduto({ p, destaque }: { p: Produto; destaque?: boolean }) {
           : "border-copamar-primary/10 hover:border-copamar-primary/30"
       }`}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={p.poster} alt="" className="h-12 w-12 shrink-0 rounded-base bg-white object-contain" />
+      {/* next/image #101: poster vem cheio do R2/Magento; slot fixo de 48px →
+          thumb otimizado + lazy, sem mudar o layout */}
+      <Image src={p.poster} alt="" width={48} height={48} className="h-12 w-12 shrink-0 rounded-base bg-white object-contain" />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium text-copamar-primary">
           {p.titulo}

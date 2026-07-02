@@ -17,6 +17,7 @@ import SecoesProduto from "@modules/products/components/secoes-produto"
 import BeneficiosCompra from "@modules/products/components/beneficios-compra"
 import SeloAbsorcao from "@modules/common/components/selo-absorcao"
 import Spin360 from "@modules/products/components/spin-360"
+import { Ga4ViewItem } from "@modules/common/components/ga4-ecommerce"
 import { getProductPrice } from "@lib/util/get-product-price"
 
 type ProductTemplateProps = {
@@ -46,6 +47,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     <>
       {/* breadcrumb visível: caminho de volta pra categoria (#54 linking) */}
       <BreadcrumbPdp product={product} />
+      {/* GA4 view_item (funil e-commerce, auditoria 02/07) */}
+      <Ga4ViewItem product={product} />
       {/* ORDEM MOBILE (Marco 07/06) = ORDEM DO DOM via flex-col + order:
           título → imagens → comprar/CEP → descrição.
           DESKTOP = 3 ZONAS estilo Amazon (Marco 09/06): ESQUERDA = galeria + 360

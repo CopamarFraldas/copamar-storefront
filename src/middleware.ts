@@ -116,8 +116,13 @@ export async function middleware(request: NextRequest) {
 
   const countryCode = regionMap && (await getCountryCode(request, regionMap))
 
+  // Igualdade EXATA do 1º segmento vs o countryCode válido. O `.includes()`
+  // herdado do starter fazia "/brasil".includes("br") === true → qualquer URL
+  // cujo 1º segmento CONTÉM o código passava reto e renderizava a HOME em
+  // soft-200 indexável (confirmado em produção nas .html lixo do Magento).
   const urlHasCountryCode =
-    countryCode && request.nextUrl.pathname.split("/")[1].includes(countryCode)
+    countryCode &&
+    request.nextUrl.pathname.split("/")[1]?.toLowerCase() === countryCode
 
   // if one of the country codes is in the url and the cache id is set, return next
   if (urlHasCountryCode && cacheIdCookie) {
@@ -137,6 +142,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // check if the url is a static asset
+  // ⚠️ o bypass do "." TEM que ficar: assets reais de /public (ex.
+  // /produtos/tena/*.jpg) passam pelo middleware e um 308 pra /br/... quebraria
+  // as imagens. O efeito colateral (lixo tipo /pagina-velha.html caía no route
+  // [countryCode] e virava HOME em soft-200) é tratado no app router:
+  // src/app/[countryCode]/layout.tsx valida o código e dá notFound() → 404 real.
   if (request.nextUrl.pathname.includes(".")) {
     return NextResponse.next()
   }

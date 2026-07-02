@@ -2,6 +2,7 @@ import { retrieveOrder } from "@lib/data/orders"
 import GcrOptin from "@modules/order/components/gcr-optin"
 import MarketingConsentRegister from "@modules/order/components/marketing-consent-register"
 import GoogleAdsConversion from "@modules/order/components/google-ads-conversion"
+import { Ga4Purchase } from "@modules/common/components/ga4-ecommerce"
 import OrderCompletedTemplate from "@modules/order/templates/order-completed-template"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
@@ -64,6 +65,9 @@ export default async function OrderConfirmedPage(props: Props) {
         }
         newCustomer={novo}
       />
+      {/* GA4 purchase (funil e-commerce, auditoria 02/07): items[] + mesmo
+          transaction_id da conversão do Ads (display_id), dedup por pedido */}
+      <Ga4Purchase order={order} />
       {/* opt-in do Google Customer Reviews (garimpo #7): mantém a coleta de
           seller ratings viva pós-cutover. Gate: NEXT_PUBLIC_GCR_OPTIN */}
       <GcrOptin

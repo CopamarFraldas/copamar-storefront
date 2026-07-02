@@ -81,6 +81,21 @@ export default function GoogleAdsTag() {
             analytics_storage: 'denied',
             wait_for_update: 500
           });
+          // recorrente que JÁ decidiu no banner: aplica a escolha salva AQUI
+          // (inline, antes do gtag.js) — o update do useEffect chega pós-hydration
+          // e o primeiro hit saía denied mesmo pra quem aceitou (auditoria 02/07)
+          try {
+            var salvo = JSON.parse(localStorage.getItem('${CONSENT_KEY}'));
+            if (salvo) {
+              var mkt = salvo.marketing ? 'granted' : 'denied';
+              gtag('consent', 'update', {
+                ad_storage: mkt,
+                ad_user_data: mkt,
+                ad_personalization: mkt,
+                analytics_storage: salvo.analytics ? 'granted' : 'denied'
+              });
+            }
+          } catch (e) { /* sem decisão salva / storage bloqueado */ }
           gtag('js', new Date());
           ${ADS_LIVE || !LIVE ? `gtag('config', '${GADS_ID}');` : ""}
           ${GA4_ID && (GA4_LIVE || !LIVE) ? `gtag('config', '${GA4_ID}');` : ""}
