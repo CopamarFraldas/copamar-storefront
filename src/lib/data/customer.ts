@@ -5,6 +5,7 @@ import { LOGIN_MIGRADO, SENHA_REDEFINIDA, TOKEN_EXPIRADO, CPF_JA_CADASTRADO, EMA
 import medusaError from "@lib/util/medusa-error"
 import { isValidCpf, isValidCnpj, isValidCpfOrCnpj } from "@lib/util/cpf"
 import { sanitizaEndereco } from "@lib/util/endereco"
+import { validaTelefoneOpcional } from "@lib/util/telefone"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -191,6 +192,21 @@ export async function signupAndSetAddress(
       !((formData.get("fiscal_razao_social") as string) || "").trim()
     ) {
       return "Informe a razão social da empresa para a nota fiscal."
+    }
+  }
+
+  // TELEFONE COM DDD (jul/26, QDB): pré-valida ANTES do signup pelo mesmo
+  // motivo do doc fiscal acima — telefone inválido não pode criar conta órfã
+  // (o reenvio corrigido cairia em "e-mail já existe"). O `pattern` do input
+  // segura isso no client; aqui é o backstop. setAddresses revalida depois.
+  {
+    const foneErr =
+      validaTelefoneOpcional(
+        String(formData.get("shipping_address.phone") || "")
+      ) ||
+      validaTelefoneOpcional(String(formData.get("billing_address.phone") || ""))
+    if (foneErr) {
+      return foneErr
     }
   }
 
@@ -395,6 +411,16 @@ export const addCustomerAddress = async (
     numero: (formData.get("numero") as string) || "",
     complemento: (formData.get("address_2") as string) || "",
   })
+  // Redesign QDB (jul/26): título vira o NOME do endereço salvo (address_name,
+  // campo nativo do customer address no Medusa v2) + tipo de local no metadata
+  // (chaves aditivas — bling-push continua lendo logradouro/numero/bairro).
+  const titulo = ((formData.get("endereco_titulo") as string) || "").trim()
+  const tipoLocal = ((formData.get("tipo_local") as string) || "").trim()
+  // telefone com DDD quando preenchido (backstop do pattern client — jul/26)
+  const foneErr = validaTelefoneOpcional((formData.get("phone") as string) || "")
+  if (foneErr) {
+    return { success: false, error: foneErr }
+  }
   const address = {
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
@@ -409,7 +435,8 @@ export const addCustomerAddress = async (
     phone: formData.get("phone") as string,
     is_default_billing: isDefaultBilling,
     is_default_shipping: isDefaultShipping,
-    metadata: { logradouro, numero, bairro },
+    address_name: titulo || undefined,
+    metadata: { logradouro, numero, bairro, titulo, tipo_local: tipoLocal },
   }
 
   const headers = {
@@ -465,6 +492,19 @@ export const updateCustomerAddress = async (
     numero: (formData.get("numero") as string) || "",
     complemento: (formData.get("address_2") as string) || "",
   })
+  // título/tipo do redesign QDB (jul/26) — address_name nativo + metadata.
+  // SÓ mexe quando o form ENVIA os campos (formData.has): o form de cobrança
+  // do perfil (profile-billing-address) não os tem e não pode apagar o título
+  // de quem salvou pelo form novo. `titulo || null` permite LIMPAR na edição.
+  const temTitulo = formData.has("endereco_titulo")
+  const temTipo = formData.has("tipo_local")
+  const titulo = ((formData.get("endereco_titulo") as string) || "").trim()
+  const tipoLocal = ((formData.get("tipo_local") as string) || "").trim()
+  // telefone com DDD quando preenchido (backstop do pattern client — jul/26)
+  const foneErr = validaTelefoneOpcional((formData.get("phone") as string) || "")
+  if (foneErr) {
+    return { success: false, error: foneErr }
+  }
   const address = {
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
@@ -475,7 +515,14 @@ export const updateCustomerAddress = async (
     postal_code: formData.get("postal_code") as string,
     province: formData.get("province") as string,
     country_code: formData.get("country_code") as string,
-    metadata: { logradouro, numero, bairro },
+    ...(temTitulo ? { address_name: titulo || null } : {}),
+    metadata: {
+      logradouro,
+      numero,
+      bairro,
+      ...(temTitulo ? { titulo } : {}),
+      ...(temTipo ? { tipo_local: tipoLocal } : {}),
+    },
   } as HttpTypes.StoreUpdateCustomerAddress
 
   const phone = formData.get("phone") as string

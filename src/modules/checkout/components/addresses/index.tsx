@@ -78,6 +78,9 @@ const Addresses = ({
               checked={sameAsBilling}
               onChange={toggleSameAsBilling}
               cart={cart}
+              // Ordem QDB (jul/26): CPF/CNPJ entre Sobrenome e Telefone. O bloco
+              // continua dentro do MESMO <form> — os names do FormData não mudam.
+              fiscalSlot={<IdentificacaoFiscal cart={cart} customer={customer} />}
             />
 
             {!sameAsBilling && (
@@ -92,8 +95,6 @@ const Addresses = ({
                 <BillingAddress cart={cart} customer={customer} />
               </div>
             )}
-
-            <IdentificacaoFiscal cart={cart} customer={customer} />
 
             {/* Opt-in de marketing (#97) — DESMARCADO por padrão (LGPD) */}
             <label className="flex items-start gap-x-2 mt-6 text-small-regular text-ui-fg-subtle select-none cursor-pointer">

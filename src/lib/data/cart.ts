@@ -4,6 +4,7 @@ import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { isValidCpf, isValidCnpj } from "@lib/util/cpf"
 import { sanitizaEndereco } from "@lib/util/endereco"
+import { validaTelefoneOpcional } from "@lib/util/telefone"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -406,6 +407,13 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         numero: String(formData.get(`${p}.numero`) || ""),
         complemento: String(formData.get(`${p}.address_2`) || ""),
       })
+      // Redesign QDB (jul/26): título do endereço ("Casa da mãe") e tipo de
+      // local (Apartamento/Comercial/…) viajam no metadata do address — fluem
+      // pro pedido (logística/rota do Dedé). Chaves ADITIVAS: o bling-push
+      // continua lendo só logradouro/numero/bairro. Sempre presentes (mesmo
+      // vazias) pra sobrescrever valor antigo caso o metadata seja mesclado.
+      const titulo = String(formData.get(`${p}.endereco_titulo`) || "").trim()
+      const tipoLocal = String(formData.get(`${p}.tipo_local`) || "").trim()
       return {
         first_name: formData.get(`${p}.first_name`),
         last_name: formData.get(`${p}.last_name`),
@@ -417,8 +425,20 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         country_code: formData.get(`${p}.country_code`),
         province: formData.get(`${p}.province`),
         phone: formData.get(`${p}.phone`),
-        metadata: { logradouro, numero, bairro },
+        metadata: { logradouro, numero, bairro, titulo, tipo_local: tipoLocal },
       }
+    }
+
+    // TELEFONE COM DDD (jul/26, QDB): caso real "998590034" (9 dígitos, sem
+    // DDD) passou e derrubou o pedido no ERP. Preenchido → exige 10-11 dígitos
+    // com DDD; vazio continua aceito (contrato inalterado). Backstop do
+    // pattern client-side (o `pattern` do input é só client). Cobrança ausente
+    // (same_as_billing) vem null → "" → passa.
+    const foneErr =
+      validaTelefoneOpcional(String(formData.get("shipping_address.phone") || "")) ||
+      validaTelefoneOpcional(String(formData.get("billing_address.phone") || ""))
+    if (foneErr) {
+      return foneErr
     }
 
     const data = {

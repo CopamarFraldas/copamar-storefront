@@ -1,4 +1,4 @@
-import { Label } from "@medusajs/ui"
+import { Label, clx } from "@medusajs/ui"
 import React, { useEffect, useImperativeHandle, useState } from "react"
 
 import Eye from "@modules/common/icons/eye"
@@ -13,10 +13,18 @@ type InputProps = Omit<
   touched?: Record<string, unknown>
   name: string
   topLabel?: string
+  /**
+   * Campo preenchido automaticamente (ex.: pelo CEP/ViaCEP) e travado (jul/26,
+   * UX QDB). Usa readOnly + aria-disabled — NUNCA `disabled`, porque input
+   * disabled NÃO entra no FormData do submit nativo (as server actions leem o
+   * form pelo name). Visual acinzentado com tokens do design system
+   * (bg-ui-bg-disabled/text-ui-fg-subtle) pra não quebrar AA no dark mode.
+   */
+  travado?: boolean
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ type, name, label, touched, required, topLabel, ...props }, ref) => {
+  ({ type, name, label, touched, required, topLabel, travado, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null)
     const [showPassword, setShowPassword] = useState(false)
     const [inputType, setInputType] = useState(type)
@@ -45,8 +53,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={name}
             placeholder=" "
             required={required}
-            className="pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-ui-bg-field border rounded-md appearance-none focus:outline-none focus:ring-0 focus:shadow-borders-interactive-with-active border-ui-border-base hover:bg-ui-bg-field-hover"
+            className={clx(
+              "pt-4 pb-1 block w-full h-11 px-4 mt-0 border rounded-md appearance-none focus:outline-none focus:ring-0 border-ui-border-base",
+              travado
+                ? "bg-ui-bg-disabled text-ui-fg-subtle cursor-default"
+                : "bg-ui-bg-field hover:bg-ui-bg-field-hover focus:shadow-borders-interactive-with-active"
+            )}
             {...props}
+            readOnly={travado ? true : props.readOnly}
+            aria-disabled={travado || undefined}
+            tabIndex={travado ? -1 : props.tabIndex}
             ref={inputRef}
           />
           <label

@@ -17,6 +17,7 @@ import {
 } from "@lib/data/customer"
 import EnderecoFields from "./endereco-fields"
 import { derivaEndereco } from "@lib/util/endereco"
+import { maskTelefoneBr, TELEFONE_MSG } from "@lib/util/telefone"
 
 type EditAddressProps = {
   region: HttpTypes.StoreRegion
@@ -81,6 +82,15 @@ const EditAddress: React.FC<EditAddressProps> = ({
           >
             {address.first_name} {address.last_name}
           </Heading>
+          {/* título do endereço (QDB jul/26) — "Casa da mãe", "Trabalho"… */}
+          {address.address_name && (
+            <Text
+              className="txt-compact-small text-ui-fg-subtle"
+              data-testid="address-title"
+            >
+              {address.address_name}
+            </Text>
+          )}
           {address.company && (
             <Text
               className="txt-compact-small text-ui-fg-base"
@@ -156,6 +166,27 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 defaultValue={address.company || undefined}
                 data-testid="company-input"
               />
+              {/* Ordem QDB (jul/26): telefone (mascarado, DDD obrigatório se
+                  preenchido) ANTES do endereço. Edição de endereço existente
+                  NÃO passa pelo fluxo progressivo (EnderecoFields detecta os
+                  defaults e mostra tudo editável). */}
+              <Input
+                label="Telefone (com DDD)"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
+                defaultValue={maskTelefoneBr(address.phone || "") || undefined}
+                onChange={(e) => {
+                  e.target.value = maskTelefoneBr(e.target.value)
+                }}
+                onInvalid={(e) =>
+                  e.currentTarget.setCustomValidity(TELEFONE_MSG)
+                }
+                onInput={(e) => e.currentTarget.setCustomValidity("")}
+                data-testid="phone-input"
+              />
               <EnderecoFields
                 defaults={{
                   postal_code: address.postal_code || "",
@@ -168,23 +199,22 @@ const EditAddress: React.FC<EditAddressProps> = ({
                   address_2: derivaEndereco(address).complemento,
                   city: address.city || "",
                   province: address.province || "",
+                  // título/tipo do redesign QDB (jul/26)
+                  endereco_titulo:
+                    (address as any).address_name ||
+                    String((address.metadata as any)?.titulo || ""),
+                  tipo_local: String((address.metadata as any)?.tipo_local || ""),
                 }}
-              />
-              <CountrySelect
-                name="country_code"
-                region={region}
-                required
-                autoComplete="country"
-                defaultValue={address.country_code || undefined}
-                data-testid="country-select"
-              />
-              <Input
-                label="Telefone"
-                name="phone"
-                autoComplete="phone"
-                defaultValue={address.phone || undefined}
-                data-testid="phone-input"
-              />
+              >
+                <CountrySelect
+                  name="country_code"
+                  region={region}
+                  required
+                  autoComplete="country"
+                  defaultValue={address.country_code || undefined}
+                  data-testid="country-select"
+                />
+              </EnderecoFields>
             </div>
             {formState.error && (
               <div className="text-rose-500 text-small-regular py-2">

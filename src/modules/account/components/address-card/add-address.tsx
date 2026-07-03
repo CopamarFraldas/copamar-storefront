@@ -11,6 +11,7 @@ import Modal from "@modules/common/components/modal"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import { HttpTypes } from "@medusajs/types"
 import { addCustomerAddress } from "@lib/data/customer"
+import { maskTelefoneBr, TELEFONE_MSG } from "@lib/util/telefone"
 import EnderecoFields from "./endereco-fields"
 
 const AddAddress = ({
@@ -87,20 +88,34 @@ const AddAddress = ({
                 autoComplete="organization"
                 data-testid="company-input"
               />
-              <EnderecoFields />
-              <CountrySelect
-                region={region}
-                name="country_code"
-                required
-                autoComplete="country"
-                data-testid="country-select"
-              />
+              {/* Ordem QDB (jul/26): telefone (mascarado, DDD obrigatório se
+                  preenchido) ANTES do CEP; endereço revelado pelo CEP. Input
+                  não-controlado → máscara aplicada direto no e.target.value. */}
               <Input
-                label="Telefone"
+                label="Telefone (com DDD)"
                 name="phone"
-                autoComplete="phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
+                onChange={(e) => {
+                  e.target.value = maskTelefoneBr(e.target.value)
+                }}
+                onInvalid={(e) =>
+                  e.currentTarget.setCustomValidity(TELEFONE_MSG)
+                }
+                onInput={(e) => e.currentTarget.setCustomValidity("")}
                 data-testid="phone-input"
               />
+              <EnderecoFields>
+                <CountrySelect
+                  region={region}
+                  name="country_code"
+                  required
+                  autoComplete="country"
+                  data-testid="country-select"
+                />
+              </EnderecoFields>
             </div>
             {formState.error && (
               <div

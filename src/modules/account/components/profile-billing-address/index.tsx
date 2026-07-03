@@ -8,6 +8,7 @@ import NativeSelect from "@modules/common/components/native-select"
 import AccountInfo from "../account-info"
 import { HttpTypes } from "@medusajs/types"
 import { addCustomerAddress, updateCustomerAddress } from "@lib/data/customer"
+import { maskTelefoneBr, TELEFONE_MSG } from "@lib/util/telefone"
 
 type MyInformationProps = {
   customer: HttpTypes.StoreCustomer
@@ -123,13 +124,24 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
             defaultValue={billingAddress?.company || undefined}
             data-testid="billing-company-input"
           />
+          {/* máscara BR + DDD obrigatório (jul/26) — mesma validação do
+              checkout; a server action valida de novo no submit */}
           <Input
-            label="Telefone"
+            label="Telefone (com DDD)"
             name="phone"
-            type="phone"
-            autoComplete="phone"
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
             required
-            defaultValue={billingAddress?.phone ?? customer?.phone ?? ""}
+            pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
+            defaultValue={maskTelefoneBr(
+              billingAddress?.phone ?? customer?.phone ?? ""
+            )}
+            onChange={(e) => {
+              e.target.value = maskTelefoneBr(e.target.value)
+            }}
+            onInvalid={(e) => e.currentTarget.setCustomValidity(TELEFONE_MSG)}
+            onInput={(e) => e.currentTarget.setCustomValidity("")}
             data-testid="billing-phone-input"
           />
           <Input

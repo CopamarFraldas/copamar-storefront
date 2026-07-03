@@ -2,26 +2,42 @@ import { HttpTypes } from "@medusajs/types"
 import { Container } from "@medusajs/ui"
 import Checkbox from "@modules/common/components/checkbox"
 import Input from "@modules/common/components/input"
+import EnderecoCampos from "@modules/common/components/endereco-campos"
 import { mapKeys } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
-import { fetchCep, isValidCep } from "@lib/util/viacep"
+import { useCepEndereco } from "@lib/hooks/use-cep-endereco"
+import { maskTelefoneBr, TELEFONE_MSG } from "@lib/util/telefone"
 import { derivaEndereco } from "@lib/util/endereco"
 
+/**
+ * Passo de endereço do checkout — redesign "Quem Disse Berenice" (jul/26):
+ * pessoais primeiro (Nome, Sobrenome, CPF/NF via fiscalSlot, Telefone com
+ * máscara, E-mail), depois Título do endereço + Tipo de local + CEP; os campos
+ * de endereço só aparecem depois do CEP (preenchidos pelo ViaCEP e travados,
+ * foco no Número). Endereço JÁ EXISTENTE no carrinho ou selecionado no
+ * AddressSelect NÃO passa pelo fluxo progressivo (aparece completo/editável).
+ * Os names dos inputs são os MESMOS de sempre — setAddresses/bling-push intactos.
+ */
 const ShippingAddress = ({
   customer,
   cart,
   checked,
   onChange,
+  fiscalSlot,
 }: {
   customer: HttpTypes.StoreCustomer | null
   cart: HttpTypes.StoreCart | null
   checked: boolean
   onChange: () => void
+  /** bloco "Dados para a nota fiscal" (CPF/CNPJ) — renderiza entre Sobrenome e
+   *  Telefone (ordem QDB), continuando dentro do MESMO <form>/FormData */
+  fiscalSlot?: React.ReactNode
 }) => {
   const sa: any = cart?.shipping_address || {}
   const saE = derivaEndereco(sa) // novo (metadata) OU migrado (address_1 mushed + bairro no address_2)
+  const saMd = (sa.metadata || {}) as Record<string, any>
   const [formData, setFormData] = useState<Record<string, any>>({
     "shipping_address.first_name": sa.first_name || "",
     "shipping_address.last_name": sa.last_name || "",
@@ -35,8 +51,29 @@ const ShippingAddress = ({
     "shipping_address.city": sa.city || "",
     "shipping_address.country_code": sa.country_code || "",
     "shipping_address.province": sa.province || "",
-    "shipping_address.phone": sa.phone || "",
+    // telefone entra já mascarado — a máscara também normaliza legado sem formato
+    "shipping_address.phone": maskTelefoneBr(sa.phone || ""),
+    // título do endereço + tipo de local (QDB itens 7/8) — viajam no metadata
+    "shipping_address.endereco_titulo": String(saMd.titulo || ""),
+    "shipping_address.tipo_local": String(saMd.tipo_local || ""),
     email: cart?.email || "",
+  })
+
+  // Fluxo progressivo por CEP: SÓ pra endereço novo. Carrinho que já tem
+  // endereço (voltou pra editar / migrado) entra em modo completo.
+  const cepCtl = useCepEndereco({
+    completoInicial: !!(sa.postal_code || sa.address_1),
+    aplicar: (r) =>
+      setFormData((prev: Record<string, any>) => ({
+        ...prev,
+        "shipping_address.address_1":
+          r.logradouro || prev["shipping_address.address_1"],
+        "shipping_address.bairro": r.bairro || prev["shipping_address.bairro"],
+        "shipping_address.city": r.localidade || prev["shipping_address.city"],
+        "shipping_address.province": r.uf || prev["shipping_address.province"],
+        "shipping_address.country_code":
+          prev["shipping_address.country_code"] || "br",
+      })),
   })
 
   const countriesInRegion = useMemo(
@@ -57,7 +94,7 @@ const ShippingAddress = ({
     address?: HttpTypes.StoreCartAddress,
     email?: string
   ) => {
-    address &&
+    if (address) {
       setFormData((prevState: Record<string, any>) => ({
         ...prevState,
         "shipping_address.first_name": address?.first_name || "",
@@ -71,8 +108,23 @@ const ShippingAddress = ({
         "shipping_address.city": address?.city || "",
         "shipping_address.country_code": address?.country_code || "",
         "shipping_address.province": address?.province || "",
-        "shipping_address.phone": address?.phone || "",
+        "shipping_address.phone": maskTelefoneBr(address?.phone || ""),
+        // endereço salvo da conta traz address_name; carrinho traz metadata.titulo
+        "shipping_address.endereco_titulo": String(
+          (address as any)?.address_name ||
+            (address?.metadata as any)?.titulo ||
+            ""
+        ),
+        "shipping_address.tipo_local": String(
+          (address?.metadata as any)?.tipo_local || ""
+        ),
       }))
+      // endereço salvo/selecionado NÃO passa pelo fluxo progressivo: mostra
+      // tudo preenchido e editável, como sempre foi (guarda-rail do redesign)
+      if (address.postal_code || address.address_1) {
+        cepCtl.marcarCompleto()
+      }
+    }
 
     email &&
       setFormData((prevState: Record<string, any>) => ({
@@ -90,6 +142,7 @@ const ShippingAddress = ({
     if (cart && !cart.email && customer?.email) {
       setFormAddress(undefined, customer.email)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart]) // Add cart as a dependency
 
   const handleChange = (
@@ -103,24 +156,9 @@ const ShippingAddress = ({
     })
   }
 
-  // Auto-preenche o endereço pelo CEP (ViaCEP). Só dispara com 8 dígitos; em
-  // CEP inexistente/falha, não mexe nos campos (cliente preenche manual).
-  const [cepLoading, setCepLoading] = useState(false)
-  const handleCepLookup = async (raw: string) => {
-    if (!isValidCep(raw)) return
-    setCepLoading(true)
-    const r = await fetchCep(raw)
-    setCepLoading(false)
-    if (!r) return
-    setFormData((prev: Record<string, any>) => ({
-      ...prev,
-      "shipping_address.address_1": r.logradouro || prev["shipping_address.address_1"],
-      "shipping_address.bairro": r.bairro || prev["shipping_address.bairro"],
-      "shipping_address.city": r.localidade || prev["shipping_address.city"],
-      "shipping_address.province": r.uf || prev["shipping_address.province"],
-      "shipping_address.country_code": prev["shipping_address.country_code"] || "br",
-    }))
-  }
+  // usado pelo EnderecoCampos (título/tipo/cep/rua/número/bairro/compl/cidade/uf)
+  const setCampo = (nomeInput: string, valor: string) =>
+    setFormData((prev: Record<string, any>) => ({ ...prev, [nomeInput]: valor }))
 
   // opção de criar conta (define senha) durante o checkout — só p/ não logado
   const [createAccount, setCreateAccount] = useState(false)
@@ -143,113 +181,119 @@ const ShippingAddress = ({
           />
         </Container>
       )}
-      <div className="mb-4">
-        <Input
-          label="CEP"
-          name="shipping_address.postal_code"
-          autoComplete="postal-code"
-          value={formData["shipping_address.postal_code"]}
-          onChange={(e) => {
-            handleChange(e)
-            handleCepLookup(e.target.value)
+      <div className="flex flex-col gap-y-4">
+        {/* 1. Pessoais: Nome, Sobrenome */}
+        <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
+          <Input
+            label="Nome"
+            name="shipping_address.first_name"
+            autoComplete="given-name"
+            value={formData["shipping_address.first_name"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-first-name-input"
+          />
+          <Input
+            label="Sobrenome"
+            name="shipping_address.last_name"
+            autoComplete="family-name"
+            value={formData["shipping_address.last_name"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-last-name-input"
+          />
+        </div>
+
+        {/* 2. CPF/CNPJ (identificação fiscal) — mesma posição da ordem QDB */}
+        {fiscalSlot}
+
+        {/* 3. Telefone (máscara BR + DDD obrigatório quando preenchido) e E-mail */}
+        <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
+          <Input
+            label="Telefone (com DDD)"
+            name="shipping_address.phone"
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
+            pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
+            value={formData["shipping_address.phone"]}
+            onChange={(e) =>
+              setCampo(e.target.name, maskTelefoneBr(e.target.value))
+            }
+            onInvalid={(e) => e.currentTarget.setCustomValidity(TELEFONE_MSG)}
+            onInput={(e) => e.currentTarget.setCustomValidity("")}
+            data-testid="shipping-phone-input"
+          />
+          <Input
+            label="E-mail"
+            name="email"
+            type="email"
+            title="Digite um e-mail válido."
+            autoComplete="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            data-testid="shipping-email-input"
+          />
+        </div>
+
+        {/* 4. Título do endereço → Tipo de local → CEP → revelação progressiva */}
+        <EnderecoCampos
+          nomes={{
+            titulo: "shipping_address.endereco_titulo",
+            tipoLocal: "shipping_address.tipo_local",
+            cep: "shipping_address.postal_code",
+            rua: "shipping_address.address_1",
+            numero: "shipping_address.numero",
+            bairro: "shipping_address.bairro",
+            complemento: "shipping_address.address_2",
+            cidade: "shipping_address.city",
+            uf: "shipping_address.province",
           }}
-          required
-          data-testid="shipping-postal-code-input"
-        />
-        <span className="text-xs text-ui-fg-subtle mt-1 block">
-          {cepLoading
-            ? "Buscando endereço…"
-            : "Digite o CEP que preenchemos o endereço pra você."}
-        </span>
-      </div>
-      <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
-        <Input
-          label="Nome"
-          name="shipping_address.first_name"
-          autoComplete="given-name"
-          value={formData["shipping_address.first_name"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-first-name-input"
-        />
-        <Input
-          label="Sobrenome"
-          name="shipping_address.last_name"
-          autoComplete="family-name"
-          value={formData["shipping_address.last_name"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-last-name-input"
-        />
-        <Input
-          label="Endereço (só a rua, sem número)"
-          name="shipping_address.address_1"
-          autoComplete="address-line1"
-          value={formData["shipping_address.address_1"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-address-input"
-        />
-        <Input
-          label="Número (da rua, ex: 388)"
-          name="shipping_address.numero"
-          placeholder="ex: 388"
-          value={formData["shipping_address.numero"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-numero-input"
-        />
-        <Input
-          label="Bairro"
-          name="shipping_address.bairro"
-          value={formData["shipping_address.bairro"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-bairro-input"
-        />
-        <Input
-          label="Complemento — apto/bloco (ex: apto 21)"
-          name="shipping_address.address_2"
-          placeholder="ex: apto 21, bloco B"
-          autoComplete="address-line2"
-          value={formData["shipping_address.address_2"]}
-          onChange={handleChange}
-          data-testid="shipping-complemento-input"
-        />
-        <Input
-          label="Empresa"
-          name="shipping_address.company"
-          value={formData["shipping_address.company"]}
-          onChange={handleChange}
-          autoComplete="organization"
-          data-testid="shipping-company-input"
-        />
-        <Input
-          label="Cidade"
-          name="shipping_address.city"
-          autoComplete="address-level2"
-          value={formData["shipping_address.city"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-city-input"
-        />
-        <CountrySelect
-          name="shipping_address.country_code"
-          autoComplete="country"
-          region={cart?.region}
-          value={formData["shipping_address.country_code"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-country-select"
-        />
-        <Input
-          label="Estado"
-          name="shipping_address.province"
-          autoComplete="address-level1"
-          value={formData["shipping_address.province"]}
-          onChange={handleChange}
-          data-testid="shipping-province-input"
-        />
+          valores={{
+            titulo: formData["shipping_address.endereco_titulo"],
+            tipoLocal: formData["shipping_address.tipo_local"],
+            cep: formData["shipping_address.postal_code"],
+            rua: formData["shipping_address.address_1"],
+            numero: formData["shipping_address.numero"],
+            bairro: formData["shipping_address.bairro"],
+            complemento: formData["shipping_address.address_2"],
+            cidade: formData["shipping_address.city"],
+            uf: formData["shipping_address.province"],
+          }}
+          tids={{
+            titulo: "shipping-endereco-titulo-input",
+            tipoLocal: "shipping-tipo-local",
+            cep: "shipping-postal-code-input",
+            rua: "shipping-address-input",
+            numero: "shipping-numero-input",
+            bairro: "shipping-bairro-input",
+            complemento: "shipping-complemento-input",
+            cidade: "shipping-city-input",
+            uf: "shipping-province-input",
+            corrigirCep: "shipping-corrigir-cep",
+          }}
+          onCampo={setCampo}
+          cep={cepCtl}
+        >
+          <Input
+            label="Empresa"
+            name="shipping_address.company"
+            value={formData["shipping_address.company"]}
+            onChange={handleChange}
+            autoComplete="organization"
+            data-testid="shipping-company-input"
+          />
+          <CountrySelect
+            name="shipping_address.country_code"
+            autoComplete="country"
+            region={cart?.region}
+            value={formData["shipping_address.country_code"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-country-select"
+          />
+        </EnderecoCampos>
       </div>
       <div className="my-8">
         <Checkbox
@@ -258,27 +302,6 @@ const ShippingAddress = ({
           checked={checked}
           onChange={onChange}
           data-testid="billing-address-checkbox"
-        />
-      </div>
-      <div className="grid grid-cols-1 small:grid-cols-2 gap-4 mb-4">
-        <Input
-          label="E-mail"
-          name="email"
-          type="email"
-          title="Digite um e-mail válido."
-          autoComplete="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          data-testid="shipping-email-input"
-        />
-        <Input
-          label="Telefone"
-          name="shipping_address.phone"
-          autoComplete="tel"
-          value={formData["shipping_address.phone"]}
-          onChange={handleChange}
-          data-testid="shipping-phone-input"
         />
       </div>
       {!customer && (
