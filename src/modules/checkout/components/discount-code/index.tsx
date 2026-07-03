@@ -60,8 +60,11 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
       return
     }
     const input = document.getElementById("promotion-input") as HTMLInputElement
+    // NÃO-CUMULATIVO (Marco 03/07): cupom manual entra, PIX5 automático SAI —
+    // cobre a ordem "PIX escolhido primeiro, cupom depois" (o setDescontoPix
+    // cobre a inversa). Sem isso, ANIVER10 + PIX5 = 15% no PIX.
     const codes = promotions
-      .filter((p) => p.code !== undefined)
+      .filter((p) => p.code !== undefined && p.code !== "PIX5")
       .map((p) => p.code!)
     codes.push(code.toString())
 

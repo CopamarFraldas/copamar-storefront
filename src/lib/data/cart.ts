@@ -308,9 +308,14 @@ export async function setDescontoPix(ativo: boolean) {
   const codes: string[] = ((cart as any)?.promotions || [])
     .map((p: any) => p?.code)
     .filter((c: any): c is string => typeof c === "string" && !!c)
+  // NÃO-CUMULATIVO (Marco 03/07, cupom ANIVER10): com CUPOM MANUAL no carrinho
+  // o PIX5 automático não entra (e sai se já estava) — senão o aniversário de
+  // 10% virava 15% no PIX. Cupom manual = qualquer código ≠ PIX5.
+  const temCupomManual = codes.some((c) => c !== "PIX5")
+  const querPix5 = ativo && !temCupomManual
   const tem = codes.includes("PIX5")
-  if (ativo === tem) return
-  const novos = ativo ? [...codes, "PIX5"] : codes.filter((c) => c !== "PIX5")
+  if (querPix5 === tem) return
+  const novos = querPix5 ? [...codes, "PIX5"] : codes.filter((c) => c !== "PIX5")
   await applyPromotions(novos)
 }
 
