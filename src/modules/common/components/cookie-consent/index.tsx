@@ -91,6 +91,36 @@ const CookieConsent = () => {
     // só aparece se ainda não houver decisão registrada
     if (!lsGet(CONSENT_KEY)) {
       setVisivel(true)
+    } else {
+      // RE-SYNC do consentimento (03/07): os webhooks /consent e /track ficaram
+      // trancados no ORIGIN de staging desde o cutover — quem aceitou cookies em
+      // produção tem a decisão SÓ no navegador e o banco recusa os eventos
+      // ("sem_consentimento") pra sempre, porque o banner não reaparece. Aqui,
+      // 1x/dia, re-envia a decisão salva pro backend (upsert idempotente) e cura
+      // o histórico de todo mundo sem incomodar ninguém.
+      try {
+        const ultimo = Number(lsGet("copamar_consent_sync_ts") || 0)
+        if (Date.now() - ultimo > 24 * 60 * 60 * 1000) {
+          const c = JSON.parse(lsGet(CONSENT_KEY) || "{}") as Consent
+          fetch(CONSENT_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              uuid: getUuid(),
+              essencial: true,
+              analytics: !!c.analytics,
+              marketing: !!c.marketing,
+              versao: c.versao || VERSAO,
+            }),
+            keepalive: true,
+            credentials: "omit",
+            mode: "cors",
+          }).catch(() => {})
+          lsSet("copamar_consent_sync_ts", String(Date.now()))
+        }
+      } catch {
+        /* re-sync é best-effort */
+      }
     }
     // reabrir pelo link "Configurar cookies" do rodapé
     const abrir = () => {
