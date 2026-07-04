@@ -38,6 +38,21 @@ export default function ComprovanteEntrega({
   // câmera in-browser (não salva no celular — "falta memória" 11/06)
   const [cameraAberta, setCameraAberta] = useState(false)
   const [usarInputFile, setUsarInputFile] = useState(false)
+  // TRAVA DE DISTÂNCIA (Marco 04/07 — caso Myriam/Roseli: card errado confirmado
+  // a 11km do endereço): se o GPS do motorista está longe do pino da parada,
+  // pede um 2º toque explícito. NÃO bloqueia (pino do Nominatim erra em avenida
+  // longa — caso Monica 2,7km legítima) — só confirma a intenção.
+  const [confirmouLonge, setConfirmouLonge] = useState(false)
+  const distanciaM = (() => {
+    if (!gps || parada.dest_lat == null || parada.dest_long == null) return null
+    const dx = (gps.lat - parada.dest_lat) * 111320
+    const dy =
+      (gps.long - parada.dest_long) *
+      111320 *
+      Math.cos((parada.dest_lat * Math.PI) / 180)
+    return Math.round(Math.hypot(dx, dy))
+  })()
+  const longeDemais = distanciaM != null && distanciaM > 1500
 
   // captura GPS ao abrir (best-effort — se o cliente negar, segue sem)
   useEffect(() => {
@@ -58,6 +73,11 @@ export default function ComprovanteEntrega({
   }
 
   const confirmar = async () => {
+    // longe do pino e ainda sem o 2º toque → mostra o aviso e espera
+    if (longeDemais && !confirmouLonge) {
+      setConfirmouLonge(true)
+      return
+    }
     setSalvando(true)
     setErro("")
     const fd = new FormData()
@@ -164,9 +184,27 @@ export default function ComprovanteEntrega({
       </p>
       {erro && <p className="mt-1 text-center text-xs font-medium text-rose-600">{erro}</p>}
 
+      {/* aviso da trava de distância: só aparece após o 1º toque estando longe */}
+      {longeDemais && confirmouLonge && !salvando && (
+        <div className="mt-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-center">
+          <p className="text-sm font-bold text-amber-800">
+            ⚠️ Você está a {distanciaM! >= 1000 ? `${(distanciaM! / 1000).toFixed(1)} km` : `${distanciaM} m`} deste endereço
+          </p>
+          <p className="mt-1 text-xs text-amber-700">
+            {parada.endereco}
+          </p>
+          <p className="mt-1 text-xs font-semibold text-amber-800">
+            É essa entrega mesmo? Confira o nome do cliente no card antes de confirmar de novo.
+          </p>
+        </div>
+      )}
+
       <div className="mt-2 grid grid-cols-2 gap-2">
         <button
-          onClick={onCancelar}
+          onClick={() => {
+            setConfirmouLonge(false)
+            onCancelar()
+          }}
           disabled={salvando}
           className="rounded-xl bg-white py-3 text-sm font-semibold text-slate-500 active:scale-[0.98] disabled:opacity-50"
         >
@@ -175,9 +213,15 @@ export default function ComprovanteEntrega({
         <button
           onClick={confirmar}
           disabled={salvando}
-          className="rounded-xl bg-[#22c55e] py-3 text-sm font-bold text-white active:scale-[0.98] disabled:opacity-50"
+          className={`rounded-xl py-3 text-sm font-bold text-white active:scale-[0.98] disabled:opacity-50 ${
+            longeDemais && confirmouLonge ? "bg-amber-500" : "bg-[#22c55e]"
+          }`}
         >
-          {salvando ? "Salvando…" : "Confirmar entrega ✓"}
+          {salvando
+            ? "Salvando…"
+            : longeDemais && confirmouLonge
+              ? "Sim, é essa — confirmar ✓"
+              : "Confirmar entrega ✓"}
         </button>
       </div>
     </div>
