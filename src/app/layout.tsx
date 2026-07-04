@@ -84,8 +84,12 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           <main className="relative">{props.children}</main>
           <GlobalChrome />
           <IdentifyOnLogin />
-          {/* tracking on-site (LGPD): só roda com consentimento; carrega após interativo */}
-          <Script src="/copamar-track.js" strategy="afterInteractive" />
+          {/* tracking on-site (LGPD): só roda com consentimento. 04/07 (2º passe
+              LCP/TBT): afterInteractive → lazyOnload — o tracking não precisa
+              competir com o LCP/hidratação, carrega no idle após a página estar
+              interativa. Não é consent/GA4/Ads (esses ficam no GoogleAdsTag,
+              intactos), então nada de medição crítica é adiado. */}
+          <Script src="/copamar-track.js" strategy="lazyOnload" />
         </ThemeProvider>
       </body>
     </html>

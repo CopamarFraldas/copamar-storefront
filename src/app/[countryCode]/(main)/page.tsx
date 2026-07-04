@@ -1,8 +1,13 @@
 import { Metadata } from "next"
 
 import HeroConversao from "@modules/home/components/hero-conversao"
-import BussolaSection from "@modules/home/components/hero-bussola/bussola-section"
-import FreteCep from "@modules/shipping/components/frete-cep"
+// 04/07 (2º passe LCP/TBT): BussolaSection e FreteCep entram por wrappers
+// dynamic({ssr:false}) — ver comentários nos wrappers. BussolaSection tira
+// framer-motion do bundle inicial; FreteCep tira o JS da calculadora. Ambos
+// abaixo da dobra, sem valor de SEO. page.tsx é Server Component, por isso os
+// dynamic({ssr:false}) moram nos wrappers "use client", não aqui.
+import BussolaSection from "@modules/home/components/hero-bussola/bussola-section-lazy"
+import FreteCep from "@modules/shipping/components/frete-cep/frete-cep-lazy"
 import GuiaEscolha from "@modules/home/components/guia-escolha"
 import TrustStrip from "@modules/home/components/trust-strip"
 import FeaturedRail from "@modules/home/components/featured-rail"
