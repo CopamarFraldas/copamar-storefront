@@ -4,7 +4,7 @@ import Checkbox from "@modules/common/components/checkbox"
 import Input from "@modules/common/components/input"
 import EnderecoCampos from "@modules/common/components/endereco-campos"
 import { mapKeys } from "lodash"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
 import { useCepEndereco } from "@lib/hooks/use-cep-endereco"
@@ -167,6 +167,19 @@ const ShippingAddress = ({
   // opção de criar conta (define senha) durante o checkout — só p/ não logado
   const [createAccount, setCreateAccount] = useState(false)
 
+  // FIX deadlock (revisão 06/07): o telefone também muda PROGRAMATICAMENTE
+  // (AddressSelect/carrinho preenchem via setFormAddress, sem evento `input`,
+  // então o onInput que limpa o setCustomValidity nunca dispara). Sem limpar
+  // aqui, um submit com telefone vazio + escolher um endereço salvo deixava o
+  // customError grudado e o form travava com a mensagem velha. Limpa a cada
+  // mudança de valor — a validação nativa (required/pattern) reavalia no
+  // próximo submit e o onInvalid repõe a mensagem certa se ainda for inválido.
+  const foneRef = useRef<HTMLInputElement>(null)
+  const foneValor = formData["shipping_address.phone"]
+  useEffect(() => {
+    foneRef.current?.setCustomValidity("")
+  }, [foneValor])
+
   return (
     <>
       {customer && (addressesInRegion?.length || 0) > 0 && (
@@ -216,6 +229,7 @@ const ShippingAddress = ({
             e E-mail */}
         <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
           <Input
+            ref={foneRef}
             label="Telefone (com DDD)"
             name="shipping_address.phone"
             type="tel"

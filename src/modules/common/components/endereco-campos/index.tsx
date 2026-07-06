@@ -3,7 +3,7 @@
 import { clx } from "@medusajs/ui"
 import Input from "@modules/common/components/input"
 import { CepEnderecoControl } from "@lib/hooks/use-cep-endereco"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 /**
  * Campos de endereço no padrão "Quem Disse Berenice" (jul/26) — COMPARTILHADO
@@ -102,6 +102,17 @@ const EnderecoCampos = ({
   // erro visível "escolha o tipo de local" — acende quando o submit esbarra no
   // required do backstop nativo; apaga assim que o cliente escolhe um tipo
   const [tipoLocalErro, setTipoLocalErro] = useState(false)
+  // FIX deadlock (revisão 06/07): o valor do tipo_local muda por PROP (clique
+  // no chip / endereço salvo), NUNCA por evento `input` — o onInput do campo
+  // sr-only nunca dispara. Sem limpar o customError aqui, um submit sem tipo
+  // deixava setCustomValidity(MSG) grudado pra SEMPRE e o form nunca mais
+  // submetia, mesmo depois de escolher um chip.
+  const tipoLocalInputRef = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (valores.tipoLocal) {
+      tipoLocalInputRef.current?.setCustomValidity("")
+    }
+  }, [valores.tipoLocal])
   const complObrigatorio = TIPOS_COMPLEMENTO_OBRIGATORIO.has(tipo)
   const dicaCompl = DICA_COMPLEMENTO[tipo]
   const temTravas =
@@ -145,6 +156,7 @@ const EnderecoCampos = ({
           // validação, bloqueia o submit e ancora o balão junto dos botões.
           // MESMO name/valor de sempre (contrato do FormData intacto).
           <input
+            ref={tipoLocalInputRef}
             type="text"
             name={nomes.tipoLocal}
             value={valores.tipoLocal}
