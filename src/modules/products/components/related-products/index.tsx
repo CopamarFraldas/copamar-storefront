@@ -1,5 +1,6 @@
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getReviewsAggregates } from "@lib/data/reviews"
 import { HttpTypes } from "@medusajs/types"
 import Product from "../product-preview"
 import RelatedProductsCarousel from "./carousel"
@@ -41,6 +42,9 @@ export default async function RelatedProducts({
     return null
   }
 
+  // estrelinhas dos cards — agregados em LOTE (1 chamada pro trilho todo)
+  const reviewsAggs = await getReviewsAggregates(products.map((p) => p.id))
+
   return (
     <div className="product-page-constraint">
       <div className="flex flex-col items-center text-center mb-16">
@@ -57,7 +61,12 @@ export default async function RelatedProducts({
           mas pode recebê-los como children. */}
       <RelatedProductsCarousel>
         {products.map((p) => (
-          <Product key={p.id} region={region} product={p} />
+          <Product
+            key={p.id}
+            region={region}
+            product={p}
+            reviews={p.id ? reviewsAggs[p.id] : undefined}
+          />
         ))}
       </RelatedProductsCarousel>
     </div>

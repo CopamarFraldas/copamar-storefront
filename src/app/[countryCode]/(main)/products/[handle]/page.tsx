@@ -9,6 +9,7 @@ import { isProductOutOfStock } from "@lib/util/stock"
 import { extrairSpecs } from "@lib/util/specs"
 import { getSiteUrl } from "@lib/util/seo"
 import { inferMarca, extrairGtin13 } from "@lib/util/product-filters"
+import { getReviewsAggregates } from "@lib/data/reviews"
 import {
   JsonLd,
   productSchema,
@@ -146,7 +147,13 @@ export default async function ProductPage(props: Props) {
 
   const images = getImagesForVariant(pricedProduct, selectedVariantId)
 
-  // ── JSON-LD Product + Breadcrumb (dados REAIS — sem rating em produto) ──
+  // avaliações first-party (estrelas no topo + aggregateRating no JSON-LD);
+  // falhou → null e a página segue sem estrelas no topo (a seção client-side
+  // embaixo é independente e sempre fresca)
+  const reviewsAgg =
+    (await getReviewsAggregates([pricedProduct.id]))[pricedProduct.id!] || null
+
+  // ── JSON-LD Product + Breadcrumb (dados REAIS; rating só first-party) ──
   const site = getSiteUrl()
   const url = `${site}/${params.countryCode}/products/${pricedProduct.handle}`
   const { cheapestPrice } = getProductPrice({ product: pricedProduct })
@@ -173,6 +180,8 @@ export default async function ProductPage(props: Props) {
     currency: "BRL",
     availability: esgotado ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
     specs: extrairSpecs(pricedProduct),
+    // first-party (copamar_reviews) — o productSchema só inclui se total>0
+    aggregateRating: reviewsAgg || undefined,
   })
   // breadcrumb pela CATEGORIA REAL (06/06 — antes era "Loja" genérico):
   // Início → [categoria-pai →] categoria → produto, alinhado à navegação
@@ -203,6 +212,7 @@ export default async function ProductPage(props: Props) {
         region={region}
         countryCode={params.countryCode}
         images={images}
+        reviewsAgg={reviewsAgg}
       />
     </>
   )

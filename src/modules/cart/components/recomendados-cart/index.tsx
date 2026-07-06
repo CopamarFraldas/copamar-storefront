@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { getReviewsAggregates } from "@lib/data/reviews"
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import { getRegion } from "@lib/data/regions"
@@ -38,6 +39,9 @@ export default async function RecomendadosCart({
     .slice(0, 4)
   if (sugestoes.length < 2) return null
 
+  // estrelinhas dos cards — agregados em LOTE (1 chamada pro trilho todo)
+  const reviewsAggs = await getReviewsAggregates(sugestoes.map((p) => p.id))
+
   return (
     <section className="mt-12" aria-labelledby="recomendados-h">
       <h2 id="recomendados-h" className="mb-4 text-lg font-semibold text-ui-fg-base">
@@ -46,7 +50,11 @@ export default async function RecomendadosCart({
       <ul className="grid grid-cols-2 gap-4 small:grid-cols-4">
         {sugestoes.map((p) => (
           <li key={p.id}>
-            <ProductPreview product={p} region={region} />
+            <ProductPreview
+              product={p}
+              region={region}
+              reviews={p.id ? reviewsAggs[p.id] : undefined}
+            />
           </li>
         ))}
       </ul>

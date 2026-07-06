@@ -5,6 +5,8 @@ import { isProductOutOfStock, avisoEstoque } from "@lib/util/stock"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SeloAbsorcao from "@modules/common/components/selo-absorcao"
+import Estrelas from "@modules/common/components/estrelas"
+import type { ReviewsAgg } from "@lib/data/reviews"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 import AddToCartButton from "./add-to-cart-button"
@@ -13,10 +15,14 @@ export default async function ProductPreview({
   product,
   isFeatured,
   region,
+  reviews,
 }: {
   product: HttpTypes.StoreProduct
   isFeatured?: boolean
   region: HttpTypes.StoreRegion
+  /** agregado de avaliações vindo em LOTE do listing (getReviewsAggregates) —
+   *  NUNCA buscar por card. Sem prop/sem avaliação → card sem estrelas. */
+  reviews?: ReviewsAgg | null
 }) {
   // const pricedProduct = await listProducts({
   //   regionId: region.id,
@@ -73,6 +79,13 @@ export default async function ProductPreview({
           >
             {product.title}
           </Text>
+          {/* estrelinhas (avaliações first-party) — padrão Amazon/ML */}
+          {reviews && reviews.total > 0 && (
+            <span className="flex items-center gap-1">
+              <Estrelas media={reviews.media} tamanho="xs" />
+              <span className="text-xs text-ui-fg-subtle">({reviews.total})</span>
+            </span>
+          )}
           {cheapestPrice && (
             <div className="flex flex-col min-w-0">
               <PreviewPrice price={cheapestPrice} />

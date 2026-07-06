@@ -1,5 +1,6 @@
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getReviewsAggregates } from "@lib/data/reviews"
 import { inferGenero, inferMarca, inferTipo } from "@lib/util/product-filters"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
@@ -82,6 +83,10 @@ export default async function PaginatedProducts({
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
+  // estrelinhas dos cards: agregados de avaliações em UMA chamada pro listing
+  // inteiro (nunca por card); falhou → {} e os cards saem sem estrelas
+  const reviewsAggs = await getReviewsAggregates(products.map((p) => p.id))
+
   return (
     <>
       <ul
@@ -101,7 +106,11 @@ export default async function PaginatedProducts({
               data-absorcao={((p.metadata || {}) as any).absorcao_gotas ?? ""}
               data-noturno={((p.metadata || {}) as any).uso_noturno === true || ((p.metadata || {}) as any).uso_noturno === "true" ? "1" : ""}
             >
-              <ProductPreview product={p} region={region} />
+              <ProductPreview
+                product={p}
+                region={region}
+                reviews={p.id ? reviewsAggs[p.id] : undefined}
+              />
             </li>
           )
         })}

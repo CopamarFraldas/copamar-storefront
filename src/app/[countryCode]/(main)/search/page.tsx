@@ -3,6 +3,7 @@ import { buscarIdsProdutos } from "@lib/data/busca"
 
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getReviewsAggregates } from "@lib/data/reviews"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import FiltrosBusca from "@modules/store/components/filtros-busca"
@@ -60,6 +61,9 @@ export default async function SearchPage({ params, searchParams }: Props) {
         })
     : { response: { products: [], count: 0 } }
 
+  // estrelinhas dos cards — agregados em LOTE (1 chamada pro resultado todo)
+  const reviewsAggs = await getReviewsAggregates(products.map((p) => p.id))
+
   return (
     <div className="content-container py-8">
       <h1 className="text-2xl font-semibold text-ui-fg-base break-words">
@@ -112,7 +116,11 @@ export default async function SearchPage({ params, searchParams }: Props) {
               data-titulo={p.title}
               data-tamanho={((p.metadata || {}) as any).tamanho || ""}
             >
-              <ProductPreview product={p} region={region} />
+              <ProductPreview
+                product={p}
+                region={region}
+                reviews={p.id ? reviewsAggs[p.id] : undefined}
+              />
             </li>
           ))}
         </ul>

@@ -2,6 +2,8 @@ import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ReviewsBadge from "@modules/common/components/reviews-badge"
+import Estrelas from "@modules/common/components/estrelas"
+import type { ReviewsAgg } from "@lib/data/reviews"
 import Compartilhar from "@modules/products/components/compartilhar"
 
 type ProductInfoProps = {
@@ -10,12 +12,19 @@ type ProductInfoProps = {
    *  Permite à PDP mobile mostrar o título em cima e a descrição colapsada
    *  embaixo (Marco 07/06). Sem a prop, renderiza tudo (compat). */
   parte?: "cabecalho" | "descricao"
+  /** avaliações DESTE produto (first-party) — estrelas pequenas sob o título */
+  reviewsAgg?: ReviewsAgg | null
   /** segmento de país da rota (ex.: "br") — o Compartilhar usa pra montar a
    *  URL canônica da PDP. Opcional por compat; default "br". */
   countryCode?: string
 }
 
-const ProductInfo = ({ product, parte, countryCode }: ProductInfoProps) => {
+const ProductInfo = ({
+  product,
+  parte,
+  reviewsAgg,
+  countryCode,
+}: ProductInfoProps) => {
   const mostraCabecalho = parte !== "descricao"
   const mostraDescricao = parte !== "cabecalho"
   return (
@@ -40,6 +49,26 @@ const ProductInfo = ({ product, parte, countryCode }: ProductInfoProps) => {
             >
               {product.title}
             </Heading>
+
+            {/* estrelas DO PRODUTO (avaliações first-party) — âncora pra seção.
+                Só quando existe avaliação; agregado server-side (pode atrasar
+                até 5 min, a seção embaixo é a fresca). */}
+            {reviewsAgg && reviewsAgg.total > 0 && (
+              <a
+                href="#avaliacoes"
+                className="-mt-2 flex w-fit items-center gap-1.5 hover:underline"
+                aria-label={`Nota ${reviewsAgg.media.toFixed(1).replace(".", ",")} de 5 — ver as ${reviewsAgg.total} avaliações`}
+              >
+                <Estrelas media={reviewsAgg.media} tamanho="sm" />
+                <span className="text-sm font-semibold text-ui-fg-base">
+                  {reviewsAgg.media.toFixed(1).replace(".", ",")}
+                </span>
+                <span className="text-sm text-copamar-primary">
+                  ({reviewsAgg.total}{" "}
+                  {reviewsAgg.total === 1 ? "avaliação" : "avaliações"})
+                </span>
+              </a>
+            )}
 
             {/* prova social real da LOJA (C1) + COMPARTILHAR na mesma linha.
                 escopo="loja" deixa claro que a nota 4,9/600 é da Copamar no

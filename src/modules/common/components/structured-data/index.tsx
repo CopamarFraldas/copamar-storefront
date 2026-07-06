@@ -51,6 +51,10 @@ const HORARIOS = [
  * Caminho: selo visível linkado (fonte verificável) hoje; se um dia a loja
  * coletar reviews first-party, reintroduzir o markup com ESSES dados.
  * NADA fabricado.
+ *
+ * UPDATE 07/2026: reviews first-party de PRODUTO existem (copamar_reviews,
+ * coletadas no site) → productSchema aceita aggregateRating com ESSES dados.
+ * O veto acima segue valendo pra Organization/LocalBusiness.
  */
 
 export function organizationSchema() {
@@ -236,8 +240,12 @@ export type ProductSchemaInput = {
   description?: string
   image?: string | string[]
   sku?: string
-  /** GTIN/EAN-13 real (variant.barcode/ean). Sem rating em produto (guardrail). */
+  /** GTIN/EAN-13 real (variant.barcode/ean). */
   gtin?: string
+  /** Avaliações FIRST-PARTY do produto (copamar_reviews, coletadas no próprio
+   *  site) — exatamente o caso que a política do Google permite (ver nota do
+   *  aggregateRating de loja acima, que segue vedado). Só entra com total>0. */
+  aggregateRating?: { media: number; total: number }
   brand?: string
   url?: string
   price?: number | string
@@ -262,6 +270,16 @@ export function productSchema(product: ProductSchemaInput) {
   }
   if (product.brand) {
     schema.brand = { "@type": "Brand", name: product.brand }
+  }
+  // avaliações first-party do PRODUTO (nunca a nota "emprestada" da loja)
+  if (product.aggregateRating && product.aggregateRating.total > 0) {
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: String(product.aggregateRating.media),
+      reviewCount: product.aggregateRating.total,
+      bestRating: "5",
+      worstRating: "1",
+    }
   }
   // specs estruturadas factuais (tamanho, unidades por pacote...) pra IA citar
   if (product.specs?.length) {

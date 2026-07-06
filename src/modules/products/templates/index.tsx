@@ -19,12 +19,16 @@ import SeloAbsorcao from "@modules/common/components/selo-absorcao"
 import Spin360 from "@modules/products/components/spin-360"
 import { Ga4ViewItem } from "@modules/common/components/ga4-ecommerce"
 import { getProductPrice } from "@lib/util/get-product-price"
+import AvaliacoesProduto from "@modules/products/components/avaliacoes"
+import type { ReviewsAgg } from "@lib/data/reviews"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   countryCode: string
   images: HttpTypes.StoreProductImage[]
+  /** agregado de avaliações (server-side, cacheado) — estrelas no topo */
+  reviewsAgg?: ReviewsAgg | null
 }
 
 const ProductTemplate: React.FC<ProductTemplateProps> = ({
@@ -32,6 +36,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   region,
   countryCode,
   images,
+  reviewsAgg,
 }) => {
   if (!product || !product.id) {
     return notFound()
@@ -67,6 +72,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <ProductInfo
             product={product}
             parte="cabecalho"
+            reviewsAgg={reviewsAgg}
             countryCode={countryCode}
           />
         </div>
@@ -118,6 +124,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <SecoesProduto product={product} />
         </div>
       </div>
+      {/* Avaliações first-party (estrelinhas 1-5 + comentários) — client-side
+          pelo proxy /api/reviews (a PDP é cacheada; a seção fica sempre fresca) */}
+      <AvaliacoesProduto productId={product.id} />
       <div
         className="content-container my-16 small:my-32"
         data-testid="related-products-container"

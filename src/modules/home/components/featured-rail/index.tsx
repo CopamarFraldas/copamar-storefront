@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { getReviewsAggregates } from "@lib/data/reviews"
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -39,6 +40,9 @@ const FeaturedRail = async ({ region }: { region: HttpTypes.StoreRegion }) => {
     products.find((p) => p.handle === h)
   ).filter(Boolean) as HttpTypes.StoreProduct[]
 
+  // estrelinhas dos cards — agregados em LOTE (1 chamada pro trilho todo)
+  const reviewsAggs = await getReviewsAggregates(ordenados.map((p) => p.id))
+
   return (
     <section
       id="nossos-produtos"
@@ -69,7 +73,11 @@ const FeaturedRail = async ({ region }: { region: HttpTypes.StoreRegion }) => {
             key={product.id}
             className="w-[42vw] max-w-[200px] shrink-0 snap-start small:w-auto small:max-w-none"
           >
-            <ProductPreview product={product} region={region} />
+            <ProductPreview
+              product={product}
+              region={region}
+              reviews={product.id ? reviewsAggs[product.id] : undefined}
+            />
           </li>
         ))}
       </ul>
