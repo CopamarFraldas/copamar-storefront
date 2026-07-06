@@ -4,7 +4,10 @@ import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { isValidCpf, isValidCnpj } from "@lib/util/cpf"
 import { sanitizaEndereco } from "@lib/util/endereco"
-import { validaTelefoneOpcional } from "@lib/util/telefone"
+import {
+  validaTelefoneObrigatorio,
+  validaTelefoneOpcional,
+} from "@lib/util/telefone"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -434,16 +437,29 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       }
     }
 
-    // TELEFONE COM DDD (jul/26, QDB): caso real "998590034" (9 dígitos, sem
-    // DDD) passou e derrubou o pedido no ERP. Preenchido → exige 10-11 dígitos
-    // com DDD; vazio continua aceito (contrato inalterado). Backstop do
-    // pattern client-side (o `pattern` do input é só client). Cobrança ausente
-    // (same_as_billing) vem null → "" → passa.
+    // TELEFONE DE ENTREGA OBRIGATÓRIO (jul/26, caso Danielle): pedido sem
+    // telefone = entrega às cegas (motorista não consegue ligar). Entrega →
+    // vazio NÃO passa + exige 10-11 dígitos com DDD (caso "998590034").
+    // Cobrança segue OPCIONAL (preenchido → valida DDD; ausente por
+    // same_as_billing vem null → "" → passa). Backstop autoritativo do
+    // required/pattern client-side.
     const foneErr =
-      validaTelefoneOpcional(String(formData.get("shipping_address.phone") || "")) ||
+      validaTelefoneObrigatorio(
+        String(formData.get("shipping_address.phone") || "")
+      ) ||
       validaTelefoneOpcional(String(formData.get("billing_address.phone") || ""))
     if (foneErr) {
       return foneErr
+    }
+
+    // TIPO DE LOCAL DE ENTREGA OBRIGATÓRIO (jul/26): a logística (rota do
+    // Dedé/etiqueta) precisa saber se é apartamento/condomínio/etc. Gate SÓ no
+    // endereço de ENTREGA — cobrança e endereços da conta seguem opcionais.
+    const tipoLocalEntrega = String(
+      formData.get("shipping_address.tipo_local") || ""
+    ).trim()
+    if (!tipoLocalEntrega) {
+      return "Escolha o tipo de local de entrega."
     }
 
     const data = {

@@ -3,7 +3,7 @@
 import { clx } from "@medusajs/ui"
 import Input from "@modules/common/components/input"
 import { CepEnderecoControl } from "@lib/hooks/use-cep-endereco"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 
 /**
  * Campos de endereço no padrão "Quem Disse Berenice" (jul/26) — COMPARTILHADO
@@ -56,6 +56,9 @@ type Chave =
   | "cidade"
   | "uf"
 
+/** Mensagem de tipo de local obrigatório (checkout, jul/26 — caso Danielle). */
+export const MSG_TIPO_LOCAL_OBRIGATORIO = "Escolha o tipo de local de entrega."
+
 type Props = {
   /** name de cada input no FormData (contrato do submit — não inventar) */
   nomes: Record<Chave, string>
@@ -65,6 +68,13 @@ type Props = {
   /** o dono do estado aplica (nomeInput → valor) no seu formData */
   onCampo: (nomeInput: string, valor: string) => void
   cep: CepEnderecoControl
+  /**
+   * Tipo de local OBRIGATÓRIO (jul/26): só o ENDEREÇO DE ENTREGA do checkout
+   * liga isto — a logística precisa saber o tipo de local. Bloqueia o submit
+   * sem escolha (backstop nativo + erro visível). Conta/cobrança seguem
+   * opcionais (prop ausente = comportamento de sempre, input hidden).
+   */
+  tipoLocalObrigatorio?: boolean
   /** campos extras dentro do grid revelado (Empresa, País…) */
   children?: React.ReactNode
 }
@@ -79,8 +89,19 @@ const HINT_CEP: Record<CepEnderecoControl["status"], string> = {
     "Não achamos esse CEP — confira os números ou preencha o endereço manualmente.",
 }
 
-const EnderecoCampos = ({ nomes, valores, tids, onCampo, cep, children }: Props) => {
+const EnderecoCampos = ({
+  nomes,
+  valores,
+  tids,
+  onCampo,
+  cep,
+  tipoLocalObrigatorio,
+  children,
+}: Props) => {
   const tipo = valores.tipoLocal
+  // erro visível "escolha o tipo de local" — acende quando o submit esbarra no
+  // required do backstop nativo; apaga assim que o cliente escolhe um tipo
+  const [tipoLocalErro, setTipoLocalErro] = useState(false)
   const complObrigatorio = TIPOS_COMPLEMENTO_OBRIGATORIO.has(tipo)
   const dicaCompl = DICA_COMPLEMENTO[tipo]
   const temTravas =
@@ -111,26 +132,56 @@ const EnderecoCampos = ({ nomes, valores, tids, onCampo, cep, children }: Props)
 
       {/* Tipo de local de entrega — SEMPRE visível, ANTES do CEP (o cliente
           escolhe o tipo antes de digitar o CEP). Botões type="button" não
-          entram no FormData → o input hidden carrega o valor no submit. */}
+          entram no FormData → o input com o NAME (hidden ou sr-only, o mesmo
+          contrato) carrega o valor no submit. */}
       <div>
         <span className="text-small-regular text-ui-fg-base block mb-2">
           Tipo de local de entrega
+          {tipoLocalObrigatorio && <span className="text-rose-500">*</span>}
         </span>
-        <input type="hidden" name={nomes.tipoLocal} value={valores.tipoLocal} />
+        {tipoLocalObrigatorio ? (
+          // OBRIGATÓRIO (checkout/entrega): input required "invisível mas
+          // focável" — hidden é isento de validação nativa; sr-only entra na
+          // validação, bloqueia o submit e ancora o balão junto dos botões.
+          // MESMO name/valor de sempre (contrato do FormData intacto).
+          <input
+            type="text"
+            name={nomes.tipoLocal}
+            value={valores.tipoLocal}
+            onChange={() => {}}
+            required
+            aria-hidden="true"
+            tabIndex={-1}
+            autoComplete="off"
+            className="sr-only"
+            onInvalid={(e) => {
+              e.currentTarget.setCustomValidity(MSG_TIPO_LOCAL_OBRIGATORIO)
+              setTipoLocalErro(true)
+            }}
+            onInput={(e) => e.currentTarget.setCustomValidity("")}
+          />
+        ) : (
+          <input type="hidden" name={nomes.tipoLocal} value={valores.tipoLocal} />
+        )}
         <div className="flex flex-wrap gap-2" data-testid={tids.tipoLocal}>
           {TIPOS_LOCAL.map((t) => (
             <button
               key={t}
               type="button"
-              onClick={() =>
-                // clicar de novo desmarca (tipo é opcional; complemento volta a "se tiver")
-                onCampo(nomes.tipoLocal, valores.tipoLocal === t ? "" : t)
-              }
+              onClick={() => {
+                // clicar de novo desmarca (complemento volta a "se tiver"; no
+                // checkout o submit exige escolher de novo)
+                const novo = valores.tipoLocal === t ? "" : t
+                onCampo(nomes.tipoLocal, novo)
+                if (novo) setTipoLocalErro(false)
+              }}
               aria-pressed={valores.tipoLocal === t}
               className={clx(
                 "rounded-full border px-3 py-1.5 text-sm transition-colors",
                 valores.tipoLocal === t
                   ? "border-ui-border-interactive bg-ui-bg-interactive text-ui-fg-on-color"
+                  : tipoLocalErro && !valores.tipoLocal
+                  ? "border-rose-400 bg-ui-bg-subtle text-ui-fg-subtle hover:text-ui-fg-base hover:border-ui-border-strong"
                   : "border-ui-border-base bg-ui-bg-subtle text-ui-fg-subtle hover:text-ui-fg-base hover:border-ui-border-strong"
               )}
               data-testid={tids.tipoLocal ? `${tids.tipoLocal}-${t}` : undefined}
@@ -139,6 +190,17 @@ const EnderecoCampos = ({ nomes, valores, tids, onCampo, cep, children }: Props)
             </button>
           ))}
         </div>
+        {tipoLocalErro && !valores.tipoLocal && (
+          <span
+            className="text-xs text-rose-500 mt-1 block"
+            role="alert"
+            data-testid={
+              tids.tipoLocal ? `${tids.tipoLocal}-erro` : undefined
+            }
+          >
+            {MSG_TIPO_LOCAL_OBRIGATORIO}
+          </span>
+        )}
       </div>
 
       {/* CEP — o gatilho da revelação progressiva */}

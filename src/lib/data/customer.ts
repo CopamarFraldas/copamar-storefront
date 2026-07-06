@@ -5,7 +5,10 @@ import { LOGIN_MIGRADO, SENHA_REDEFINIDA, TOKEN_EXPIRADO, CPF_JA_CADASTRADO, EMA
 import medusaError from "@lib/util/medusa-error"
 import { isValidCpf, isValidCnpj, isValidCpfOrCnpj } from "@lib/util/cpf"
 import { sanitizaEndereco } from "@lib/util/endereco"
-import { validaTelefoneOpcional } from "@lib/util/telefone"
+import {
+  validaTelefoneObrigatorio,
+  validaTelefoneOpcional,
+} from "@lib/util/telefone"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -197,17 +200,25 @@ export async function signupAndSetAddress(
 
   // TELEFONE COM DDD (jul/26, QDB): pré-valida ANTES do signup pelo mesmo
   // motivo do doc fiscal acima — telefone inválido não pode criar conta órfã
-  // (o reenvio corrigido cairia em "e-mail já existe"). O `pattern` do input
-  // segura isso no client; aqui é o backstop. setAddresses revalida depois.
+  // (o reenvio corrigido cairia em "e-mail já existe"). Entrega é OBRIGATÓRIO
+  // (caso Danielle: sem telefone o motorista não consegue ligar); cobrança
+  // segue opcional. O `required`/`pattern` do input segura isso no client;
+  // aqui é o backstop. setAddresses revalida depois.
   {
     const foneErr =
-      validaTelefoneOpcional(
+      validaTelefoneObrigatorio(
         String(formData.get("shipping_address.phone") || "")
       ) ||
       validaTelefoneOpcional(String(formData.get("billing_address.phone") || ""))
     if (foneErr) {
       return foneErr
     }
+  }
+
+  // TIPO DE LOCAL DE ENTREGA (jul/26): obrigatório no checkout — pré-valida
+  // aqui também pra não criar conta órfã. setAddresses revalida como backstop.
+  if (!String(formData.get("shipping_address.tipo_local") || "").trim()) {
+    return "Escolha o tipo de local de entrega."
   }
 
   const accountPassword = ((formData.get("account_password") as string) || "").trim()

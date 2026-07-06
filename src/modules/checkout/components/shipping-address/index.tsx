@@ -8,7 +8,11 @@ import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
 import { useCepEndereco } from "@lib/hooks/use-cep-endereco"
-import { maskTelefoneBr, TELEFONE_MSG } from "@lib/util/telefone"
+import {
+  maskTelefoneBr,
+  TELEFONE_MSG,
+  TELEFONE_OBRIGATORIO_MSG,
+} from "@lib/util/telefone"
 import { derivaEndereco } from "@lib/util/endereco"
 
 /**
@@ -207,7 +211,9 @@ const ShippingAddress = ({
         {/* 2. CPF/CNPJ (identificação fiscal) — mesma posição da ordem QDB */}
         {fiscalSlot}
 
-        {/* 3. Telefone (máscara BR + DDD obrigatório quando preenchido) e E-mail */}
+        {/* 3. Telefone (OBRIGATÓRIO desde jul/26 — caso Danielle: sem telefone
+            o motorista entrega às cegas; máscara BR + 10-11 dígitos com DDD)
+            e E-mail */}
         <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
           <Input
             label="Telefone (com DDD)"
@@ -216,11 +222,18 @@ const ShippingAddress = ({
             inputMode="numeric"
             autoComplete="tel"
             pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
+            required
             value={formData["shipping_address.phone"]}
             onChange={(e) =>
               setCampo(e.target.name, maskTelefoneBr(e.target.value))
             }
-            onInvalid={(e) => e.currentTarget.setCustomValidity(TELEFONE_MSG)}
+            onInvalid={(e) =>
+              e.currentTarget.setCustomValidity(
+                e.currentTarget.validity.valueMissing
+                  ? TELEFONE_OBRIGATORIO_MSG
+                  : TELEFONE_MSG
+              )
+            }
             onInput={(e) => e.currentTarget.setCustomValidity("")}
             data-testid="shipping-phone-input"
           />
@@ -275,6 +288,9 @@ const ShippingAddress = ({
           }}
           onCampo={setCampo}
           cep={cepCtl}
+          // tipo de local é OBRIGATÓRIO no endereço de ENTREGA (jul/26) —
+          // cobrança e conta seguem opcionais
+          tipoLocalObrigatorio
         >
           <Input
             label="Empresa"

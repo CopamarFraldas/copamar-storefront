@@ -38,12 +38,29 @@ export const TELEFONE_MSG =
   "Telefone incompleto — inclua o DDD (ex.: (11) 99859-0034)."
 
 /**
- * Valida telefone OPCIONAL: vazio passa (contrato atual do checkout/conta não
- * obriga telefone); preenchido exige DDD. Retorna a mensagem de erro ou null.
- * Usada no client (setCustomValidity) e como backstop nas server actions.
+ * Valida telefone OPCIONAL: vazio passa; preenchido exige DDD. Retorna a
+ * mensagem de erro ou null. Usada no client (setCustomValidity) e como
+ * backstop nas server actions da CONTA (novo/editar endereço) e do telefone
+ * de COBRANÇA do checkout — fluxos onde telefone segue não-obrigatório.
  */
 export function validaTelefoneOpcional(v: unknown): string | null {
   const s = typeof v === "string" ? v : ""
   if (!s.trim()) return null
+  return isValidTelefoneBr(s) ? null : TELEFONE_MSG
+}
+
+export const TELEFONE_OBRIGATORIO_MSG =
+  "Informe um telefone com DDD — o entregador precisa falar com você na entrega (ex.: (11) 99859-0034)."
+
+/**
+ * Valida telefone OBRIGATÓRIO — SÓ no telefone de ENTREGA do checkout
+ * (jul/26, caso Danielle: pedido sem telefone = entrega às cegas, o motorista
+ * não consegue ligar). Vazio NÃO passa; preenchido exige 10-11 dígitos com
+ * DDD. NÃO usar nos fluxos da conta nem no telefone de cobrança — esses
+ * continuam com validaTelefoneOpcional.
+ */
+export function validaTelefoneObrigatorio(v: unknown): string | null {
+  const s = typeof v === "string" ? v : ""
+  if (!s.trim()) return TELEFONE_OBRIGATORIO_MSG
   return isValidTelefoneBr(s) ? null : TELEFONE_MSG
 }
