@@ -64,7 +64,11 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       >
         {/* 1. título — mobile: topo · desktop: coluna do MEIO, em cima da descrição */}
         <div className="order-1 w-full pt-2 small:order-none small:col-start-2 small:row-start-1 small:pt-0">
-          <ProductInfo product={product} parte="cabecalho" />
+          <ProductInfo
+            product={product}
+            parte="cabecalho"
+            countryCode={countryCode}
+          />
         </div>
 
         {/* 2. galeria + 360 — coluna ESQUERDA, STICKY, foto grande */}
