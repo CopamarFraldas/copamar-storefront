@@ -59,7 +59,10 @@ const WhatsAppFloat = () => {
       // some enquanto a barra de cookies está aberta (html.consent-bar-open):
       // subir não bastava — o painel "Gerenciar" é alto e o float (z-100)
       // cobria o toggle de Marketing. Ao decidir o consentimento, ele volta.
-      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3 [html.consent-bar-open_&]:hidden"
+      // Some também com o chat da MAPA no site ativo (html.mapa-chat-ativo,
+      // setado pelo MapaChat): durante restrição da Meta o wa.me é um número
+      // mudo. WhatsApp saudável → crew desliga o failover → FAB volta sozinho.
+      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3 [html.consent-bar-open_&]:hidden [html.mapa-chat-ativo_&]:hidden"
       style={{
         transform: deslocamento,
         // bounce suave (overshoot) na ida e na volta — "animação cool"

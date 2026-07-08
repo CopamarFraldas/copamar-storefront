@@ -128,6 +128,17 @@ const MapaChat = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const listaRef = useRef<HTMLDivElement>(null)
 
+  // failover ativo → classe no <html> (mesmo padrão do consent-bar-open):
+  // o FAB verde do WhatsApp se esconde via [html.mapa-chat-ativo_&]:hidden —
+  // durante a restrição da Meta ele apontaria pra um número mudo. Quando o
+  // crew reportar WhatsApp saudável (ativo=false), a classe sai e o FAB volta.
+  useEffect(() => {
+    const el = document.documentElement
+    if (ativo) el.classList.add("mapa-chat-ativo")
+    else el.classList.remove("mapa-chat-ativo")
+    return () => el.classList.remove("mapa-chat-ativo")
+  }, [ativo])
+
   // status do failover: no mount + a cada 5 min (limpo no unmount)
   useEffect(() => {
     let vivo = true
