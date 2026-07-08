@@ -99,7 +99,17 @@ export async function POST(req: NextRequest) {
       cache: "no-store",
     })
     if (!r.ok) {
-      return NextResponse.json({ resposta: FALLBACK })
+      // o crew manda mensagem amigável DE PROPÓSITO no corpo do 429 (throttle)
+      // e do 503 (kill-switch) — repassa em vez de trocar por "tenta de novo",
+      // que convidaria o usuário a repetir e pioraria um flood.
+      const jb = (await r.json().catch(() => null)) as {
+        resposta?: unknown
+      } | null
+      const rb =
+        typeof jb?.resposta === "string" && jb.resposta.trim().length > 0
+          ? jb.resposta
+          : FALLBACK
+      return NextResponse.json({ resposta: rb })
     }
     const j = (await r.json().catch(() => null)) as {
       resposta?: unknown

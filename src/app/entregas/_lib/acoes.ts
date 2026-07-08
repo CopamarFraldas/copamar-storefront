@@ -423,7 +423,10 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
     // mensagens idênticas) — 1 mensagem por PESSOA, no plural se tem N pedidos
     const grupos = new Map<string, typeof alvos>()
     for (const p of alvos) {
-      const k = (p.celular || "").replace(/\D/g, "").slice(-8)
+      // chave por DDD+número (últimos 11 díg) — NÃO por 8 finais: dois clientes
+      // com os mesmos 8 dígitos finais (DDDs diferentes) colidiam e um só é
+      // avisado. 11 díg = DDD(2)+celular(9), robusto ao prefixo 55.
+      const k = (p.celular || "").replace(/\D/g, "").slice(-11)
       const g = grupos.get(k)
       if (g) g.push(p)
       else grupos.set(k, [p])
@@ -443,7 +446,7 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
         p.celular,
         msg,
         "rota-dia",
-        `rota-${hojeBR()}-${(p.celular || "").replace(/\D/g, "").slice(-8)}`
+        `rota-${hojeBR()}-${(p.celular || "").replace(/\D/g, "").slice(-11)}`
       )
       if (!ok) {
         falhas++
