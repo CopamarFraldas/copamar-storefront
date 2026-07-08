@@ -12,6 +12,23 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  // ID de build ESTÁVEL pelo commit git (fix boleto/checkout 08/07): por padrão
+  // o Next gera um id aleatório a cada build → toda reconstrução/reinício do
+  // container invalida os Server Action ids e QUEBRA quem está no meio do
+  // checkout ("Failed to find Server Action"). O boleto (fluxo mais longo) era
+  // o mais atingido. Com o id preso ao commit, reinícios do MESMO código não
+  // derrubam mais os checkouts em andamento (só um deploy de código novo muda,
+  // o que é inevitável). Fallback fixo se o git não estiver disponível no build.
+  generateBuildId: async () => {
+    try {
+      return require("child_process")
+        .execSync("git rev-parse HEAD")
+        .toString()
+        .trim()
+    } catch {
+      return "copamar-stable"
+    }
+  },
   // Foto do comprovante de entrega (camera real = 5-15MB) — o default de 1MB
   // dava 413 e o motorista nao conseguia confirmar (incidente 11/06)
   experimental: {
