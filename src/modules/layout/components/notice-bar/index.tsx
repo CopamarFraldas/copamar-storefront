@@ -11,7 +11,9 @@ import { useEffect, useState } from "react"
  * CLS: começa VISÍVEL (estado comum = não-dispensada → sem salto). Só some pra
  * quem já fechou nesta sessão (pequeno reflow pra trás, aceitável).
  */
-const STORAGE_KEY = "copamar-notice-dismissed-v1"
+// v2-mapa: chave nova de propósito — quem já dispensou o aviso padrão PRECISA
+// ver este (WhatsApp fora do ar 24h). Voltar pra v1 quando remover o aviso.
+const STORAGE_KEY = "copamar-notice-dismissed-v2-mapa"
 
 const NoticeBar = () => {
   const [hidden, setHidden] = useState(false)
@@ -29,10 +31,11 @@ const NoticeBar = () => {
   return (
     <div className="relative bg-copamar-primary text-white text-xs sm:text-sm">
       <div className="content-container flex items-center justify-center gap-x-2 py-2 pr-8 text-center">
-        <span aria-hidden>🚚</span>
+        <span aria-hidden>📵</span>
         <span>
-          Entrega para <strong>todo o Brasil</strong> · 3x sem juros ou{" "}
-          <strong>5% de desconto no PIX e no boleto</strong>
+          Nosso <strong>WhatsApp está temporariamente indisponível</strong> até
+          quinta (09/07) ~11h30 · pedidos pelo site funcionam{" "}
+          <strong>normalmente</strong> · 5% de desconto no PIX e no boleto
         </span>
       </div>
       <button
