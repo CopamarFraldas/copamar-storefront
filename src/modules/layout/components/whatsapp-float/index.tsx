@@ -59,11 +59,12 @@ const WhatsAppFloat = () => {
       // some enquanto a barra de cookies está aberta (html.consent-bar-open):
       // subir não bastava — o painel "Gerenciar" é alto e o float (z-100)
       // cobria o toggle de Marketing. Ao decidir o consentimento, ele volta.
-      // Some também com o chat da MAPA no site ativo (html.mapa-chat-ativo,
-      // setado pelo MapaChatStatusBridge no GlobalChrome — vale no checkout
-      // também): durante restrição da Meta o wa.me é um número mudo. WhatsApp
-      // saudável → crew desliga o failover → FAB volta sozinho.
-      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3 [html.consent-bar-open_&]:hidden [html.mapa-chat-ativo_&]:hidden"
+      // Durante a restrição da MAPA (html.mapa-chat-ativo, setado pelo
+      // MapaChatStatusBridge): o FAB CONTINUA — o número do ATENDENTE humano
+      // (952050000) é OUTRO e segue normal; só o botão da MAPA (49903013, o
+      // número mudo) some (ver classe no <a> dela). WhatsApp saudável → crew
+      // desliga o failover → a MAPA volta sozinha.
+      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3 [html.consent-bar-open_&]:hidden"
       style={{
         transform: deslocamento,
         // bounce suave (overshoot) na ida e na volta — "animação cool"
@@ -95,7 +96,10 @@ const WhatsAppFloat = () => {
             rel="noopener"
             aria-label="Falar com a Mapa, assistente virtual 24h da Copamar, no WhatsApp"
             onClick={() => setOpen(false)}
-            className="group flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200"
+            // durante a restrição a MAPA (49903013) está muda → esconde só ela;
+            // o atendente humano acima continua. Volta sozinha quando o failover
+            // desliga (crew vê o WhatsApp da MAPA saudável).
+            className="group flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200 [html.mapa-chat-ativo_&]:hidden"
           >
             <span className="rounded-lg bg-white dark:bg-ui-bg-component shadow-md px-3 py-1.5 text-xs font-medium text-ui-fg-base whitespace-nowrap">
               Falar com a Mapa <span className="text-ui-fg-subtle">· IA 24h</span>

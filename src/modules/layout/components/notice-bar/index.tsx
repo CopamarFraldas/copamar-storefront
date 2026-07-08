@@ -11,9 +11,10 @@ import { useEffect, useState } from "react"
  * CLS: começa VISÍVEL (estado comum = não-dispensada → sem salto). Só some pra
  * quem já fechou nesta sessão (pequeno reflow pra trás, aceitável).
  */
-// v2-mapa: chave nova de propósito — quem já dispensou o aviso padrão PRECISA
-// ver este (WhatsApp fora do ar 24h). Voltar pra v1 quando remover o aviso.
-const STORAGE_KEY = "copamar-notice-dismissed-v2-mapa"
+// v3-mapa: chave nova de propósito — quem dispensou o aviso anterior PRECISA
+// ver este (mudou: especialista disponível + horário do feriado). Voltar pra
+// v1 quando a MAPA do WhatsApp voltar e o aviso sair.
+const STORAGE_KEY = "copamar-notice-dismissed-v3-mapa"
 
 const NoticeBar = () => {
   const [hidden, setHidden] = useState(false)
@@ -31,11 +32,19 @@ const NoticeBar = () => {
   return (
     <div className="relative bg-copamar-primary text-white text-xs sm:text-sm">
       <div className="content-container flex items-center justify-center gap-x-2 py-2 pr-8 text-center">
-        <span aria-hidden>📵</span>
+        <span aria-hidden>🧭</span>
         <span>
-          Nosso <strong>WhatsApp está temporariamente indisponível</strong> até
-          quinta (09/07) ~11h30 · pedidos pelo site funcionam{" "}
-          <strong>normalmente</strong> · 5% de desconto no PIX e no boleto
+          A <strong>MAPA no WhatsApp está fora do ar</strong> hoje — mas você{" "}
+          <a
+            href="https://wa.me/5511952050000?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Copamar%20e%20gostaria%20de%20falar%20com%20um%20especialista."
+            target="_blank"
+            rel="noopener"
+            className="font-semibold underline underline-offset-2 hover:text-white/80"
+          >
+            fala com um especialista
+          </a>{" "}
+          ou pede pelo site normalmente ·{" "}
+          <strong>amanhã (feriado) atendemos das 8h às 17h</strong>
         </span>
       </div>
       <button
