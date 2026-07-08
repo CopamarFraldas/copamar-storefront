@@ -35,6 +35,41 @@ async function logAvisoProativo(number: string, texto: string) {
   } catch { /* histórico é best-effort */ }
 }
 
+/**
+ * Deposita na fila_whatsapp (carteiro-wa.py envia espaçado 45-75s, só com o
+ * gateway aberto). Nasceu do INCIDENTE 08/07: o aviso "sai hoje" mandou 21
+ * mensagens em 26s (pausa de 700ms) e a Meta derrubou o número por 24h.
+ * Rajada NUNCA mais: lote grande = fila. dedup evita duplicata em re-tap.
+ */
+async function enfileirarWhatsApp(
+  celularCliente: string | null | undefined,
+  texto: string,
+  origem: string,
+  dedup: string
+): Promise<boolean> {
+  if (!SUPA || !KEY || !texto) return false
+  const cel = (celularCliente || "").replace(/\D/g, "")
+  if (!LIVE || !cel) return false // shadow segue no envio direto (1 msg só)
+  const numero = cel.startsWith("55") ? cel : `55${cel}`
+  try {
+    const res = await fetch(`${SUPA}/rest/v1/fila_whatsapp`, {
+      method: "POST",
+      headers: {
+        apikey: KEY!,
+        Authorization: `Bearer ${KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal,resolution=ignore-duplicates",
+      },
+      body: JSON.stringify({ numero, texto, origem, prioridade: 2, dedup }),
+    })
+    if (!res.ok) return false
+    await logAvisoProativo(numero, `${texto} [enfileirado]`)
+    return true
+  } catch {
+    return false
+  }
+}
+
 async function enviarWhatsApp(
   celularCliente: string | null | undefined,
   texto: string,
@@ -402,8 +437,14 @@ export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: nu
     for (const grupo of Array.from(grupos.values())) {
       const p = grupo[0]
       const msg = mensagemCliente("sai_hoje", p.nome_cliente, grupo.length)
-      const ref = grupo.map((x: { numero_pedido: string }) => x.numero_pedido).join("/")
-      const ok = await enviarWhatsApp(p.celular, msg, ref)
+      // INCIDENTE 08/07: 21 envios diretos em 26s → restrição Meta 24h. Agora
+      // DEPOSITA na fila e o carteiro entrega espaçado (~20min pra rota cheia).
+      const ok = await enfileirarWhatsApp(
+        p.celular,
+        msg,
+        "rota-dia",
+        `rota-${hojeBR()}-${(p.celular || "").replace(/\D/g, "").slice(-8)}`
+      )
       if (!ok) {
         falhas++
         continue // sem trava → entra na próxima rodada do cliente
