@@ -2,11 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 
+import {
+  MAPA_CHAT_EVENTO,
+  lerStatusMapaChat,
+} from "@modules/layout/components/mapa-chat/status"
+
 /**
  * Chat da MAPA no site — guardrail do WhatsApp restrito (Meta 24h).
  *
- * Só aparece quando o crew diz que o failover está ATIVO (/api/mapa-chat/status,
- * re-checado a cada 5 min). Todo o tráfego passa pelos proxies /api/mapa-chat/*
+ * Só aparece quando o crew diz que o failover está ATIVO — quem checa é o
+ * MapaChatStatusBridge (./status, montado no GlobalChrome); este widget só
+ * consome o resultado. Todo o tráfego passa pelos proxies /api/mapa-chat/*
  * — o browser nunca vê URL interna nem chave, e a identidade (logado/email/nome)
  * é resolvida server-side.
  *
@@ -37,7 +43,6 @@ const UUID_FALLBACK_KEY = "copamar_uuid" // só se o tracking nunca gerou o dele
 const HISTORICO_KEY = "copamar_mapa_chat_v1" // sessionStorage
 const MAX_TURNOS_ENVIO = 20 // contrato do crew: historico máx 20
 const MAX_TURNOS_GUARDADOS = 40 // teto do sessionStorage (não cresce infinito)
-const STATUS_INTERVALO_MS = 5 * 60_000
 
 /** uuid v4 com fallback pra browsers sem crypto.randomUUID (mesma tática do track.js) */
 const gerarUuid = (): string => {
@@ -128,36 +133,18 @@ const MapaChat = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const listaRef = useRef<HTMLDivElement>(null)
 
-  // failover ativo → classe no <html> (mesmo padrão do consent-bar-open):
-  // o FAB verde do WhatsApp se esconde via [html.mapa-chat-ativo_&]:hidden —
-  // durante a restrição da Meta ele apontaria pra um número mudo. Quando o
-  // crew reportar WhatsApp saudável (ativo=false), a classe sai e o FAB volta.
+  // status do failover: quem CHECA a API (mount + 5 min) e seta a classe
+  // html.mapa-chat-ativo é o MapaChatStatusBridge, montado no GlobalChrome
+  // (root layout — cobre o checkout também, onde este widget não existe).
+  // Aqui só consumimos: leitura inicial da classe + evento do bridge.
+  // Zero fetch duplicado.
   useEffect(() => {
-    const el = document.documentElement
-    if (ativo) el.classList.add("mapa-chat-ativo")
-    else el.classList.remove("mapa-chat-ativo")
-    return () => el.classList.remove("mapa-chat-ativo")
-  }, [ativo])
-
-  // status do failover: no mount + a cada 5 min (limpo no unmount)
-  useEffect(() => {
-    let vivo = true
-    const checar = () => {
-      fetch("/api/mapa-chat/status", { cache: "no-store" })
-        .then((r) => r.json())
-        .then((j: { ativo?: boolean }) => {
-          if (vivo) setAtivo(j?.ativo === true)
-        })
-        .catch(() => {
-          if (vivo) setAtivo(false)
-        })
+    setAtivo(lerStatusMapaChat())
+    const onStatus = (e: Event) => {
+      setAtivo(Boolean((e as CustomEvent).detail?.ativo))
     }
-    checar()
-    const id = setInterval(checar, STATUS_INTERVALO_MS)
-    return () => {
-      vivo = false
-      clearInterval(id)
-    }
+    window.addEventListener(MAPA_CHAT_EVENTO, onStatus)
+    return () => window.removeEventListener(MAPA_CHAT_EVENTO, onStatus)
   }, [])
 
   // persiste o histórico na sessão (teto de 40 mensagens)
