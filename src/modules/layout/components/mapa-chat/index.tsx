@@ -16,6 +16,12 @@ import {
  * — o browser nunca vê URL interna nem chave, e a identidade (logado/email/nome)
  * é resolvida server-side.
  *
+ * VISUAL (08/07): identidade "A Bússola que Respira" — a MAPA é a guia. O avatar
+ * e o indicador de "pensando" são uma BÚSSOLA cuja agulha procura o norte
+ * (motivo da marca, não enfeite). Paleta creme/areia quente (copamar-cream) +
+ * agulha no laranja da casa; nome em serifada humanista (a mesma do Hero).
+ * Movimento só quando ela pensa, e desligado em prefers-reduced-motion.
+ *
  * Posição: canto inferior direito, EMPILHADO ACIMA do FAB verde do WhatsApp
  * (bottom-4/6 + 56px + folga). z-[60]: acima do header sticky (z-50) e da barra
  * mobile de compra (z-50), ABAIXO do drawer do carrinho (z-[70]) e do modal de
@@ -32,11 +38,11 @@ type Turno = { papel: "cliente" | "mapa"; texto: string }
 const BOAS_VINDAS: Turno = {
   papel: "mapa",
   texto:
-    "Oi! Sou a MAPA 💙 Posso te ajudar a escolher fraldas, calcular frete e tirar dúvidas. O que você procura?",
+    "Oi! Sou a MAPA, sua guia aqui na Copamar. Me conta o que você precisa — tamanho, absorção ou frete pro seu CEP — que eu te oriento pra escolha certa.",
 }
 
 const FALLBACK_LOCAL =
-  "A MAPA está com dificuldade agora 🙈 tenta de novo em instantes?"
+  "Me perdi por um instante aqui 🧭 pode mandar de novo?"
 
 const UUID_TRACK_KEY = "copamar_uuid_anon" // do copamar-track.js (reuso, ponte #47)
 const UUID_FALLBACK_KEY = "copamar_uuid" // só se o tracking nunca gerou o dele
@@ -97,6 +103,57 @@ const carregarHistorico = (): Turno[] => {
   }
   return [BOAS_VINDAS]
 }
+
+/**
+ * A bússola — assinatura da MAPA. currentColor pinta o anel/ticks (herda a cor
+ * do contexto); a agulha-norte é sempre o laranja da casa. Com `buscando`, a
+ * agulha varre procurando o norte (a MAPA "achando o caminho"). O sway mora no
+ * <style> do painel e é desligado em prefers-reduced-motion.
+ */
+const Bussola = ({
+  buscando = false,
+  className = "",
+}: {
+  buscando?: boolean
+  className?: string
+}) => (
+  <svg
+    viewBox="0 0 40 40"
+    className={`${className} ${buscando ? "mapa-buscando" : ""}`}
+    fill="none"
+    aria-hidden
+  >
+    <circle cx="20" cy="20" r="17" stroke="currentColor" strokeWidth="1.8" opacity="0.9" />
+    <g className="mapa-agulha">
+      <path d="M20 4.5 L25.5 20 L14.5 20 Z" fill="#ef7e1a" />
+      <path d="M20 35.5 L25.5 20 L14.5 20 Z" fill="currentColor" opacity="0.42" />
+    </g>
+    <circle cx="20" cy="20" r="2.6" fill="currentColor" />
+  </svg>
+)
+
+/** keyframes escopados (mapa-): sem depender de plugin de animação. */
+const EstiloBussola = () => (
+  <style>{`
+    .mapa-agulha { transform-box: fill-box; transform-origin: center; }
+    .mapa-buscando .mapa-agulha {
+      animation: mapa-seek 1.5s cubic-bezier(.45,.05,.55,.95) infinite;
+    }
+    @keyframes mapa-seek {
+      0%   { transform: rotate(-26deg); }
+      50%  { transform: rotate(22deg); }
+      100% { transform: rotate(-26deg); }
+    }
+    .mapa-painel { animation: mapa-sobe .26s cubic-bezier(.16,1,.3,1); }
+    @keyframes mapa-sobe {
+      from { transform: translateY(14px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mapa-buscando .mapa-agulha, .mapa-painel { animation: none; }
+    }
+  `}</style>
+)
 
 const IconeX = () => (
   <svg
@@ -233,13 +290,11 @@ const MapaChat = () => {
         onClick={() => setAberto(true)}
         aria-label="Abrir chat com a MAPA, assistente virtual da Copamar"
         aria-haspopup="dialog"
-        className="fixed right-4 sm:right-6 bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] sm:bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] z-[60] flex h-14 w-14 items-center justify-center gap-2 rounded-full bg-copamar-primary text-white shadow-lg shadow-black/20 transition-all duration-200 hover:scale-105 hover:bg-copamar-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copamar-primary focus-visible:ring-offset-2 sm:h-auto sm:w-auto sm:px-5 sm:py-3.5 [html.consent-bar-open_&]:hidden"
+        className="group fixed right-4 sm:right-6 bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] sm:bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] z-[60] flex h-14 w-14 items-center justify-center gap-2.5 rounded-full bg-copamar-primary text-white shadow-lg shadow-copamar-primary/30 ring-1 ring-white/10 transition-all duration-200 hover:scale-105 hover:bg-copamar-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copamar-primary focus-visible:ring-offset-2 sm:h-auto sm:w-auto sm:px-5 sm:py-3.5 [html.consent-bar-open_&]:hidden"
       >
-        <span className="text-2xl leading-none sm:text-xl" aria-hidden>
-          💬
-        </span>
-        <span className="hidden whitespace-nowrap text-sm font-semibold sm:inline">
-          Fale com a MAPA
+        <Bussola className="h-7 w-7 shrink-0 transition-transform duration-500 group-hover:rotate-12 sm:h-6 sm:w-6" />
+        <span className="hidden whitespace-nowrap text-[15px] font-semibold tracking-tight sm:inline">
+          Falar com a MAPA
         </span>
       </button>
     )
@@ -249,29 +304,35 @@ const MapaChat = () => {
     <div
       role="dialog"
       aria-label="Chat com a MAPA, assistente virtual da Copamar"
-      className="fixed inset-x-0 bottom-0 z-[60] flex h-[75vh] w-full flex-col overflow-hidden rounded-t-2xl border border-ui-border-base bg-ui-bg-base shadow-2xl shadow-black/25 animate-in fade-in slide-in-from-bottom-4 duration-200 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[560px] sm:max-h-[calc(100vh-7rem)] sm:w-[380px] sm:rounded-2xl [html.consent-bar-open_&]:hidden"
+      className="mapa-painel fixed inset-x-0 bottom-0 z-[60] flex h-[78vh] w-full flex-col overflow-hidden rounded-t-[20px] border border-copamar-sand bg-copamar-cream shadow-2xl shadow-black/25 dark:border-white/10 dark:bg-[#1b1712] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[566px] sm:max-h-[calc(100vh-7rem)] sm:w-[384px] sm:rounded-[20px] [html.consent-bar-open_&]:hidden"
     >
+      <EstiloBussola />
+
       {/* header */}
-      <div className="flex items-center gap-3 bg-copamar-primary px-4 py-3 text-white">
+      <div className="flex items-center gap-3 bg-copamar-primary px-4 py-3.5 text-white">
         <span
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-lg"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/20"
           aria-hidden
         >
-          💙
+          <Bussola className="h-6 w-6" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold leading-tight">
-            MAPA — assistente da Copamar
+          <p className="font-serif text-[17px] font-semibold leading-tight tracking-tight">
+            MAPA
           </p>
-          <p className="truncate text-[11px] leading-tight text-white/75">
-            atendimento automático · WhatsApp temporariamente indisponível
+          <p className="flex items-center gap-1.5 text-[11.5px] leading-tight text-white/80">
+            <span
+              className="h-1.5 w-1.5 rounded-full bg-copamar-success"
+              aria-hidden
+            />
+            sua guia na Copamar · respondo na hora
           </p>
         </div>
         <button
           type="button"
           onClick={() => setAberto(false)}
           aria-label="Fechar chat"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/85 transition-colors hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/85 transition-colors hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
         >
           <IconeX />
         </button>
@@ -280,10 +341,10 @@ const MapaChat = () => {
       {/* mensagens */}
       <div
         ref={listaRef}
-        className="flex-1 overflow-y-auto bg-ui-bg-subtle px-3 py-4"
+        className="flex-1 overflow-y-auto px-3.5 py-4"
         aria-live="polite"
       >
-        <ul className="flex flex-col gap-2.5">
+        <ul className="flex flex-col gap-3">
           {mensagens.map((m, i) => (
             <li
               key={i}
@@ -294,8 +355,8 @@ const MapaChat = () => {
               <span
                 className={
                   m.papel === "cliente"
-                    ? "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-copamar-primary px-3.5 py-2 text-sm text-white shadow-sm"
-                    : "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-bl-md border border-ui-border-base bg-ui-bg-base px-3.5 py-2 text-sm text-ui-fg-base shadow-sm"
+                    ? "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-copamar-primary px-4 py-2.5 text-[15px] leading-relaxed text-white shadow-sm"
+                    : "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-bl-md border border-copamar-sand bg-white px-4 py-2.5 text-[15px] leading-relaxed text-ui-fg-base shadow-sm dark:border-white/10 dark:bg-[#2a2521]"
                 }
               >
                 {m.texto}
@@ -305,17 +366,15 @@ const MapaChat = () => {
           {digitando && (
             <li className="flex justify-start">
               <span
-                className="flex items-center gap-1 rounded-2xl rounded-bl-md border border-ui-border-base bg-ui-bg-base px-3.5 py-3 shadow-sm"
+                className="flex items-center gap-2 rounded-2xl rounded-bl-md border border-copamar-sand bg-white px-4 py-2.5 text-[13px] text-ui-fg-subtle shadow-sm dark:border-white/10 dark:bg-[#2a2521]"
                 role="status"
-                aria-label="MAPA está digitando"
+                aria-label="MAPA está respondendo"
               >
-                {[0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-ui-fg-muted"
-                    style={{ animationDelay: `${i * 150}ms` }}
-                  />
-                ))}
+                <Bussola
+                  buscando
+                  className="h-5 w-5 text-copamar-primary/70 dark:text-white/70"
+                />
+                achando pra você…
               </span>
             </li>
           )}
@@ -328,7 +387,7 @@ const MapaChat = () => {
           e.preventDefault()
           void enviar()
         }}
-        className="flex items-end gap-2 border-t border-ui-border-base bg-ui-bg-base p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-3"
+        className="flex items-end gap-2 border-t border-copamar-sand bg-white p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] dark:border-white/10 dark:bg-[#211d19] sm:pb-3"
       >
         <textarea
           ref={inputRef}
@@ -338,15 +397,15 @@ const MapaChat = () => {
           onKeyDown={onKeyDownInput}
           disabled={digitando}
           maxLength={2000}
-          placeholder="Escreva sua mensagem…"
+          placeholder="Escreva pra MAPA…"
           aria-label="Sua mensagem para a MAPA"
-          className="max-h-28 min-h-[42px] flex-1 resize-none rounded-xl border border-ui-border-base bg-ui-bg-field px-3 py-2.5 text-sm text-ui-fg-base placeholder:text-ui-fg-muted focus:border-copamar-primary focus:outline-none focus:ring-1 focus:ring-copamar-primary disabled:opacity-60"
+          className="max-h-28 min-h-[44px] flex-1 resize-none rounded-xl border border-copamar-sand bg-copamar-cream px-3.5 py-2.5 text-[15px] text-ui-fg-base placeholder:text-ui-fg-muted focus:border-copamar-primary focus:outline-none focus:ring-1 focus:ring-copamar-primary disabled:opacity-60 dark:border-white/10 dark:bg-[#1b1712]"
         />
         <button
           type="submit"
           disabled={digitando || texto.trim().length === 0}
           aria-label="Enviar mensagem"
-          className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-xl bg-copamar-primary text-white transition-colors hover:bg-copamar-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copamar-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-xl bg-copamar-primary text-white transition-colors hover:bg-copamar-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-copamar-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <IconeEnviar />
         </button>
