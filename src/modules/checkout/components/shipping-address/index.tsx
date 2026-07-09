@@ -12,7 +12,6 @@ import {
   maskTelefoneBr,
   TELEFONE_MSG,
   TELEFONE_OBRIGATORIO_MSG,
-  CELULAR_OBRIGATORIO_MSG,
 } from "@lib/util/telefone"
 import { derivaEndereco } from "@lib/util/endereco"
 
@@ -185,9 +184,18 @@ const ShippingAddress = ({
     <>
       {customer && (addressesInRegion?.length || 0) > 0 && (
         <Container className="mb-6 flex flex-col gap-y-4 p-5">
-          <p className="text-small-regular">
-            {`Olá ${customer.first_name}, quer usar um dos seus endereços salvos?`}
-          </p>
+          <div className="flex flex-col gap-1">
+            <p className="text-lg small:text-xl font-semibold leading-snug text-ui-fg-base">
+              Olá,{" "}
+              <span className="text-copamar-primary">
+                {customer.first_name}
+              </span>
+              ! Que bom te ver de volta 💙
+            </p>
+            <p className="text-sm text-ui-fg-subtle">
+              Escolha um endereço salvo abaixo ou preencha um novo.
+            </p>
+          </div>
           <AddressSelect
             addresses={customer.addresses}
             addressInput={
@@ -225,19 +233,20 @@ const ShippingAddress = ({
         {/* 2. CPF/CNPJ (identificação fiscal) — mesma posição da ordem QDB */}
         {fiscalSlot}
 
-        {/* 3. CELULAR (OBRIGATÓRIO desde jul/26 — Marco: celular, não fixo; o
-            entregador liga E manda WhatsApp. Fixo de 10 díg NÃO passa). Máscara
-            BR + exige 11 díg com o 9. O servidor (setAddresses + placeOrder) é a
-            garantia à prova de autofill; aqui é a conveniência. E-mail ao lado. */}
+        {/* 3. CELULAR/telefone de ENTREGA (OBRIGATÓRIO desde jul/26 — o
+            entregador liga e manda WhatsApp). Aceita 10 (fixo) OU 11 (celular)
+            dígitos com DDD; o +55 é normalizado. O servidor (setAddresses +
+            placeOrder, ciente do país) é a garantia à prova de autofill; aqui é
+            a conveniência. E-mail ao lado. */}
         <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
           <Input
             ref={foneRef}
-            label="Celular (com DDD e WhatsApp)"
+            label="Celular (com DDD)"
             name="shipping_address.phone"
             type="tel"
             inputMode="numeric"
             autoComplete="tel"
-            pattern="\([0-9]{2}\) 9[0-9]{4}-[0-9]{4}"
+            pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
             required
             value={formData["shipping_address.phone"]}
             onChange={(e) =>
@@ -253,7 +262,11 @@ const ShippingAddress = ({
               }
             }}
             onInvalid={(e) =>
-              e.currentTarget.setCustomValidity(CELULAR_OBRIGATORIO_MSG)
+              e.currentTarget.setCustomValidity(
+                e.currentTarget.validity.valueMissing
+                  ? TELEFONE_OBRIGATORIO_MSG
+                  : TELEFONE_MSG
+              )
             }
             onInput={(e) => e.currentTarget.setCustomValidity("")}
             data-testid="shipping-phone-input"

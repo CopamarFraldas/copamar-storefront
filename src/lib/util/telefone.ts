@@ -65,26 +65,25 @@ export function validaTelefoneObrigatorio(v: unknown): string | null {
   return isValidTelefoneBr(s) ? null : TELEFONE_MSG
 }
 
-/** CELULAR válido = 11 dígitos (DDD + 9 + 8), DDD real e o 9 na 3ª posição.
- *  Fixo (10 díg) NÃO conta — a entrega precisa de celular (ligação + WhatsApp). */
-export function isValidCelularBr(v: string): boolean {
-  const d = telefoneDigits(v)
-  if (d.length !== 11) return false
-  const ddd = parseInt(d.slice(0, 2), 10)
-  return ddd >= 11 && ddd <= 99 && d[2] === "9"
-}
-
-export const CELULAR_OBRIGATORIO_MSG =
-  "Informe um CELULAR com DDD (11 dígitos) — o entregador precisa ligar e mandar WhatsApp na entrega (ex.: (11) 99859-0034)."
-
 /**
- * Valida CELULAR OBRIGATÓRIO do endereço de ENTREGA (jul/26 — Marco: celular
- * obrigatório, fixo não). Vazio ou fixo (10 díg) NÃO passam. É o gate autoritativo
- * do servidor — o cliente é conveniência, o servidor é a garantia (à prova de
- * autofill/JS off/endereço salvo). Cobrança segue com validaTelefoneOpcional.
+ * Telefone OBRIGATÓRIO do endereço de ENTREGA, CIENTE DO PAÍS (jul/26 — Marco:
+ * aceita 10 OU 11 dígitos, fixo e celular; muita gente tem número mais curto).
+ * - Brasil (country=br): exige 10 (fixo) OU 11 (celular) dígitos com DDD real. O
+ *   "+55" é removido na normalização (telefoneDigits), então quem cola com +55
+ *   passa igual.
+ * - Fora do Brasil (ex. Europa): NÃO força o formato BR — aceita qualquer número
+ *   com ≥8 dígitos (o país já vem do seletor de país do endereço).
+ * Vazio NUNCA passa. É o gate autoritativo do SERVIDOR (à prova de autofill/JS
+ * off/endereço salvo). Cobrança segue com validaTelefoneOpcional.
  */
-export function validaCelularObrigatorio(v: unknown): string | null {
+export function validaTelefoneEntrega(
+  v: unknown,
+  countryCode?: unknown
+): string | null {
   const s = typeof v === "string" ? v : ""
-  if (!s.trim()) return CELULAR_OBRIGATORIO_MSG
-  return isValidCelularBr(s) ? null : CELULAR_OBRIGATORIO_MSG
+  if (!s.trim()) return TELEFONE_OBRIGATORIO_MSG
+  const pais = String(countryCode || "br").toLowerCase()
+  if (pais === "br") return isValidTelefoneBr(s) ? null : TELEFONE_MSG
+  // internacional: só exige que exista um número plausível (≥8 dígitos)
+  return s.replace(/\D/g, "").length >= 8 ? null : TELEFONE_MSG
 }

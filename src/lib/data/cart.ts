@@ -7,7 +7,7 @@ import { sanitizaEndereco } from "@lib/util/endereco"
 import {
   validaTelefoneObrigatorio,
   validaTelefoneOpcional,
-  validaCelularObrigatorio,
+  validaTelefoneEntrega,
 } from "@lib/util/telefone"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
@@ -445,8 +445,9 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     // same_as_billing vem null → "" → passa). Backstop autoritativo do
     // required/pattern client-side.
     const foneErr =
-      validaCelularObrigatorio(
-        String(formData.get("shipping_address.phone") || "")
+      validaTelefoneEntrega(
+        String(formData.get("shipping_address.phone") || ""),
+        formData.get("shipping_address.country_code")
       ) ||
       validaTelefoneOpcional(String(formData.get("billing_address.phone") || ""))
     if (foneErr) {
@@ -582,21 +583,22 @@ export async function placeOrder(cartId?: string) {
   try {
     const { cart: cAtual } = await sdk.store.cart.retrieve(
       id,
-      { fields: "id,shipping_address.phone" },
+      { fields: "id,shipping_address.phone,shipping_address.country_code" },
       headers
     )
-    const celErr = validaCelularObrigatorio(
-      String((cAtual as any)?.shipping_address?.phone || "")
+    const foneErr = validaTelefoneEntrega(
+      String((cAtual as any)?.shipping_address?.phone || ""),
+      (cAtual as any)?.shipping_address?.country_code
     )
-    if (celErr) {
-      const err: any = new Error(celErr)
-      err.celularInvalido = true // marca pra propagar (o componente mostra a msg)
+    if (foneErr) {
+      const err: any = new Error(foneErr)
+      err.telefoneInvalido = true // marca pra propagar (o componente mostra a msg)
       throw err
     }
   } catch (e: any) {
-    // celular inválido barra o pedido; falha de LEITURA (infra) segue —
+    // telefone inválido barra o pedido; falha de LEITURA (infra) segue —
     // os gates de setAddresses/signup já validaram o vazio no passo de endereço.
-    if (e?.celularInvalido) throw e
+    if (e?.telefoneInvalido) throw e
   }
 
   const cartRes = await sdk.store.cart

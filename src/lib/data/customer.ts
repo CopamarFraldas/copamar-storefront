@@ -8,7 +8,7 @@ import { sanitizaEndereco } from "@lib/util/endereco"
 import {
   validaTelefoneObrigatorio,
   validaTelefoneOpcional,
-  validaCelularObrigatorio,
+  validaTelefoneEntrega,
 } from "@lib/util/telefone"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
@@ -207,8 +207,9 @@ export async function signupAndSetAddress(
   // aqui é o backstop. setAddresses revalida depois.
   {
     const foneErr =
-      validaCelularObrigatorio(
-        String(formData.get("shipping_address.phone") || "")
+      validaTelefoneEntrega(
+        String(formData.get("shipping_address.phone") || ""),
+        formData.get("shipping_address.country_code")
       ) ||
       validaTelefoneOpcional(String(formData.get("billing_address.phone") || ""))
     if (foneErr) {
