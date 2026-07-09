@@ -44,7 +44,7 @@ const NoticeBar = () => {
             fala com um especialista
           </a>{" "}
           ou pede pelo site normalmente ·{" "}
-          <strong>amanhã (feriado) atendemos das 8h às 17h</strong>
+          <strong>hoje (feriado) atendemos das 8h às 17h</strong>
         </span>
       </div>
       <button
