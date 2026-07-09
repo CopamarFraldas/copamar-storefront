@@ -10,8 +10,10 @@ import CountrySelect from "../country-select"
 import { useCepEndereco } from "@lib/hooks/use-cep-endereco"
 import {
   maskTelefoneBr,
+  telefoneDigits,
   TELEFONE_MSG,
   TELEFONE_OBRIGATORIO_MSG,
+  PAISES_TELEFONE,
 } from "@lib/util/telefone"
 import { derivaEndereco } from "@lib/util/endereco"
 
@@ -167,6 +169,61 @@ const ShippingAddress = ({
   // opção de criar conta (define senha) durante o checkout — só p/ não logado
   const [createAccount, setCreateAccount] = useState(false)
 
+  // Seletor de PAÍS do telefone (jul/26 — comprador de fora recebe os avisos por
+  // WhatsApp no número dele). Padrão Brasil; Brasil segue 100% igual (máscara BR
+  // no próprio campo phone). Não-Brasil: guarda "+<ddi><dígitos>" no phone e o
+  // servidor auto-detecta pelo "+". Detecta o país inicial pelo valor salvo.
+  const [paisTel, setPaisTel] = useState<string>(() => {
+    const p = String(sa.phone || "")
+    const achou = p.startsWith("+")
+      ? PAISES_TELEFONE.find(
+          (x) => x.code !== "BR" && p.replace(/\D/g, "").startsWith(x.ddi)
+        )
+      : null
+    return achou?.code || "BR"
+  })
+  const ddiAtual =
+    PAISES_TELEFONE.find((p) => p.code === paisTel)?.ddi || "55"
+
+  // dígitos NACIONAIS atuais (sem o código do país), pra remontar ao trocar país
+  const digitosNacionais = (): string =>
+    paisTel === "BR"
+      ? telefoneDigits(formData["shipping_address.phone"] || "")
+      : (formData["shipping_address.phone"] || "")
+          .replace(/\D/g, "")
+          .replace(new RegExp("^" + ddiAtual), "")
+
+  // valor MOSTRADO no input: BR = máscara; internacional = só os dígitos nacionais
+  const telExibido =
+    paisTel === "BR"
+      ? formData["shipping_address.phone"] || ""
+      : (formData["shipping_address.phone"] || "")
+          .replace(/\D/g, "")
+          .replace(new RegExp("^" + ddiAtual), "")
+
+  const onChangeTelefone = (raw: string) => {
+    if (paisTel === "BR") {
+      setCampo("shipping_address.phone", maskTelefoneBr(raw))
+    } else {
+      const d = raw.replace(/\D/g, "").slice(0, 15)
+      setCampo("shipping_address.phone", d ? "+" + ddiAtual + d : "")
+    }
+  }
+
+  const onChangePaisTel = (code: string) => {
+    const nacional = digitosNacionais()
+    const novo = PAISES_TELEFONE.find((p) => p.code === code)
+    setPaisTel(code)
+    if (code === "BR") {
+      setCampo("shipping_address.phone", maskTelefoneBr(nacional))
+    } else {
+      setCampo(
+        "shipping_address.phone",
+        nacional ? "+" + (novo?.ddi || "") + nacional : ""
+      )
+    }
+  }
+
   // FIX deadlock (revisão 06/07): o telefone também muda PROGRAMATICAMENTE
   // (AddressSelect/carrinho preenchem via setFormAddress, sem evento `input`,
   // então o onInput que limpa o setCustomValidity nunca dispara). Sem limpar
@@ -233,44 +290,61 @@ const ShippingAddress = ({
         {/* 2. CPF/CNPJ (identificação fiscal) — mesma posição da ordem QDB */}
         {fiscalSlot}
 
-        {/* 3. CELULAR/telefone de ENTREGA (OBRIGATÓRIO desde jul/26 — o
-            entregador liga e manda WhatsApp). Aceita 10 (fixo) OU 11 (celular)
-            dígitos com DDD; o +55 é normalizado. O servidor (setAddresses +
-            placeOrder, ciente do país) é a garantia à prova de autofill; aqui é
-            a conveniência. E-mail ao lado. */}
+        {/* 3. TELEFONE de ENTREGA com SELETOR DE PAÍS (jul/26). Brasil padrão e
+            100% igual (máscara BR + 10-11 díg + pop-up dos 10). Comprador de fora
+            escolhe o país → guarda "+<ddi><dígitos>" e recebe os avisos no número
+            dele (WhatsApp é mundial). O campo submetido é o hidden abaixo; o
+            servidor auto-detecta BR/intl pelo "+". E-mail ao lado. */}
         <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
-          <Input
-            ref={foneRef}
-            label="Celular (com DDD)"
-            name="shipping_address.phone"
-            type="tel"
-            inputMode="numeric"
-            autoComplete="tel"
-            pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
-            required
-            value={formData["shipping_address.phone"]}
-            onChange={(e) =>
-              setCampo(e.target.name, maskTelefoneBr(e.target.value))
-            }
-            onBlur={(e) => {
-              // captura o AUTOFILL do browser que não disparou onChange (input
-              // controlado desincroniza: DOM preenchido, state vazio → o pedido
-              // saía sem telefone, caso Marcia 27133). Ao sair do campo, sincroniza.
-              const m = maskTelefoneBr(e.currentTarget.value)
-              if (m && m !== formData["shipping_address.phone"]) {
-                setCampo(e.currentTarget.name, m)
+          <div className="flex items-end gap-2">
+            <select
+              value={paisTel}
+              onChange={(e) => onChangePaisTel(e.target.value)}
+              aria-label="País do telefone"
+              className="h-11 shrink-0 rounded-md border border-ui-border-base bg-ui-bg-field px-2 text-ui-fg-base outline-none focus:border-copamar-primary"
+              data-testid="shipping-phone-country"
+            >
+              {PAISES_TELEFONE.map((p) => (
+                <option key={p.code} value={p.code}>
+                  {p.flag} {p.code === "BR" ? "Brasil" : "+" + p.ddi}
+                </option>
+              ))}
+            </select>
+            <Input
+              ref={foneRef}
+              label={paisTel === "BR" ? "Celular (com DDD)" : "Número (WhatsApp)"}
+              // nome só de exibição — o servidor lê o hidden shipping_address.phone
+              name="phone_display"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              pattern={
+                paisTel === "BR"
+                  ? "\\([0-9]{2}\\) [0-9]{4,5}-[0-9]{4}"
+                  : undefined
               }
-            }}
-            onInvalid={(e) =>
-              e.currentTarget.setCustomValidity(
-                e.currentTarget.validity.valueMissing
-                  ? TELEFONE_OBRIGATORIO_MSG
-                  : TELEFONE_MSG
-              )
-            }
-            onInput={(e) => e.currentTarget.setCustomValidity("")}
-            data-testid="shipping-phone-input"
-          />
+              required
+              value={telExibido}
+              onChange={(e) => onChangeTelefone(e.target.value)}
+              onBlur={(e) => onChangeTelefone(e.currentTarget.value)}
+              onInvalid={(e) =>
+                e.currentTarget.setCustomValidity(
+                  e.currentTarget.validity.valueMissing
+                    ? TELEFONE_OBRIGATORIO_MSG
+                    : TELEFONE_MSG
+                )
+              }
+              onInput={(e) => e.currentTarget.setCustomValidity("")}
+              className="flex-1"
+              data-testid="shipping-phone-input"
+            />
+            {/* valor REAL submetido (BR: máscara nacional; intl: +<ddi><díg>) */}
+            <input
+              type="hidden"
+              name="shipping_address.phone"
+              value={formData["shipping_address.phone"] || ""}
+            />
+          </div>
           <Input
             label="E-mail"
             name="email"

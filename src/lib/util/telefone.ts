@@ -78,12 +78,43 @@ export function validaTelefoneObrigatorio(v: unknown): string | null {
  */
 export function validaTelefoneEntrega(
   v: unknown,
-  countryCode?: unknown
+  _countryCode?: unknown
 ): string | null {
-  const s = typeof v === "string" ? v : ""
-  if (!s.trim()) return TELEFONE_OBRIGATORIO_MSG
-  const pais = String(countryCode || "br").toLowerCase()
-  if (pais === "br") return isValidTelefoneBr(s) ? null : TELEFONE_MSG
-  // internacional: só exige que exista um número plausível (≥8 dígitos)
-  return s.replace(/\D/g, "").length >= 8 ? null : TELEFONE_MSG
+  const s = (typeof v === "string" ? v : "").trim()
+  if (!s) return TELEFONE_OBRIGATORIO_MSG
+  // AUTO-DETECTA pelo próprio número: "+<código>" ≠ +55 → internacional (o
+  // comprador de fora recebe os avisos por WhatsApp, que funciona no mundo todo);
+  // só exige um número plausível. Sem "+" ou "+55" → Brasil (10-11 díg com DDD).
+  if (s.startsWith("+") && !s.startsWith("+55")) {
+    return s.replace(/\D/g, "").length >= 8 ? null : TELEFONE_MSG
+  }
+  return isValidTelefoneBr(s) ? null : TELEFONE_MSG
+}
+
+/**
+ * Países do seletor de telefone (jul/26 — comprador de fora mandando pra família
+ * no Brasil recebe os avisos no número dele). Brasil PRIMEIRO (padrão); depois os
+ * destinos onde mais tem brasileiro. `ddi` sem o "+". Curado, sem lib externa.
+ */
+export type PaisTelefone = { code: string; nome: string; flag: string; ddi: string }
+export const PAISES_TELEFONE: PaisTelefone[] = [
+  { code: "BR", nome: "Brasil", flag: "🇧🇷", ddi: "55" },
+  { code: "PT", nome: "Portugal", flag: "🇵🇹", ddi: "351" },
+  { code: "US", nome: "EUA", flag: "🇺🇸", ddi: "1" },
+  { code: "GB", nome: "Reino Unido", flag: "🇬🇧", ddi: "44" },
+  { code: "ES", nome: "Espanha", flag: "🇪🇸", ddi: "34" },
+  { code: "DE", nome: "Alemanha", flag: "🇩🇪", ddi: "49" },
+  { code: "FR", nome: "França", flag: "🇫🇷", ddi: "33" },
+  { code: "IT", nome: "Itália", flag: "🇮🇹", ddi: "39" },
+  { code: "CH", nome: "Suíça", flag: "🇨🇭", ddi: "41" },
+  { code: "IE", nome: "Irlanda", flag: "🇮🇪", ddi: "353" },
+  { code: "NL", nome: "Holanda", flag: "🇳🇱", ddi: "31" },
+  { code: "CA", nome: "Canadá", flag: "🇨🇦", ddi: "1" },
+  { code: "AU", nome: "Austrália", flag: "🇦🇺", ddi: "61" },
+  { code: "JP", nome: "Japão", flag: "🇯🇵", ddi: "81" },
+]
+
+/** Só dígitos internacionais de um número não-BR: "+351 912..." → "351912...". */
+export function telefoneIntlDigits(v: string): string {
+  return (v || "").replace(/\D/g, "").slice(0, 15)
 }

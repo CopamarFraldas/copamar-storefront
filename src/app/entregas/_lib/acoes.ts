@@ -48,9 +48,15 @@ async function enfileirarWhatsApp(
   dedup: string
 ): Promise<boolean> {
   if (!SUPA || !KEY || !texto) return false
-  const cel = (celularCliente || "").replace(/\D/g, "")
+  const raw = (celularCliente || "").trim()
+  const cel = raw.replace(/\D/g, "")
   if (!LIVE || !cel) return false // shadow segue no envio direto (1 msg só)
-  const numero = cel.startsWith("55") ? cel : `55${cel}`
+  // preserva o "+" internacional (seletor de país no checkout); BR segue igual
+  const numero = raw.startsWith("+")
+    ? `+${cel}`
+    : cel.startsWith("55")
+    ? cel
+    : `55${cel}`
   try {
     const res = await fetch(`${SUPA}/rest/v1/fila_whatsapp`, {
       method: "POST",
