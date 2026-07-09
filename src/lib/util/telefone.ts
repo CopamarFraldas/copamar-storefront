@@ -64,3 +64,27 @@ export function validaTelefoneObrigatorio(v: unknown): string | null {
   if (!s.trim()) return TELEFONE_OBRIGATORIO_MSG
   return isValidTelefoneBr(s) ? null : TELEFONE_MSG
 }
+
+/** CELULAR válido = 11 dígitos (DDD + 9 + 8), DDD real e o 9 na 3ª posição.
+ *  Fixo (10 díg) NÃO conta — a entrega precisa de celular (ligação + WhatsApp). */
+export function isValidCelularBr(v: string): boolean {
+  const d = telefoneDigits(v)
+  if (d.length !== 11) return false
+  const ddd = parseInt(d.slice(0, 2), 10)
+  return ddd >= 11 && ddd <= 99 && d[2] === "9"
+}
+
+export const CELULAR_OBRIGATORIO_MSG =
+  "Informe um CELULAR com DDD (11 dígitos) — o entregador precisa ligar e mandar WhatsApp na entrega (ex.: (11) 99859-0034)."
+
+/**
+ * Valida CELULAR OBRIGATÓRIO do endereço de ENTREGA (jul/26 — Marco: celular
+ * obrigatório, fixo não). Vazio ou fixo (10 díg) NÃO passam. É o gate autoritativo
+ * do servidor — o cliente é conveniência, o servidor é a garantia (à prova de
+ * autofill/JS off/endereço salvo). Cobrança segue com validaTelefoneOpcional.
+ */
+export function validaCelularObrigatorio(v: unknown): string | null {
+  const s = typeof v === "string" ? v : ""
+  if (!s.trim()) return CELULAR_OBRIGATORIO_MSG
+  return isValidCelularBr(s) ? null : CELULAR_OBRIGATORIO_MSG
+}

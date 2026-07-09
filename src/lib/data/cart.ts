@@ -7,6 +7,7 @@ import { sanitizaEndereco } from "@lib/util/endereco"
 import {
   validaTelefoneObrigatorio,
   validaTelefoneOpcional,
+  validaCelularObrigatorio,
 } from "@lib/util/telefone"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
@@ -444,7 +445,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     // same_as_billing vem null → "" → passa). Backstop autoritativo do
     // required/pattern client-side.
     const foneErr =
-      validaTelefoneObrigatorio(
+      validaCelularObrigatorio(
         String(formData.get("shipping_address.phone") || "")
       ) ||
       validaTelefoneOpcional(String(formData.get("billing_address.phone") || ""))
@@ -570,6 +571,32 @@ export async function placeOrder(cartId?: string) {
 
   const headers = {
     ...(await getAuthHeaders()),
+  }
+
+  // GATE À PROVA DE ERROS (jul/26, Marco: celular obrigatório): revalida o
+  // CELULAR de entrega no ÚLTIMO passo, lendo o CARRINHO REAL — assim pega
+  // QUALQUER caminho que tenha deixado o telefone escapar dos gates de endereço
+  // (autofill dessincronizado, endereço salvo sem celular, re-set no meio).
+  // Nenhum pedido fecha sem celular válido. Falha de rede na leitura NÃO bloqueia
+  // (os gates de setAddresses/signup já validaram); só o celular inválido barra.
+  try {
+    const { cart: cAtual } = await sdk.store.cart.retrieve(
+      id,
+      { fields: "id,shipping_address.phone" },
+      headers
+    )
+    const celErr = validaCelularObrigatorio(
+      String((cAtual as any)?.shipping_address?.phone || "")
+    )
+    if (celErr) {
+      const err: any = new Error(celErr)
+      err.celularInvalido = true // marca pra propagar (o componente mostra a msg)
+      throw err
+    }
+  } catch (e: any) {
+    // celular inválido barra o pedido; falha de LEITURA (infra) segue —
+    // os gates de setAddresses/signup já validaram o vazio no passo de endereço.
+    if (e?.celularInvalido) throw e
   }
 
   const cartRes = await sdk.store.cart

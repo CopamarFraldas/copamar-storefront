@@ -12,6 +12,7 @@ import {
   maskTelefoneBr,
   TELEFONE_MSG,
   TELEFONE_OBRIGATORIO_MSG,
+  CELULAR_OBRIGATORIO_MSG,
 } from "@lib/util/telefone"
 import { derivaEndereco } from "@lib/util/endereco"
 
@@ -224,29 +225,35 @@ const ShippingAddress = ({
         {/* 2. CPF/CNPJ (identificação fiscal) — mesma posição da ordem QDB */}
         {fiscalSlot}
 
-        {/* 3. Telefone (OBRIGATÓRIO desde jul/26 — caso Danielle: sem telefone
-            o motorista entrega às cegas; máscara BR + 10-11 dígitos com DDD)
-            e E-mail */}
+        {/* 3. CELULAR (OBRIGATÓRIO desde jul/26 — Marco: celular, não fixo; o
+            entregador liga E manda WhatsApp. Fixo de 10 díg NÃO passa). Máscara
+            BR + exige 11 díg com o 9. O servidor (setAddresses + placeOrder) é a
+            garantia à prova de autofill; aqui é a conveniência. E-mail ao lado. */}
         <div className="grid grid-cols-1 small:grid-cols-2 gap-4">
           <Input
             ref={foneRef}
-            label="Telefone (com DDD)"
+            label="Celular (com DDD e WhatsApp)"
             name="shipping_address.phone"
             type="tel"
             inputMode="numeric"
             autoComplete="tel"
-            pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
+            pattern="\([0-9]{2}\) 9[0-9]{4}-[0-9]{4}"
             required
             value={formData["shipping_address.phone"]}
             onChange={(e) =>
               setCampo(e.target.name, maskTelefoneBr(e.target.value))
             }
+            onBlur={(e) => {
+              // captura o AUTOFILL do browser que não disparou onChange (input
+              // controlado desincroniza: DOM preenchido, state vazio → o pedido
+              // saía sem telefone, caso Marcia 27133). Ao sair do campo, sincroniza.
+              const m = maskTelefoneBr(e.currentTarget.value)
+              if (m && m !== formData["shipping_address.phone"]) {
+                setCampo(e.currentTarget.name, m)
+              }
+            }}
             onInvalid={(e) =>
-              e.currentTarget.setCustomValidity(
-                e.currentTarget.validity.valueMissing
-                  ? TELEFONE_OBRIGATORIO_MSG
-                  : TELEFONE_MSG
-              )
+              e.currentTarget.setCustomValidity(CELULAR_OBRIGATORIO_MSG)
             }
             onInput={(e) => e.currentTarget.setCustomValidity("")}
             data-testid="shipping-phone-input"
