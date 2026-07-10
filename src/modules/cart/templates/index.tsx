@@ -5,6 +5,7 @@ import SignInPrompt from "../components/sign-in-prompt"
 import MobileCheckoutBar from "../components/mobile-checkout-bar"
 import AvisoRecompra from "../components/aviso-recompra"
 import FreeShippingBar from "../components/free-shipping-bar"
+import ChegaAmanha from "@modules/shipping/components/chega-amanha"
 import RecomendadosCart from "../components/recomendados-cart"
 import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
@@ -38,6 +39,11 @@ const CartTemplate = ({
                 {cart && cart.region && (
                   <>
                     <div className="bg-ui-bg-base py-6 flex flex-col gap-y-4">
+                      {/* 🚚 "Chega AMANHÃ até as Xh" — mesma promessa/dado da
+                          PDP; CEP do cart ou do localStorage (FreteCep) */}
+                      <ChegaAmanha
+                        cepConhecido={cart.shipping_address?.postal_code}
+                      />
                       {/* barra de frete grátis (Tena-style, 07/06) — só com CEP conhecido */}
                       <FreeShippingBar
                         subtotal={Number(cart.item_subtotal ?? cart.subtotal) || 0}

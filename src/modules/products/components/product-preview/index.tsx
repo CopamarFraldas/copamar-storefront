@@ -8,6 +8,7 @@ import SeloAbsorcao from "@modules/common/components/selo-absorcao"
 import Estrelas from "@modules/common/components/estrelas"
 import type { ReviewsAgg } from "@lib/data/reviews"
 import Thumbnail from "../thumbnail"
+import CompararCheckbox from "../comparar/checkbox"
 import PreviewPrice from "./price"
 import AddToCartButton from "./add-to-cart-button"
 
@@ -16,6 +17,7 @@ export default async function ProductPreview({
   isFeatured,
   region,
   reviews,
+  comparavel,
 }: {
   product: HttpTypes.StoreProduct
   isFeatured?: boolean
@@ -23,6 +25,9 @@ export default async function ProductPreview({
   /** agregado de avaliações vindo em LOTE do listing (getReviewsAggregates) —
    *  NUNCA buscar por card. Sem prop/sem avaliação → card sem estrelas. */
   reviews?: ReviewsAgg | null
+  /** liga o "⚖ Comparar" — só nos grids da loja/busca (opt-in por prop pra
+   *  NÃO aparecer nos rails da home, relacionados e recomendados do carrinho) */
+  comparavel?: boolean
 }) {
   // const pricedProduct = await listProducts({
   //   regionId: region.id,
@@ -118,6 +123,14 @@ export default async function ProductPreview({
           <p className="text-[11px] text-ui-fg-subtle leading-snug">{aviso}</p>
         )}
         {!esgotado && <AddToCartButton product={product} />}
+        {/* comparador: fora do link do card (marcar nunca navega) */}
+        {comparavel && product.handle && (
+          <CompararCheckbox
+            handle={product.handle}
+            title={product.title || product.handle}
+            thumbnail={product.thumbnail || product.images?.[0]?.url || null}
+          />
+        )}
       </div>
     </div>
   )

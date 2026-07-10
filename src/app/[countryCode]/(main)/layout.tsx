@@ -5,6 +5,7 @@ import { retrieveCustomer } from "@lib/data/customer"
 import { getBaseURL } from "@lib/util/env"
 import { StoreCartShippingOption } from "@medusajs/types"
 import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
+import CompararBar from "@modules/layout/components/comparar-bar"
 import GoogleStoreWidget from "@modules/common/components/google-store-widget"
 import MapaChat from "@modules/layout/components/mapa-chat"
 import Footer from "@modules/layout/templates/footer"
@@ -41,6 +42,9 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
         />
       )}
       {props.children}
+      {/* barra fixa do comparador (⚖) — client, só renderiza com itens
+          marcados; some sozinha no carrinho/checkout e na própria /comparar */}
+      <CompararBar />
       <Footer />
       {/* selo oficial do Google (store widget) — OFF até o Marco ativar o
           programa no Merchant Center; liga com NEXT_PUBLIC_GOOGLE_STORE_WIDGET=true */}

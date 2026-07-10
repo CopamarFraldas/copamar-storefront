@@ -110,6 +110,7 @@ export default async function PaginatedProducts({
                 product={p}
                 region={region}
                 reviews={p.id ? reviewsAggs[p.id] : undefined}
+                comparavel
               />
             </li>
           )

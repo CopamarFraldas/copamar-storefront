@@ -81,6 +81,11 @@ const FreteCep = ({
     try {
       try {
         localStorage.setItem(CEP_KEY, digits)
+        // avisa quem mais usa o CEP salvo na MESMA aba (ex.: ChegaAmanha) —
+        // o evento "storage" nativo só dispara em OUTRAS abas
+        window.dispatchEvent(
+          new CustomEvent("copamar:cep", { detail: { cep: digits } })
+        )
       } catch {}
       const params = new URLSearchParams({ cep: digits })
       if (vid) params.set("variant_id", vid)

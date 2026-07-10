@@ -11,6 +11,7 @@ import { HttpTypes } from "@medusajs/types"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
 import FreteCep from "@modules/shipping/components/frete-cep"
+import ChegaAmanha from "@modules/shipping/components/chega-amanha"
 import TamanhosIrmaos from "@modules/products/components/tamanhos-irmaos"
 import BreadcrumbPdp from "@modules/products/components/breadcrumb-pdp"
 import SecoesProduto from "@modules/products/components/secoes-produto"
@@ -114,6 +115,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
               real com o peso da variante; lista completa de modalidades.
               ouvirPdp: reage à variante/quantidade do ProductActions (recota ao
               mudar a quantidade — antes travava em 1 unidade, Marco 23/06). */}
+          {/* 🚚 "Chega AMANHÃ até as Xh" — só com CEP salvo NA ZONA de entrega
+              de amanhã (backend decide; corte calculado no servidor). Fica
+              colado no consultor de frete, que é quem colhe o CEP. */}
+          <ChegaAmanha className="-mb-4" />
           <FreteCep variantId={product.variants?.[0]?.id} ouvirPdp />
           {/* benefícios/confiança — preenche e enriquece o box (Marco 09/06) */}
           <BeneficiosCompra />

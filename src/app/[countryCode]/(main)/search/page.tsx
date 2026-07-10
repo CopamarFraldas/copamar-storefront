@@ -135,6 +135,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
                 product={p}
                 region={region}
                 reviews={p.id ? reviewsAggs[p.id] : undefined}
+                comparavel
               />
             </li>
           ))}
