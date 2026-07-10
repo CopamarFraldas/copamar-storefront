@@ -96,6 +96,33 @@ export default function TrocasDevolucoesPage() {
             </LocalizedClientLink>{" "}
             ou pergunte no WhatsApp — ajudamos a acertar de primeira.
           </p>
+
+          {/* Troca na visita — região de entrega própria (texto aprovado
+              pelo Marco, v2 10/07 — não alterar a essência) */}
+          <div className="mt-3 rounded-lg border border-copamar-primary/30 bg-copamar-primary/5 px-4 py-3 text-sm leading-relaxed">
+            <h3 className="font-semibold text-ui-fg-base mb-1">
+              🚚 Troca de tamanho na região de entrega própria
+            </h3>
+            <p>
+              <strong>Errou o tamanho? A gente troca!</strong> Na nossa região
+              de entrega própria (São Paulo e Grande ABC), nosso entregador
+              leva o tamanho certo e recolhe o pacote —{" "}
+              <strong>na mesma visita, sem custo</strong>.
+            </p>
+            <p className="mt-2">
+              Válido para pacotes fechados e lacrados, em até 7 dias após a
+              entrega.
+            </p>
+          </div>
+
+          <p className="mt-3 text-sm leading-relaxed text-ui-fg-subtle">
+            <strong className="text-ui-fg-base">
+              Fora da região de entrega própria
+            </strong>
+            , a troca de tamanho segue o fluxo padrão: você devolve primeiro o
+            pacote lacrado pelos Correios (a gente combina tudo pelo WhatsApp)
+            e, assim que ele chega aqui, enviamos o tamanho certo.
+          </p>
         </section>
 
         <section>

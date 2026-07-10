@@ -12,6 +12,7 @@ import { HttpTypes } from "@medusajs/types"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import FreteCep from "@modules/shipping/components/frete-cep"
 import ChegaAmanha from "@modules/shipping/components/chega-amanha"
+import TrocaFacil from "@modules/shipping/components/troca-facil"
 import TamanhosIrmaos from "@modules/products/components/tamanhos-irmaos"
 import BreadcrumbPdp from "@modules/products/components/breadcrumb-pdp"
 import SecoesProduto from "@modules/products/components/secoes-produto"
@@ -120,6 +121,11 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
               colado no consultor de frete, que é quem colhe o CEP. */}
           <ChegaAmanha className="-mb-4" />
           <FreteCep variantId={product.variants?.[0]?.id} ouvirPdp />
+          {/* 🚚 "Errou o tamanho? A gente troca!" — só com CEP salvo DENTRO da
+              região de entrega própria (fretes_ceps decide, via /api/regiao-
+              propria). Fecha o bloco de frete: promessa (ChegaAmanha) → cotação
+              (FreteCep) → garantia de troca. Clique abre o modal com a regra. */}
+          <TrocaFacil className="-mt-4" />
           {/* benefícios/confiança — preenche e enriquece o box (Marco 09/06) */}
           <BeneficiosCompra />
         </div>
