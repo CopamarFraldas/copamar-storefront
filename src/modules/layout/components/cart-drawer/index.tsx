@@ -23,11 +23,14 @@ import CartCrossSell from "./cross-sell"
 const CartDrawer = ({
   cart: cartState,
   complementos = [],
+  irmaosComplementos = {},
   countryCode = "br",
 }: {
   cart?: HttpTypes.StoreCart | null
   /** curadoria toalha/luva pro "Vai levar junto?" — já buscada no server */
   complementos?: HttpTypes.StoreProduct[]
+  /** handle da sugestão → produtos irmãos de tamanho (P·M·G), já buscados */
+  irmaosComplementos?: Record<string, HttpTypes.StoreProduct[]>
   countryCode?: string
 }) => {
   const [aberto, setAberto] = useState(false)
@@ -229,6 +232,7 @@ const CartDrawer = ({
                     <CartCrossSell
                       cart={cartState!}
                       produtos={complementos}
+                      irmaos={irmaosComplementos}
                       countryCode={countryCode}
                     />
                   )}
