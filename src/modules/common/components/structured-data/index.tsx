@@ -246,6 +246,16 @@ export type ProductSchemaInput = {
    *  site) — exatamente o caso que a política do Google permite (ver nota do
    *  aggregateRating de loja acima, que segue vedado). Só entra com total>0. */
   aggregateRating?: { media: number; total: number }
+  /** Até 3 avaliações publicadas recentes (mesma fonte first-party) → `review`
+   *  no markup, pro rich snippet com estrelas. `nome` JÁ vem exibível do
+   *  backend ("Maria S."); `comentario` é o campo exibido na PDP (sanitizado).
+   *  Só entram junto com aggregateRating (total>0) — NUNCA sozinhas/fake. */
+  reviews?: {
+    nome: string
+    rating: number
+    comentario?: string
+    created_at: string
+  }[]
   brand?: string
   url?: string
   price?: number | string
@@ -275,11 +285,37 @@ export function productSchema(product: ProductSchemaInput) {
   if (product.aggregateRating && product.aggregateRating.total > 0) {
     schema.aggregateRating = {
       "@type": "AggregateRating",
-      ratingValue: String(product.aggregateRating.media),
+      // média com 1 casa decimal ("4.7", "5.0") — como o Google exibe
+      ratingValue: Number(product.aggregateRating.media).toFixed(1),
       reviewCount: product.aggregateRating.total,
       bestRating: "5",
       worstRating: "1",
     }
+    // até 3 reviews recentes (mesma fonte) — só existem JUNTO do agregado;
+    // zero reviews → nem aggregateRating nem review (nada vazio/fake)
+    const reviews = (product.reviews || [])
+      .filter((r) => Number.isFinite(r.rating) && r.rating >= 1 && r.rating <= 5)
+      .slice(0, 3)
+      .map((r) => {
+        const item: Record<string, unknown> = {
+          "@type": "Review",
+          author: { "@type": "Person", name: r.nome || "Cliente Copamar" },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: String(r.rating),
+            bestRating: "5",
+            worstRating: "1",
+          },
+        }
+        const d = new Date(r.created_at)
+        if (!isNaN(d.getTime())) {
+          item.datePublished = d.toISOString().slice(0, 10)
+        }
+        const corpo = (r.comentario || "").trim()
+        if (corpo) item.reviewBody = corpo
+        return item
+      })
+    if (reviews.length) schema.review = reviews
   }
   // specs estruturadas factuais (tamanho, unidades por pacote...) pra IA citar
   if (product.specs?.length) {

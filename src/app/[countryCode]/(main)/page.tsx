@@ -1,5 +1,7 @@
 import { Metadata } from "next"
+import { Suspense } from "react"
 
+import AvisoRecompraInvalida from "@modules/home/components/aviso-recompra-invalida"
 import HeroConversao, { getBanners } from "@modules/home/components/hero-conversao"
 import BannerEsteira from "@modules/home/components/banner-esteira"
 // 04/07 (2º passe LCP/TBT): BussolaSection e FreteCep entram por wrappers
@@ -68,6 +70,11 @@ export default async function Home(props: {
 
   return (
     <>
+      {/* aviso discreto de link de recompra inválido (?recompra=invalido) —
+          client-side + Suspense pra não tirar a home do cache estático */}
+      <Suspense fallback={null}>
+        <AvisoRecompraInvalida />
+      </Suspense>
       {bannerTopo && (
         <BannerEsteira altura={200} alturaMobile={140} duracao={90} prioridade
           banners={bannersTopo?.banners} marcaSlides={bannersTopo?.marca_slides} />

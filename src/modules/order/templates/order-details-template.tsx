@@ -5,6 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
+import LembreteRecompra from "@modules/order/components/lembrete-recompra"
 import OrderDetails from "@modules/order/components/order-details"
 import OrderSummary from "@modules/order/components/order-summary"
 import RastreioEntrega from "@modules/order/components/rastreio-entrega"
@@ -19,6 +20,15 @@ type OrderDetailsTemplateProps = {
 const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
   order,
 }) => {
+  // celular do pedido — o bloco "Me lembre de repor" só aparece se dá pra
+  // mandar WhatsApp (entrega → cobrança → cliente)
+  const celular = String(
+    order.shipping_address?.phone ||
+      order.billing_address?.phone ||
+      (order as any).customer?.phone ||
+      ""
+  ).replace(/\D/g, "")
+
   return (
     <div className="flex flex-col justify-center gap-y-4">
       <div className="flex gap-2 justify-between items-center">
@@ -46,6 +56,9 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
           displayId={order.display_id}
           countryCode={(order.shipping_address?.country_code as any) || "br"}
         />
+        {celular.length >= 10 && (
+          <LembreteRecompra orderId={order.id} displayId={order.display_id} />
+        )}
         <Items order={order} />
         <ShippingDetails order={order} />
         <OrderSummary order={order} />
