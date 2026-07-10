@@ -13,8 +13,10 @@
 
 import Image from "next/image"
 
-type BannerInput = { image_url: string; link?: string }
-type SlideInput = { badge: string; titulo: string; sub: string }
+import { painelId, trackBanner } from "@lib/tracking/banner-ab"
+
+export type BannerInput = { image_url: string; link?: string }
+export type SlideInput = { badge: string; titulo: string; sub: string }
 
 // FALLBACK — usado quando o admin ainda não tem nada salvo (ou a API falha)
 const LINKS_FALLBACK: Record<string, string> = {
@@ -30,7 +32,8 @@ const LINKS_FALLBACK: Record<string, string> = {
   "10": "/br/search?q=dermacare"
 }
 
-const BANNERS_FALLBACK: BannerInput[] = [
+// exportado: o banner-carrossel (variante B do A/B do topo) usa o MESMO fallback
+export const BANNERS_FALLBACK: BannerInput[] = [
   "frete_gratis", "tena_slip", "dia_noite_vita", "promo_mes", "abena",
   "vitaplus", "tena_men", "2", "retirar_loja", "10",
 ].map((n) => ({ image_url: `/banners-esteira/${n}.webp`, link: LINKS_FALLBACK[n] || undefined }))
@@ -96,6 +99,7 @@ export default function BannerEsteira({
   prioridade = false,
   banners,
   marcaSlides,
+  varianteAB,
 }: {
   altura?: number
   /** altura menor no mobile (banner no TOPO não pode engolir a 1ª dobra do celular) */
@@ -105,6 +109,8 @@ export default function BannerEsteira({
   prioridade?: boolean
   banners?: BannerInput[]
   marcaSlides?: SlideInput[]
+  /** setado pelo A/B do topo (banner-topo-ab): liga o banner_click com a variante; sem ele, zero tracking (comportamento antigo) */
+  varianteAB?: "esteira"
 }) {
   const bs = banners && banners.length ? banners : BANNERS_FALLBACK
   const ms = marcaSlides && marcaSlides.length ? marcaSlides : MARCA_FALLBACK
@@ -129,7 +135,21 @@ export default function BannerEsteira({
         {seq.map((it, i) =>
           it.tipo === "banner" ? (
             it.b.link ? (
-              <a key={i} href={it.b.link} className="block shrink-0" aria-label="Ver oferta">
+              <a
+                key={i}
+                href={it.b.link}
+                className="block shrink-0"
+                aria-label="Ver oferta"
+                onClick={
+                  varianteAB
+                    ? () =>
+                        trackBanner("banner_click", {
+                          variante: varianteAB,
+                          painel: painelId(it.b),
+                        })
+                    : undefined
+                }
+              >
                 {/* next/image #101: width/height 0 + width:auto porque cada banner
                     tem proporção própria (e os do admin são upload livre) — mesmo
                     layout do <img> cru de antes (sem CLS novo), mas com lazy-load

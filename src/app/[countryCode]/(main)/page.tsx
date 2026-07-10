@@ -4,6 +4,7 @@ import { Suspense } from "react"
 import AvisoRecompraInvalida from "@modules/home/components/aviso-recompra-invalida"
 import HeroConversao, { getBanners } from "@modules/home/components/hero-conversao"
 import BannerEsteira from "@modules/home/components/banner-esteira"
+import BannerTopoAB from "@modules/home/components/banner-topo-ab"
 // 04/07 (2º passe LCP/TBT): BussolaSection e FreteCep entram por wrappers
 // dynamic({ssr:false}) — ver comentários nos wrappers. BussolaSection tira
 // framer-motion do bundle inicial; FreteCep tira o JS da calculadora. Ambos
@@ -67,6 +68,10 @@ export default async function Home(props: {
   // Mobile mais baixo (140px) pra não engolir a 1ª dobra; 1ª imagem com priority (LCP).
   const bannerTopo = process.env.NEXT_PUBLIC_BANNER_TOPO === "true"
   const bannersTopo = bannerTopo ? await getBanners() : null
+  // A/B esteira×carrossel no banner do topo (10/07, ressalva WCAG 2.2.2 da
+  // super análise). "on" = sorteio 50/50 client-side (banner-topo-ab);
+  // qualquer outro valor = kill switch, todo mundo vê a esteira atual.
+  const bannerAB = process.env.NEXT_PUBLIC_BANNER_AB === "on"
 
   return (
     <>
@@ -75,10 +80,14 @@ export default async function Home(props: {
       <Suspense fallback={null}>
         <AvisoRecompraInvalida />
       </Suspense>
-      {bannerTopo && (
-        <BannerEsteira altura={200} alturaMobile={140} duracao={90} prioridade
-          banners={bannersTopo?.banners} marcaSlides={bannersTopo?.marca_slides} />
-      )}
+      {bannerTopo &&
+        (bannerAB ? (
+          <BannerTopoAB altura={200} alturaMobile={140} duracao={90} prioridade
+            banners={bannersTopo?.banners} marcaSlides={bannersTopo?.marca_slides} />
+        ) : (
+          <BannerEsteira altura={200} alturaMobile={140} duracao={90} prioridade
+            banners={bannersTopo?.banners} marcaSlides={bannersTopo?.marca_slides} />
+        ))}
       <HeroConversao esteira={!bannerTopo} />
       {heroBussola && <BussolaSection />}
       {/* dois "ajudantes" cedo na página: consultor de frete (nº1) + guia de
