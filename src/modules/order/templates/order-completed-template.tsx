@@ -6,6 +6,8 @@ import ConfirmationHero from "@modules/order/components/confirmation-hero"
 import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
 import LembreteRecompra from "@modules/order/components/lembrete-recompra"
+import EntregaProgramada from "@modules/order/components/entrega-programada"
+import { getEntregaProgramadaConfig } from "@lib/data/entrega-programada"
 import OnboardingCta from "@modules/order/components/onboarding-cta"
 import OrderDetails from "@modules/order/components/order-details"
 import RetiradaAviso from "@modules/order/components/retirada-aviso"
@@ -34,6 +36,13 @@ export default async function OrderCompletedTemplate({
   ).replace(/\D/g, "")
   const temCelular = celular.length >= 10
 
+  // 📦 Entrega Programada: só oferece com a flag copamar_kv ON (fail-closed) —
+  // e com celular (o ciclo chega por WhatsApp). Convive com o lembrete: o
+  // lembrete é UM toque avulso, a entrega programada é RECORRENTE com 5%.
+  const { ativo: epAtiva } = temCelular
+    ? await getEntregaProgramadaConfig()
+    : { ativo: false }
+
   return (
     <div className="py-6 min-h-[calc(100vh-64px)]">
       <div className="content-container flex flex-col justify-center items-center gap-y-10 max-w-4xl h-full w-full">
@@ -51,6 +60,13 @@ export default async function OrderCompletedTemplate({
               por WhatsApp; sem número não tem como avisar) */}
           {temCelular && (
             <LembreteRecompra orderId={order.id} displayId={order.display_id} />
+          )}
+          {/* 📦 recorrente com 5% — logo abaixo do lembrete avulso */}
+          {epAtiva && (
+            <EntregaProgramada
+              orderId={order.id}
+              displayId={order.display_id}
+            />
           )}
           <Heading level="h2" className="flex flex-row text-3xl-regular">
             Resumo

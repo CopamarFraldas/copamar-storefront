@@ -46,6 +46,11 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   // INVISÍVEL (sem lixeira!) — remover o code por fora do /cashback/remover
   // deixaria o saldo reservado sem desconto correspondente (revisão 10/07).
   const temCashback = promotions.some((p) => p.code?.startsWith("CASHBK-"))
+  // ASSINATURA5 (Entrega Programada, 10/07) também NÃO é cupom digitável: quem
+  // aplica é o MOTOR, no carrinho do ciclo. Aparece na lista (o cliente PRECISA
+  // ver os 5% prometidos no WhatsApp) mas SEM lixeira — tirar sem querer
+  // mataria o benefício da entrega programada no meio do checkout.
+  const temAssinatura = promotions.some((p) => p.code === "ASSINATURA5")
   const promotionsVisiveis = promotions.filter(
     (p) => !p.code?.startsWith("CASHBK-")
   )
@@ -69,11 +74,28 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     if (!code) {
       return
     }
+    // ASSINATURA5 não é digitável: é o desconto automático da Entrega
+    // Programada (o motor aplica no carrinho do ciclo). Digitado aqui, seria
+    // 5% "de graça" fora do programa.
+    if (code.toString().trim().toUpperCase() === "ASSINATURA5") {
+      setErrorMessage(
+        "Esse é o desconto automático da Entrega Programada — ele já vem aplicado no pedido do seu ciclo."
+      )
+      return
+    }
     // NÃO-CUMULATIVO também com o cashback (mesma regra do backend): cupom
     // manual por cima do resgate acumularia os dois descontos.
     if (temCashback) {
       setErrorMessage(
         "Cupom não acumula com o cashback. Remova o cashback aplicado para usar o cupom."
+      )
+      return
+    }
+    // NÃO-CUMULATIVO com a Entrega Programada (regra do desenho 10/07): os 5%
+    // da assinatura não somam com cupom manual.
+    if (temAssinatura) {
+      setErrorMessage(
+        "Sua Entrega Programada já garante 5% de desconto — cupom não acumula."
       )
       return
     }
@@ -195,24 +217,28 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                         )} */}
                       </span>
                     </Text>
-                    {!promotion.is_automatic && (
-                      <button
-                        className="flex items-center"
-                        onClick={() => {
-                          if (!promotion.code) {
-                            return
-                          }
+                    {/* ASSINATURA5 = benefício do programa, não cupom: SEM
+                        lixeira (padrão do fix do cashback) — remover aqui
+                        tiraria os 5% prometidos no WhatsApp do ciclo */}
+                    {!promotion.is_automatic &&
+                      promotion.code !== "ASSINATURA5" && (
+                        <button
+                          className="flex items-center"
+                          onClick={() => {
+                            if (!promotion.code) {
+                              return
+                            }
 
-                          removePromotionCode(promotion.code)
-                        }}
-                        data-testid="remove-discount-button"
-                      >
-                        <Trash size={14} />
-                        <span className="sr-only">
-                          Remover cupom do pedido
-                        </span>
-                      </button>
-                    )}
+                            removePromotionCode(promotion.code)
+                          }}
+                          data-testid="remove-discount-button"
+                        >
+                          <Trash size={14} />
+                          <span className="sr-only">
+                            Remover cupom do pedido
+                          </span>
+                        </button>
+                      )}
                   </div>
                 )
               })}

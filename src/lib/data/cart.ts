@@ -317,6 +317,9 @@ export async function setDescontoPix(ativo: boolean) {
   // 10% virava 15% no PIX. Cupom manual = qualquer código ≠ PIX5 — EXCETO o
   // resgate de cashback (CASHBK-*), que por regra aprovada CONVIVE com o PIX5
   // (sem esta exceção, usar o cashback derrubava os 5% do PIX — revisão 10/07).
+  // ASSINATURA5 (Entrega Programada, 10/07) cai DE PROPÓSITO no balde "cupom
+  // manual": o 5% da assinatura SUBSTITUI o PIX5 (vale em qualquer pagamento,
+  // nunca soma) — NÃO adicionar exceção pra ele aqui.
   const temCupomManual = codes.some(
     (c) => c !== "PIX5" && !c.startsWith("CASHBK-")
   )
@@ -375,6 +378,11 @@ export async function submitPromotionForm(
   formData: FormData
 ) {
   const code = formData.get("code") as string
+  // ASSINATURA5 não é digitável (desconto do motor da Entrega Programada) —
+  // mesmo guard do DiscountCode, aqui como backstop server-side.
+  if (String(code || "").trim().toUpperCase() === "ASSINATURA5") {
+    return "Esse é o desconto automático da Entrega Programada."
+  }
   try {
     await applyPromotions([code])
   } catch (e: any) {

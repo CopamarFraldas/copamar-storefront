@@ -6,6 +6,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
 import LembreteRecompra from "@modules/order/components/lembrete-recompra"
+import EntregaProgramada from "@modules/order/components/entrega-programada"
 import OrderDetails from "@modules/order/components/order-details"
 import OrderSummary from "@modules/order/components/order-summary"
 import RastreioEntrega from "@modules/order/components/rastreio-entrega"
@@ -15,10 +16,14 @@ import React from "react"
 
 type OrderDetailsTemplateProps = {
   order: HttpTypes.StoreOrder
+  /** flag copamar_kv 'entrega_programada' — o PAI (server) lê e passa (este
+   * template é client component, não pode buscar a flag sozinho) */
+  entregaProgramadaAtiva?: boolean
 }
 
 const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
   order,
+  entregaProgramadaAtiva,
 }) => {
   // celular do pedido — o bloco "Me lembre de repor" só aparece se dá pra
   // mandar WhatsApp (entrega → cobrança → cliente)
@@ -58,6 +63,10 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
         />
         {celular.length >= 10 && (
           <LembreteRecompra orderId={order.id} displayId={order.display_id} />
+        )}
+        {/* 📦 recorrente com 5% — logo abaixo do lembrete avulso */}
+        {celular.length >= 10 && entregaProgramadaAtiva && (
+          <EntregaProgramada orderId={order.id} displayId={order.display_id} />
         )}
         <Items order={order} />
         <ShippingDetails order={order} />
