@@ -106,12 +106,14 @@ const WhatsAppIcon = () => (
 const Atendimento = () => (
   <div className="flex flex-col gap-y-3">
     <h3 className="text-sm font-semibold text-ui-fg-base">Atendimento</h3>
-    {/* Botão MAPA — destaque visual (assistente virtual 24h, mais usado) */}
+    {/* Botão MAPA — destaque visual (assistente virtual 24h, mais usado).
+        Verde #15803d (era #25d366, 1,98:1 com branco — reprovava WCAG AA):
+        5,0:1 e continua lendo como "verde de WhatsApp". */}
     <a
-      href="https://wa.me/551149903013"
+      href="https://wa.me/551141190201"
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-2 rounded-full bg-[#25d366] hover:bg-[#1ebe5d] text-white font-semibold px-4 py-2.5 shadow-md hover:shadow-lg transition-all"
+      className="inline-flex items-center gap-2 rounded-full bg-[#15803d] hover:bg-[#166534] text-white font-semibold px-4 py-2.5 shadow-md hover:shadow-lg transition-all"
       aria-label="Falar com a Mapa, assistente virtual da Copamar, pelo WhatsApp"
     >
       <WhatsAppIcon />
@@ -125,7 +127,7 @@ const Atendimento = () => (
       href="https://wa.me/5511952050000"
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-2 rounded-full border border-[#25d366] text-[#25d366] hover:bg-[#25d366]/10 font-semibold px-4 py-2.5 transition-colors"
+      className="inline-flex items-center gap-2 rounded-full border border-[#15803d] text-[#15803d] hover:bg-[#15803d]/10 font-semibold px-4 py-2.5 transition-colors"
       aria-label="Falar com um atendente humano pelo WhatsApp"
     >
       <WhatsAppIcon />
@@ -134,35 +136,36 @@ const Atendimento = () => (
         <span className="text-[10px] font-normal opacity-80">Seg a Sex · 8h às 17h</span>
       </span>
     </a>
+    {/* text-sm + py-2 (era text-xs): alvo de toque >= 24px pro público 45-65 */}
     <a
       href="mailto:vendas@copamarfraldas.com.br"
-      className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors mt-1"
+      className="text-sm py-2 text-ui-fg-subtle hover:text-[#1251b8] transition-colors mt-1"
     >
       ou e-mail: vendas@copamarfraldas.com.br
     </a>
     {/* páginas institucionais de atendimento (Marco 04/06) */}
-    <div className="mt-1 flex flex-col gap-y-1">
+    <div className="mt-1 flex flex-col">
       <LocalizedClientLink
         href="/contato"
-        className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
+        className="text-sm py-2 text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
       >
         Contato e endereço
       </LocalizedClientLink>
       <LocalizedClientLink
         href="/trocas-e-devolucoes"
-        className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
+        className="text-sm py-2 text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
       >
         Trocas e Devoluções
       </LocalizedClientLink>
       <LocalizedClientLink
         href="/perguntas-frequentes"
-        className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
+        className="text-sm py-2 text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
       >
         Perguntas frequentes
       </LocalizedClientLink>
       <LocalizedClientLink
         href="/politica-de-privacidade"
-        className="text-xs text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
+        className="text-sm py-2 text-ui-fg-subtle hover:text-[#1251b8] transition-colors"
       >
         Política de Privacidade
       </LocalizedClientLink>

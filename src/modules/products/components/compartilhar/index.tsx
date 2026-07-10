@@ -215,7 +215,7 @@ const Compartilhar = ({
           >
             {copiado ? (
               <span
-                className="flex items-center gap-x-2.5 text-emerald-600"
+                className="flex items-center gap-x-2.5 text-emerald-700"
                 aria-live="polite"
               >
                 <svg

@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react"
 export default function Spin360({ basePath, alt }: { basePath: string; alt: string }) {
   const FRAMES = 36
   const [frame, setFrame] = useState(0)
+  const [precarregar, setPrecarregar] = useState(false)
   const [carregado, setCarregado] = useState(false)
   const [interagiu, setInteragiu] = useState(false)
   const drag = useRef<{ x: number; frame: number } | null>(null)
@@ -19,19 +20,58 @@ export default function Spin360({ basePath, alt }: { basePath: string; alt: stri
   const src = (n: number) =>
     `${basePath}/f${String(((n % FRAMES) + FRAMES) % FRAMES).padStart(2, "0")}.jpg`
 
-  // pré-carrega os frames (depois do 1º render)
+  // libera o pré-carregamento só quando o componente se aproxima da tela
+  // e o navegador está ocioso — os 36 frames (~1,6MB) não pesam mais no LCP
   useEffect(() => {
+    if (precarregar) return
+    const el = rootRef.current
+    if (!el || typeof IntersectionObserver === "undefined") {
+      // fallback raro (sem observer): carrega um pouco depois, sem travar a página
+      const t = window.setTimeout(() => setPrecarregar(true), 3000)
+      return () => clearTimeout(t)
+    }
+    let idle = 0
+    let usouIdle = false
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return
+        io.disconnect()
+        // espera um momento ocioso (com fallback pra navegadores sem a API, ex. Safari)
+        if (typeof window.requestIdleCallback === "function") {
+          usouIdle = true
+          idle = window.requestIdleCallback(() => setPrecarregar(true), { timeout: 2000 })
+        } else {
+          idle = window.setTimeout(() => setPrecarregar(true), 200)
+        }
+      },
+      { rootMargin: "200px" }
+    )
+    io.observe(el)
+    return () => {
+      io.disconnect()
+      if (usouIdle) window.cancelIdleCallback?.(idle)
+      else clearTimeout(idle)
+    }
+  }, [precarregar])
+
+  // pré-carrega os frames (sob demanda — liberado acima ou na 1ª interação)
+  useEffect(() => {
+    if (!precarregar) return
+    let cancelado = false
     let vivos = 0
     for (let i = 0; i < FRAMES; i++) {
       const img = new Image()
       img.onload = () => {
         vivos++
-        if (vivos >= FRAMES - 2) setCarregado(true)
+        if (!cancelado && vivos >= FRAMES - 2) setCarregado(true)
       }
       img.src = src(i)
     }
+    return () => {
+      cancelado = true
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [basePath])
+  }, [precarregar, basePath])
 
   // auto-gira 1 volta quando visível (e ainda sem interação)
   useEffect(() => {
@@ -64,6 +104,7 @@ export default function Spin360({ basePath, alt }: { basePath: string; alt: stri
 
   const onDown = (x: number) => {
     setInteragiu(true)
+    setPrecarregar(true) // quem já quer girar não espera o idle
     drag.current = { x, frame }
   }
   const onMove = (x: number) => {

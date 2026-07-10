@@ -1,5 +1,6 @@
 import { getNavCategories } from "@lib/data/nav-categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import CategoriaTrackLink from "@modules/common/components/categoria-track-link"
 import ChipsScroller from "./chips-scroller"
 
 /**
@@ -49,16 +50,30 @@ const CategoryChips = async ({ inline = false }: { inline?: boolean }) => {
           🏢 Atacado / CNPJ
         </a>
       </li>
-      {chips.map((c) => (
-        <li key={c.handle} className="shrink-0 snap-start">
-          <LocalizedClientLink
-            href={c.href}
-            className="inline-flex items-center whitespace-nowrap rounded-full border border-ui-border-base bg-ui-bg-base px-4 py-1.5 text-sm font-medium text-ui-fg-base transition hover:border-copamar-primary hover:bg-copamar-primary/10 hover:text-copamar-primary"
-          >
-            {c.name}
-          </LocalizedClientLink>
-        </li>
-      ))}
+      {chips.map((c) => {
+        const cls =
+          "inline-flex items-center whitespace-nowrap rounded-full border border-ui-border-base bg-ui-bg-base px-4 py-1.5 text-sm font-medium text-ui-fg-base transition hover:border-copamar-primary hover:bg-copamar-primary/10 hover:text-copamar-primary"
+        return (
+          <li key={c.handle} className="shrink-0 snap-start">
+            {c.handle === "__all__" ? (
+              <LocalizedClientLink href={c.href} className={cls}>
+                {c.name}
+              </LocalizedClientLink>
+            ) : (
+              // evento click_categoria (origem "chips") — fire-and-forget,
+              // não bloqueia a navegação
+              <CategoriaTrackLink
+                handle={c.handle}
+                origem="chips"
+                href={c.href}
+                className={cls}
+              >
+                {c.name}
+              </CategoriaTrackLink>
+            )}
+          </li>
+        )
+      })}
     </ul>
   )
 

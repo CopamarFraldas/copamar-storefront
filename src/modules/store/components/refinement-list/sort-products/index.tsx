@@ -2,7 +2,7 @@
 
 import FilterRadioGroup from "@modules/common/components/filter-radio-group"
 
-export type SortOptions = "price_asc" | "price_desc" | "created_at"
+export type SortOptions = "destaque" | "price_asc" | "price_desc" | "created_at"
 
 type SortProductsProps = {
   sortBy: SortOptions
@@ -11,6 +11,12 @@ type SortProductsProps = {
 }
 
 const sortOptions = [
+  {
+    // "Mais vendidos" = curadoria (metadata.destaque) + boost da loja; é o
+    // default da /store — ver StoreTemplate e sortProducts.
+    value: "destaque",
+    label: "Mais vendidos",
+  },
   {
     value: "created_at",
     label: "Mais recentes",

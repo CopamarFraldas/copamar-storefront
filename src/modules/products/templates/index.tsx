@@ -20,6 +20,7 @@ import Spin360 from "@modules/products/components/spin-360"
 import { Ga4ViewItem } from "@modules/common/components/ga4-ecommerce"
 import { getProductPrice } from "@lib/util/get-product-price"
 import AvaliacoesProduto from "@modules/products/components/avaliacoes"
+import CompreJunto from "@modules/products/components/compre-junto"
 import type { ReviewsAgg } from "@lib/data/reviews"
 
 type ProductTemplateProps = {
@@ -124,6 +125,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <SecoesProduto product={product} />
         </div>
       </div>
+      {/* Compre Junto (Manus 10/07): complementos de higiene, curadoria fixa */}
+      <Suspense fallback={null}>
+        <CompreJunto product={product} countryCode={countryCode} />
+      </Suspense>
       {/* Avaliações first-party (estrelinhas 1-5 + comentários) — client-side
           pelo proxy /api/reviews (a PDP é cacheada; a seção fica sempre fresca) */}
       <AvaliacoesProduto productId={product.id} />

@@ -34,7 +34,7 @@ type Resultado = {
 
 const CEP_KEY = "copamar_cep"
 const WHATS_FRETE =
-  "https://wa.me/551149903013?text=" +
+  "https://wa.me/551141190201?text=" +
   encodeURIComponent(
     "Olá! Não sei meu frete. Pode me ajudar a calcular o frete e o prazo?"
   )
@@ -153,6 +153,15 @@ const FreteCep = ({
           Calcular frete e prazo
         </span>
       </div>
+      {/* Manus 10/07 (regra do Marco): comunicar a condição do frete grátis CEDO,
+          antes do checkout — grátis ≥ R$50 é da ENTREGA PRÓPRIA (SP e região) */}
+      <p className="mt-1 text-xs text-ui-fg-subtle">
+        <strong className="text-emerald-700 dark:text-emerald-400">
+          Frete GRÁTIS a partir de R$ 50
+        </strong>{" "}
+        em São Paulo e região (entrega própria) · demais regiões, calcule pelo
+        CEP
+      </p>
 
       <form
         onSubmit={(e) => {

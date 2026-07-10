@@ -54,13 +54,20 @@ const Payment = ({
       o.service_zone?.fulfillment_set?.type === "pickup"
   )
 
-  // estado inicial: se a sessão ativa é boleto, marca boleto; senão começa vazio
-  // (o provider PagBank não distingue PIX/Cartão, então o cliente re-escolhe).
-  const [opcao, setOpcao] = useState<Opcao>(
-    activeSession?.provider_id && isPagHiperBoleto(activeSession.provider_id)
-      ? "boleto"
-      : ""
-  )
+  // estado inicial: se a sessão ativa é boleto, marca boleto; com qualquer OUTRA
+  // sessão ativa começa vazio (PagBank não distingue PIX/Cartão — o cliente
+  // re-escolhe; nunca sobrescrever o que já existe). SEM sessão nenhuma, o PIX
+  // já vem pré-selecionado — SÓ o estado do radio: nenhuma payment session é
+  // criada no mount (o QR do PagBankPix só nasce no clique em "Gerar PIX") e o
+  // desconto PIX5 entra pelo MESMO useEffect de sempre, idêntico ao clique
+  // manual (incidente "PIX órfão": trocar método após o QR apaga a sessão).
+  const [opcao, setOpcao] = useState<Opcao>(() => {
+    if (activeSession) {
+      return isPagHiperBoleto(activeSession.provider_id) ? "boleto" : ""
+    }
+    // pré-seleciona só se o PIX (PagBank) está de fato disponível
+    return pagbankId ? "pix" : ""
+  })
 
   const searchParams = useSearchParams()
   const router = useRouter()

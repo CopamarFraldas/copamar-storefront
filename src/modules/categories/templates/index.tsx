@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
-import { ordenaSubs } from "@lib/data/nav-categories"
+import SubcategoriasBand from "@modules/categories/components/subcategorias-band"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
@@ -77,22 +77,14 @@ export default function CategoryTemplate({
             <p>{category.description}</p>
           </div>
         )}
-        {category.category_children && category.category_children.length > 0 && (
-          <div className="mb-8">
-            <p className="mb-3 text-sm text-ui-fg-subtle">Refine sua busca</p>
-            <div className="flex flex-wrap gap-2">
-              {[...category.category_children].sort(ordenaSubs).map((c) => (
-                <LocalizedClientLink
-                  key={c.id}
-                  href={`/categories/${c.handle}`}
-                  className="inline-flex items-center rounded-full border border-ui-border-base bg-ui-bg-subtle px-4 py-1.5 text-sm text-ui-fg-subtle transition-colors hover:border-[#1251b8] hover:bg-[#1251b8]/5 hover:text-[#1251b8]"
-                >
-                  {c.name}
-                </LocalizedClientLink>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* faixa de subcategorias (aprovado 10/07): botões grandes touch-first
+            no topo da listagem — substitui os chips pequenos "Refine sua busca".
+            Sem filhas, o componente não renderiza nada. */}
+        <SubcategoriasBand
+          categoriaNome={category.name}
+          subs={category.category_children}
+        />
+
         {/* filtros rápidos (nº5) — tamanho 100% (metadata) + tipo/absorção */}
         <FiltrosBusca gridId="categoria-grid" />
         <Suspense

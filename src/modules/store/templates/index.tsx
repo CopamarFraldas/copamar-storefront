@@ -16,7 +16,9 @@ const StoreTemplate = ({
   countryCode: string
 }) => {
   const pageNumber = page ? parseInt(page) : 1
-  const sort = sortBy || "created_at"
+  // default = "Mais vendidos" (destaque): curadoria via metadata.destaque com
+  // recência de base — sem destaque no catálogo, a vitrine fica igual à antiga.
+  const sort = sortBy || "destaque"
 
   return (
     <div className="py-6 content-container" data-testid="category-container">

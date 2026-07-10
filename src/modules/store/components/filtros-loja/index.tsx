@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { useSearchParams } from "next/navigation"
 
 /**
  * Filtros da LOJA (/store) na sidebar — Tipo, Marca, Tamanho, "Para quem",
@@ -52,6 +53,25 @@ const FiltrosLoja = ({ gridId }: { gridId: string }) => {
   const [mostrando, setMostrando] = useState(0)
   const [total, setTotal] = useState(0)
   const [gaveta, setGaveta] = useState(false)
+  const searchParams = useSearchParams()
+
+  // seed inicial via URL (?marca=Vita+Plus&tipo=...&noturno=1) — banners da home
+  // e links de campanha chegam com a loja já filtrada (Marco 10/07). Valores
+  // devem bater EXATO com os data-attributes (case/acentos). Roda só no mount.
+  useEffect(() => {
+    const seed = (chave: string, setter: (s: Set<string>) => void) => {
+      const vals = searchParams.getAll(chave).flatMap((v) => v.split(","))
+        .map((v) => v.trim()).filter(Boolean)
+      if (vals.length) setter(new Set(vals))
+    }
+    seed("tipo", setSelTipo)
+    seed("marca", setSelMarca)
+    seed("tamanho", setSelTam)
+    seed("quem", setSelGen)
+    seed("absorcao", setSelAbs)
+    if (searchParams.get("noturno") === "1") setSoNoturno(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (gaveta) {
@@ -321,10 +341,11 @@ const FiltrosLoja = ({ gridId }: { gridId: string }) => {
         }`}
       >
         <span aria-hidden>⚙</span>
-        <span className="hidden small:inline">Filtros</span>
-        <span className="small:hidden" aria-hidden>
-          ▸
-        </span>
+        {/* rótulo SEMPRE visível — público 45-65 não liga ⚙ a "filtros"
+            (Marco 10/07). No mobile o espaço aperta → "Filtros"; no
+            desktop cabe o rótulo completo. */}
+        <span className="small:hidden">Filtros</span>
+        <span className="hidden small:inline">Filtrar produtos</span>
         {nSel > 0 && (
           <span className="rounded-full bg-white px-1.5 text-[11px] font-bold text-copamar-primary">
             {nSel}

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { usePathname } from "next/navigation"
 
 /**
  * Botão flutuante de WhatsApp — FAB expansível.
@@ -20,7 +21,38 @@ const WhatsAppFloat = () => {
   // drawer do carrinho aberto → o float é EMPURRADO pra esquerda do painel
   // e volta pro cantinho com bounce ao fechar (Marco 07/06)
   const [empurrado, setEmpurrado] = useState(false)
+  // altura da barra "Adicionar ao carrinho" da PDP (MobileActions, fixed
+  // bottom no mobile) — quando ela está visível o FAB sobe pra não cobrir
+  // o botão (Marco 10/07). 0 = sem barra → FAB no cantinho de sempre.
+  const [alturaBarraPdp, setAlturaBarraPdp] = useState(0)
+  const pathname = usePathname()
   const ref = useRef<HTMLDivElement>(null)
+
+  // PDP: a MobileActions monta/desmonta via <Transition> conforme o CTA
+  // inline sai/entra na tela — observa o DOM e MEDE a barra de verdade
+  // (título comprido quebra linha → barra mais alta; no desktop ela fica
+  // display:none → altura 0 → sem offset). Gate por pathname pra não rodar
+  // observer global fora da PDP.
+  useEffect(() => {
+    if (!pathname?.includes("/products/")) {
+      setAlturaBarraPdp(0)
+      return
+    }
+    const medir = () => {
+      const barra = document.querySelector<HTMLElement>(
+        '[data-testid="mobile-actions"]'
+      )
+      setAlturaBarraPdp(barra ? Math.round(barra.getBoundingClientRect().height) : 0)
+    }
+    medir()
+    const obs = new MutationObserver(medir)
+    obs.observe(document.body, { childList: true, subtree: true })
+    window.addEventListener("resize", medir)
+    return () => {
+      obs.disconnect()
+      window.removeEventListener("resize", medir)
+    }
+  }, [pathname])
 
   useEffect(() => {
     const onDrawer = (e: Event) => {
@@ -61,15 +93,19 @@ const WhatsAppFloat = () => {
       // cobria o toggle de Marketing. Ao decidir o consentimento, ele volta.
       // Durante a restrição da MAPA (html.mapa-chat-ativo, setado pelo
       // MapaChatStatusBridge): o FAB CONTINUA — o número do ATENDENTE humano
-      // (952050000) é OUTRO e segue normal; só o botão da MAPA (49903013, o
+      // (952050000) é OUTRO e segue normal; só o botão da MAPA (41190201, o
       // número mudo) some (ver classe no <a> dela). WhatsApp saudável → crew
       // desliga o failover → a MAPA volta sozinha.
       className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3 [html.consent-bar-open_&]:hidden"
       style={{
         transform: deslocamento,
         // bounce suave (overshoot) na ida e na volta — "animação cool"
-        transition: "transform 480ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+        transition:
+          "transform 480ms cubic-bezier(0.34, 1.56, 0.64, 1), bottom 200ms ease",
         willChange: "transform",
+        // sobe acima da barra "Adicionar ao carrinho" da PDP quando ela
+        // está na tela (inline style vence o bottom-4/6 das classes)
+        bottom: alturaBarraPdp ? alturaBarraPdp + 12 : undefined,
       }}
     >
       {/* opções (aparecem quando aberto) */}
@@ -91,12 +127,12 @@ const WhatsAppFloat = () => {
             </span>
           </a>
           <a
-            href="https://wa.me/551149903013?text=Ol%C3%A1%20Mapa!%20Vim%20pelo%20site%20da%20Copamar%20e%20gostaria%20de%20ajuda."
+            href="https://wa.me/551141190201?text=Ol%C3%A1%20Mapa!%20Vim%20pelo%20site%20da%20Copamar%20e%20gostaria%20de%20ajuda."
             target="_blank"
             rel="noopener"
             aria-label="Falar com a Mapa, assistente virtual 24h da Copamar, no WhatsApp"
             onClick={() => setOpen(false)}
-            // durante a restrição a MAPA (49903013) está muda → esconde só ela;
+            // durante a restrição a MAPA (41190201) está muda → esconde só ela;
             // o atendente humano acima continua. Volta sozinha quando o failover
             // desliga (crew vê o WhatsApp da MAPA saudável).
             className="group flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200 [html.mapa-chat-ativo_&]:hidden"

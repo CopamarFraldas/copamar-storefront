@@ -1,7 +1,7 @@
 import { Text } from "@medusajs/ui"
 import { listProducts } from "@lib/data/products"
 import { getProductPrice } from "@lib/util/get-product-price"
-import { isProductOutOfStock, avisoEstoque } from "@lib/util/stock"
+import { isProductOutOfStock, avisoEstoque, unidadesRestantes } from "@lib/util/stock"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SeloAbsorcao from "@modules/common/components/selo-absorcao"
@@ -39,6 +39,11 @@ export default async function ProductPreview({
 
   const esgotado = isProductOutOfStock(product)
   const aviso = avisoEstoque(product)
+  // selo "Últimas N unidades" — só com estoque REAL baixo (0 < N <= 10);
+  // unidadesRestantes devolve null quando não dá pra afirmar (backorder,
+  // sem controle de estoque ou inventory_quantity ausente na query)
+  const restantes = unidadesRestantes(product)
+  const poucasUnidades = !esgotado && restantes !== null && restantes <= 10
 
   return (
     // O botão "Adicionar" precisa ficar FORA do <a> (botão dentro de link é HTML
@@ -65,6 +70,17 @@ export default async function ProductPreview({
               <div aria-hidden className="absolute inset-0 bg-white/40 dark:bg-black/40 rounded-large pointer-events-none" />
             </>
           )}
+          {/* selo discreto de estoque baixo — mesmo lugar do "Esgotado", mas âmbar */}
+          {poucasUnidades && (
+            <span
+              className="absolute left-2 top-2 z-10 inline-flex items-center rounded-full bg-amber-100 text-amber-900 dark:bg-amber-900/70 dark:text-amber-100 text-[10px] font-semibold px-2 py-1 shadow-sm"
+              data-testid="selo-poucas-unidades"
+            >
+              {restantes === 1
+                ? "Última unidade"
+                : `Últimas ${restantes} unidades`}
+            </span>
+          )}
         </div>
         {/* STACK vertical (mobile-safe): nome em cima, bloco de preço embaixo —
             cada um na própria linha. O layout antigo era flex-row justify-between
@@ -88,7 +104,7 @@ export default async function ProductPreview({
           )}
           {cheapestPrice && (
             <div className="flex flex-col min-w-0">
-              <PreviewPrice price={cheapestPrice} />
+              <PreviewPrice price={cheapestPrice} productTitle={product.title} />
             </div>
           )}
         </div>

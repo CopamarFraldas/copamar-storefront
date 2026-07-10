@@ -12,6 +12,9 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
  * RefinementList, que segue em categorias/coleções). Fecha ao clicar fora/Esc.
  */
 const OPCOES: { value: SortOptions; label: string }[] = [
+  // "Mais vendidos" (default da loja): curadoria via metadata.destaque +
+  // boost Tena→demais→infantil — ver sortProducts.
+  { value: "destaque", label: "Mais vendidos" },
   { value: "created_at", label: "Mais recentes" },
   { value: "price_asc", label: "Preço: menor → maior" },
   { value: "price_desc", label: "Preço: maior → menor" },

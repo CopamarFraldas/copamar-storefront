@@ -118,6 +118,22 @@ export default async function BlogArticlePage({ params }: Props) {
         </div>
 
         <ArticleContent content={content} />
+        {/* CTA pra loja (Manus 10/07): o blog traz tráfego informativo — converte aqui */}
+        <aside className="my-10 rounded-large border border-ui-border-base bg-copamar-bg-light p-6 text-center dark:bg-ui-bg-subtle">
+          <p className="text-lg font-semibold text-ui-fg-base">
+            Precisando de fraldas geriátricas ou produtos de higiene?
+          </p>
+          <p className="mt-1 text-sm text-ui-fg-subtle">
+            Atacado e varejo, direto das fábricas — entrega para todo o Brasil e{" "}
+            <strong>5% de desconto no PIX</strong>.
+          </p>
+          <LocalizedClientLink
+            href="/store"
+            className="mt-4 inline-block rounded-full bg-copamar-cta px-6 py-2.5 font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            Ver produtos da loja →
+          </LocalizedClientLink>
+        </aside>
         <ArticleFaq faqs={frontmatter.faqs} />
       </article>
     </div>

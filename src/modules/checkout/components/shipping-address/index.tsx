@@ -345,6 +345,22 @@ const ShippingAddress = ({
               value={formData["shipping_address.phone"] || ""}
             />
           </div>
+          {/* caso Sérgio 10/07: 10 díg começando em 6-9 = celular sem o 9º dígito
+              (o WhatsApp completa o 9 e as mensagens caem em OUTRA pessoa) */}
+          {(() => {
+            const d = telefoneDigits(formData["shipping_address.phone"] || "")
+            const semNove = paisTel === "BR" && d.length === 10 && "6789".includes(d[2])
+            return semNove ? (
+              <p
+                className="mt-1 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-200"
+                data-testid="aviso-celular-sem-9"
+              >
+                ⚠️ Parece faltar o <strong>9</strong> do celular — hoje os números têm 11
+                dígitos: (DDD) 9XXXX-XXXX. Confira pra receber os avisos da sua entrega
+                no WhatsApp certinho.
+              </p>
+            ) : null
+          })()}
           <Input
             label="E-mail"
             name="email"

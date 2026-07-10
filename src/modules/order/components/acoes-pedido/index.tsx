@@ -11,7 +11,7 @@ import { getNfeLink } from "@lib/data/pedido-painel"
  *  - Baixar a nota fiscal (DANFE do Bling, lazy — busca só ao clicar)
  *  - Falar no WhatsApp sobre este pedido (deep-link com o nº pra a MAPA)
  */
-const WHATS = "551149903013"
+const WHATS = "551141190201"
 
 const AcoesPedido = ({
   orderId,

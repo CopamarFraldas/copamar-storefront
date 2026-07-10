@@ -12,6 +12,7 @@ import {
 } from "@lib/util/telefone"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import {
   getAuthHeaders,
@@ -252,35 +253,75 @@ export async function signupAndSetAddress(
   return setAddresses(currentState, formData)
 }
 
+const LOGIN_ERRO_GENERICO =
+  "CPF, telefone, e-mail ou senha incorretos — confira e tente de novo."
+
 export async function login(_currentState: unknown, formData: FormData) {
-  const email = formData.get("email") as string
+  // campo ÚNICO "identifier": CPF, telefone OU e-mail (Marco 09/07). Fallback
+  // pra "email" mantém compatibilidade com qualquer form antigo.
+  const identifier = String(
+    formData.get("identifier") ?? formData.get("email") ?? ""
+  ).trim()
   const password = formData.get("password") as string
+  const ehEmail = identifier.includes("@")
 
   try {
-    await sdk.auth
-      .login("customer", "emailpass", { email, password })
-      .then(async (token) => {
-        await setAuthToken(token as string)
-        const customerCacheTag = await getCacheTag("customers")
-        revalidateTag(customerCacheTag)
+    if (ehEmail) {
+      const token = await sdk.auth.login("customer", "emailpass", {
+        email: identifier,
+        password,
       })
-  } catch (error: any) {
-    // MIGRAÇÃO (Marco 09/06): se a conta veio do site antigo e ainda não tem
-    // senha definida, o backend dispara o e-mail de redefinição e a UI mostra
-    // "trocamos de site" em vez de "senha inválida". Contas normais seguem o
-    // fluxo de erro comum (a rota responde migrado:false).
-    try {
-      const r = await sdk.client.fetch<{ migrado: boolean }>(
-        "/store/migracao/login-check",
-        { method: "POST", body: { email } }
-      )
+      await setAuthToken(token as string)
+    } else {
+      // CPF/telefone → o backend resolve a conta e autentica (o cliente nunca
+      // vê o e-mail de ninguém). Rota responde 200 com { ok, token, erro, migrado }.
+      // Repassa o IP REAL do cliente (CF-Connecting-IP): como a chamada é
+      // server-side, sem isso o rate-limit do backend agruparia todos os
+      // clientes no IP do servidor Next.
+      const h = await headers()
+      const clientIp =
+        h.get("cf-connecting-ip") ||
+        h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        ""
+      const r = await sdk.client.fetch<{
+        ok?: boolean
+        token?: string
+        erro?: string
+        migrado?: boolean
+      }>("/store/auth/login-flex", {
+        method: "POST",
+        body: { identifier, password },
+        headers: clientIp ? { "x-real-client-ip": clientIp } : {},
+      })
+      // conta migrada do site antigo entrando por CPF/telefone: mesmo fluxo
+      // "estamos de site novo" (o backend já disparou o e-mail de reset).
       if (r?.migrado) return LOGIN_MIGRADO
-    } catch {}
+      if (!r?.ok || !r?.token) return r?.erro || LOGIN_ERRO_GENERICO
+      await setAuthToken(r.token)
+    }
+    const customerCacheTag = await getCacheTag("customers")
+    revalidateTag(customerCacheTag)
+  } catch (error: any) {
+    // MIGRAÇÃO (Marco 09/06): só faz sentido quando a pessoa entrou com o
+    // E-MAIL. Se a conta veio do site antigo e ainda não tem senha definida, o
+    // backend dispara o e-mail de redefinição e a UI mostra "trocamos de site".
+    if (ehEmail) {
+      try {
+        const r = await sdk.client.fetch<{ migrado: boolean }>(
+          "/store/migracao/login-check",
+          { method: "POST", body: { email: identifier } }
+        )
+        if (r?.migrado) return LOGIN_MIGRADO
+      } catch {}
+    }
     const msg = String(error?.message || error)
     if (/invalid email or password/i.test(msg)) {
-      return "E-mail ou senha incorretos — confira e tente de novo."
+      return ehEmail
+        ? "E-mail ou senha incorretos — confira e tente de novo."
+        : LOGIN_ERRO_GENERICO
     }
-    return msg.replace(/^Error:\s*/i, "")
+    // falha de rede/rota no caminho CPF/telefone → erro genérico (não vaza)
+    return ehEmail ? msg.replace(/^Error:\s*/i, "") : LOGIN_ERRO_GENERICO
   }
 
   // login OK → se era conta migrada, marca como reivindicada (sai do fluxo de
@@ -298,6 +339,85 @@ export async function login(_currentState: unknown, formData: FormData) {
   } catch (error: any) {
     return error.toString()
   }
+}
+
+/** IP real do cliente (atrás do CF) pra repassar ao backend nas rotas de auth. */
+async function ipHeaderCliente(): Promise<Record<string, string>> {
+  try {
+    const h = await headers()
+    const ip =
+      h.get("cf-connecting-ip") ||
+      h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      ""
+    return ip ? { "x-real-client-ip": ip } : {}
+  } catch {
+    return {}
+  }
+}
+
+/**
+ * "Entrar sem senha" — passo 1: pede o código de login por e-mail (Marco 09/07).
+ * SEMPRE retorna { enviado:true } (o backend não vaza se a conta existe). A UI
+ * mostra "se houver conta, enviamos o código pro e-mail cadastrado".
+ */
+export async function solicitarCodigoLogin(
+  _state: unknown,
+  formData: FormData
+): Promise<{ enviado?: boolean; erro?: string }> {
+  const identifier = String(formData.get("identifier") ?? "").trim()
+  if (!identifier) return { erro: "Informe seu CPF, telefone ou e-mail." }
+  try {
+    await sdk.client.fetch("/store/auth/otp/solicitar", {
+      method: "POST",
+      body: { identifier },
+      headers: await ipHeaderCliente(),
+    })
+  } catch {
+    /* resposta genérica mesmo em falha — não trava o fluxo */
+  }
+  return { enviado: true }
+}
+
+/**
+ * "Entrar sem senha" — passo 2: valida o código e loga (token de sessão mintado
+ * no backend, sem senha). Mesmo pós-login do fluxo normal (claimed + carrinho).
+ */
+export async function entrarComCodigo(
+  _state: unknown,
+  formData: FormData
+): Promise<{ ok?: boolean; erro?: string }> {
+  const identifier = String(formData.get("identifier") ?? "").trim()
+  const codigo = String(formData.get("codigo") ?? "").replace(/\D/g, "")
+  if (codigo.length !== 6) return { erro: "Digite o código de 6 dígitos do e-mail." }
+  try {
+    const r = await sdk.client.fetch<{ ok?: boolean; token?: string; erro?: string }>(
+      "/store/auth/otp/validar",
+      {
+        method: "POST",
+        body: { identifier, codigo },
+        headers: await ipHeaderCliente(),
+      }
+    )
+    if (!r?.ok || !r?.token) {
+      return { erro: r?.erro || "Código inválido ou expirado — confira ou peça um novo." }
+    }
+    await setAuthToken(r.token)
+    const customerCacheTag = await getCacheTag("customers")
+    revalidateTag(customerCacheTag)
+  } catch {
+    return { erro: "Código inválido ou expirado — confira ou peça um novo." }
+  }
+  // pós-login igual ao fluxo normal: marca conta migrada reivindicada + carrinho
+  try {
+    const authHeaders = await getAuthHeaders()
+    await sdk.client.fetch("/store/migracao/claimed", { method: "POST", headers: authHeaders })
+  } catch {}
+  try {
+    await transferCart()
+  } catch {
+    /* carrinho é best-effort no login por código */
+  }
+  return { ok: true }
 }
 
 /**

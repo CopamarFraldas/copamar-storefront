@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 
-import HeroConversao from "@modules/home/components/hero-conversao"
+import HeroConversao, { getBanners } from "@modules/home/components/hero-conversao"
+import BannerEsteira from "@modules/home/components/banner-esteira"
 // 04/07 (2º passe LCP/TBT): BussolaSection e FreteCep entram por wrappers
 // dynamic({ssr:false}) — ver comentários nos wrappers. BussolaSection tira
 // framer-motion do bundle inicial; FreteCep tira o JS da calculadora. Ambos
@@ -60,10 +61,18 @@ export default async function Home(props: {
   // escolher" (BussolaSection). Flag NEXT_PUBLIC_HERO_BUSSOLA controla a
   // entrada da Bússola; o cartão é sempre o herói.
   const heroBussola = process.env.NEXT_PUBLIC_HERO_BUSSOLA === "true"
+  // Banner no TOPO (irmão do Marco, 10/07): padrão Amazon/ML — promo antes do hero.
+  // Mobile mais baixo (140px) pra não engolir a 1ª dobra; 1ª imagem com priority (LCP).
+  const bannerTopo = process.env.NEXT_PUBLIC_BANNER_TOPO === "true"
+  const bannersTopo = bannerTopo ? await getBanners() : null
 
   return (
     <>
-      <HeroConversao />
+      {bannerTopo && (
+        <BannerEsteira altura={200} alturaMobile={140} duracao={90} prioridade
+          banners={bannersTopo?.banners} marcaSlides={bannersTopo?.marca_slides} />
+      )}
+      <HeroConversao esteira={!bannerTopo} />
       {heroBussola && <BussolaSection />}
       {/* dois "ajudantes" cedo na página: consultor de frete (nº1) + guia de
           escolha (nº3). Lado a lado no desktop (aproveita a largura, mais

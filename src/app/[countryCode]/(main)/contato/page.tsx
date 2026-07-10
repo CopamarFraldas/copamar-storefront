@@ -16,7 +16,7 @@ export async function generateMetadata(props: {
 
 const WHATS_ATENDENTE = "https://wa.me/5511952050000"
 const WHATS_FIXO = "https://wa.me/551141190201"
-const WHATS_MAPA = "https://wa.me/551149903013"
+const WHATS_MAPA = "https://wa.me/551141190201"
 const EMAIL = "vendas@copamarfraldas.com.br"
 
 // @id estável da Organization (produção) — identificador, não URL navegável
@@ -146,10 +146,10 @@ export default function ContatoPage() {
           href={WHATS_ATENDENTE}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-xl border border-ui-border-base p-5 transition hover:border-[#25d366] hover:shadow-md"
+          className="rounded-xl border border-ui-border-base p-5 transition hover:border-[#15803d] hover:shadow-md"
         >
           <p className="text-sm font-semibold text-ui-fg-base">💬 WhatsApp — atendente</p>
-          <p className="mt-1 text-xl font-bold text-[#25d366]">(11) 95205-0000</p>
+          <p className="mt-1 text-xl font-bold text-[#15803d]">(11) 95205-0000</p>
           <p className="mt-1 text-xs text-ui-fg-subtle">Seg a Sex · 08h às 17h</p>
         </a>
 
@@ -158,10 +158,10 @@ export default function ContatoPage() {
           href={WHATS_FIXO}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-xl border border-ui-border-base p-5 transition hover:border-[#25d366] hover:shadow-md"
+          className="rounded-xl border border-ui-border-base p-5 transition hover:border-[#15803d] hover:shadow-md"
         >
           <p className="text-sm font-semibold text-ui-fg-base">💬 WhatsApp e telefone</p>
-          <p className="mt-1 text-xl font-bold text-[#25d366]">(11) 4119-0201</p>
+          <p className="mt-1 text-xl font-bold text-[#15803d]">(11) 4119-0201</p>
           <p className="mt-1 text-xs text-ui-fg-subtle">
             Também atende ligação · horário comercial
           </p>
@@ -172,10 +172,10 @@ export default function ContatoPage() {
           href={WHATS_MAPA}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-xl border border-ui-border-base p-5 transition hover:border-[#25d366] hover:shadow-md"
+          className="rounded-xl border border-ui-border-base p-5 transition hover:border-[#15803d] hover:shadow-md"
         >
           <p className="text-sm font-semibold text-ui-fg-base">🤖 WhatsApp — Mapa (assistente virtual)</p>
-          <p className="mt-1 text-xl font-bold text-[#25d366]">(11) 4990-3013</p>
+          <p className="mt-1 text-xl font-bold text-[#15803d]">(11) 4119-0201</p>
           <p className="mt-1 text-xs text-ui-fg-subtle">Todos os dias · 24h — tira dúvidas e anota pedidos</p>
         </a>
 

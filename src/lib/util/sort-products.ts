@@ -43,7 +43,10 @@ export function sortProducts(
     })
   }
 
-  if (sortBy === "created_at") {
+  // "destaque" (Mais vendidos, default da loja) usa a recência como base e
+  // aplica os boosts abaixo por cima — sem nenhum metadata.destaque no
+  // catálogo, a ordem fica IDÊNTICA à antiga "created_at" com boost.
+  if (sortBy === "created_at" || sortBy === "destaque") {
     sortedProducts.sort((a, b) => {
       return (
         new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
@@ -60,10 +63,22 @@ export function sortProducts(
     return ra - rb
   })
 
+  // "Mais vendidos": metadata.destaque MAIOR primeiro (mesma curadoria do
+  // campo destaque do catálogo MAPA; true conta como 1). Sem destaque = 0,
+  // então quem não tem mantém a ordenação acima (sort estável).
+  if (sortBy === "destaque") {
+    sortedProducts.sort((a, b) => {
+      const da = Number((a.metadata as any)?.destaque) || 0
+      const db = Number((b.metadata as any)?.destaque) || 0
+      return db - da
+    })
+  }
+
   // Boost da LOJA (estável, por último = vence): Tena (0) → demais (1) →
   // infantil (2). Dentro de cada grupo a ordenação acima se mantém — as Enzzo
-  // Baby seguem RN→P→M→G entre si, mas no FIM da vitrine.
-  if (lojaBoost && sortBy === "created_at") {
+  // Baby seguem RN→P→M→G entre si, mas no FIM da vitrine. O destaque ordena
+  // DENTRO de cada grupo (não fura a regra do Marco 11/06).
+  if (lojaBoost && (sortBy === "created_at" || sortBy === "destaque")) {
     sortedProducts.sort(
       (a, b) => grupoLoja(a.title || "", a.categories) - grupoLoja(b.title || "", b.categories)
     )

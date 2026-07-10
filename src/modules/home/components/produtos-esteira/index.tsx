@@ -32,7 +32,6 @@ const PRODUTOS: { handle: string; img: string; nome: string }[] = [
   {"handle":"absorvente-masculino-abena-man-formula-2-c-15","img":"https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/5713571001141-0-01KSMWWS977E2GKDQW2KYV2JDV.webp","nome":"Absorvente Masculino Abena Man Formula 2 c/ 15 un"},
   {"handle":"tena-slip-dermacare-eg-c-24-unidades","img":"https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770983666-0-01KSMWWT84AK31T9R29VDF1TEA.webp","nome":"Tena Slip Dermacare EG c/ 24 un"},
   {"handle":"tena-pants-confort-c-16-p-m","img":"https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7896770979331-0-01KSMWWV73X4REZC6VZPC6JX42.webp","nome":"Tena Pants Confort c/ 16 un P/M"},
-  {"handle":"absorvente-comfort-life-c-20","img":"https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/07898902458707-0-01KSMWWW8HG5839PC6V1DD9ZFG.jpg","nome":"Absorvente Comfort Life c/ 20 un"},
   {"handle":"fralda-geriatrica-noturna-vitalidade-sxg-c-24","img":"https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230044-0-01KSMY5GZTQZ90TPY5SCA28SX2.jpg","nome":"Fralda Geriátrica Noturna Vitalidade SXG c/ 24 un"},
   {"handle":"fralda-geriatrica-noturna-vitalidade-p-c-30","img":"https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/0630941686331-0-01KSMY5HS416N8N8396BWDCR5W.jpg","nome":"Fralda Geriátrica Noturna Vitalidade P c/ 30 un"},
   {"handle":"fralda-geriatrica-noturna-vitalidade-eg-c-26","img":"https://pub-f7ff94baf2ca454da81e5b100b79ba92.r2.dev/7898773230037-0-01KSMWWX7KNHWD2ST3H3KKVN0S.webp","nome":"Fralda Geriátrica Noturna Vitalidade EG c/ 26 un"},

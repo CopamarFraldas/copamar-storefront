@@ -239,6 +239,32 @@ export default function ProductActions({
           )
         })()}
 
+        {/* "Últimas N unidades" (Pacote G) — aviso âmbar FACTUAL quando o
+            estoque real da variante escolhida está baixo (1 a 10). Só com
+            manage_inventory e sem backorder — nunca contador inventado. */}
+        {(() => {
+          if (!selectedVariant || !inStock) return null
+          if (!selectedVariant.manage_inventory) return null
+          if (selectedVariant.allow_backorder) return null
+          // fardo é atalho pra N unidades da UNIDADE — o saldo real mora na
+          // variante unidade, então aqui o número enganaria; melhor calar
+          if ((product.metadata as any)?.fardo_de_variant) return null
+          const saldo = selectedVariant.inventory_quantity
+          if (typeof saldo !== "number" || saldo <= 0 || saldo > 10) {
+            return null
+          }
+          return (
+            <p
+              className="w-fit rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200"
+              data-testid="aviso-estoque-baixo"
+            >
+              {saldo === 1
+                ? "Última unidade em estoque"
+                : `Últimas ${saldo} unidades em estoque`}
+            </p>
+          )
+        })()}
+
         {/* quantidade antes de adicionar (Marco 07/06) — estoque limita */}
         {inStock && selectedVariant && (
           <div className="flex items-center gap-3">

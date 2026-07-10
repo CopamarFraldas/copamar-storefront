@@ -17,10 +17,23 @@ type BannerInput = { image_url: string; link?: string }
 type SlideInput = { badge: string; titulo: string; sub: string }
 
 // FALLBACK — usado quando o admin ainda não tem nada salvo (ou a API falha)
+const LINKS_FALLBACK: Record<string, string> = {
+  "frete_gratis": "/br/store",
+  "tena_slip": "/br/search?q=tena+slip",
+  "dia_noite_vita": "/br/store?marca=Vita+Plus",
+  "promo_mes": "/br/store?tipo=Pants+(roupa+%C3%ADntima)",
+  "abena": "/br/store?marca=Abena",
+  "vitaplus": "/br/store?marca=Vita+Plus",
+  "tena_men": "/br/products/protetor-tena-men-level-3-noturno",
+  "2": "/br/search?q=vitalidade",
+  "retirar_loja": "",
+  "10": "/br/search?q=dermacare"
+}
+
 const BANNERS_FALLBACK: BannerInput[] = [
   "frete_gratis", "tena_slip", "dia_noite_vita", "promo_mes", "abena",
   "vitaplus", "tena_men", "2", "retirar_loja", "10",
-].map((n) => ({ image_url: `/banners-esteira/${n}.webp` }))
+].map((n) => ({ image_url: `/banners-esteira/${n}.webp`, link: LINKS_FALLBACK[n] || undefined }))
 
 const MARCA_FALLBACK: SlideInput[] = [
   { badge: "🏭 Direto das fábricas · Atacado e varejo", titulo: "Fraldas geriátricas\ndireto das fábricas", sub: "Cuidado e dignidade pra quem você ama." },
@@ -78,12 +91,18 @@ function CaixasEntrega() {
 
 export default function BannerEsteira({
   altura = 240,
+  alturaMobile,
   duracao = 90,
+  prioridade = false,
   banners,
   marcaSlides,
 }: {
   altura?: number
+  /** altura menor no mobile (banner no TOPO não pode engolir a 1ª dobra do celular) */
+  alturaMobile?: number
   duracao?: number
+  /** true quando a esteira é o 1º elemento da página (carrega a 1ª imagem com priority p/ LCP) */
+  prioridade?: boolean
   banners?: BannerInput[]
   marcaSlides?: SlideInput[]
 }) {
@@ -91,6 +110,7 @@ export default function BannerEsteira({
   const ms = marcaSlides && marcaSlides.length ? marcaSlides : MARCA_FALLBACK
   const base = montaSequencia(bs, ms)
   const seq = [...base, ...base] // duplicado p/ loop sem emenda
+  const hMobile = alturaMobile ?? altura
 
   return (
     <div
@@ -99,6 +119,8 @@ export default function BannerEsteira({
     >
       <style>{`
         @keyframes esteira-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .esteira-wrap { --eh: ${hMobile}px }
+        @media (min-width: 768px) { .esteira-wrap { --eh: ${altura}px } }
         .esteira-track { animation: esteira-scroll ${duracao}s linear infinite; will-change: transform; }
         .esteira-wrap:hover .esteira-track { animation-play-state: paused; }
         @media (prefers-reduced-motion: reduce) { .esteira-track { animation: none; } }
@@ -113,7 +135,7 @@ export default function BannerEsteira({
                     layout do <img> cru de antes (sem CLS novo), mas com lazy-load
                     e AVIF/WebP redimensionado. sizes ≈ maior largura renderizada
                     (aspecto ~3,2 × altura 200-240). */}
-                <Image src={it.b.image_url} alt="" width={0} height={0} sizes="680px" draggable={false} className="block w-auto select-none" style={{ height: altura, width: "auto" }} />
+                <Image src={it.b.image_url} alt="" width={0} height={0} sizes="(max-width: 767px) 460px, 680px" quality={70} priority={prioridade && i === 0} draggable={false} className="block w-auto select-none" style={{ height: "var(--eh)", width: "auto" }} />
               </a>
             ) : (
               <Image
@@ -122,18 +144,19 @@ export default function BannerEsteira({
                 alt=""
                 width={0}
                 height={0}
-                sizes="680px"
+                sizes="(max-width: 767px) 460px, 680px" quality={70}
+                priority={prioridade && i === 0}
                 aria-hidden="true"
                 draggable={false}
                 className="block w-auto shrink-0 select-none"
-                style={{ height: altura, width: "auto" }}
+                style={{ height: "var(--eh)", width: "auto" }}
               />
             )
           ) : (
             <div
               key={i}
               className="relative flex shrink-0 flex-col justify-center overflow-hidden bg-gradient-to-br from-copamar-primary to-[#0c3576] px-7 text-white"
-              style={{ height: altura, width: Math.round(altura * 1.45) }}
+              style={{ height: "var(--eh)", width: "calc(var(--eh) * 1.45)" }}
               aria-hidden="true"
             >
               <CaixasEntrega />

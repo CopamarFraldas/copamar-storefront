@@ -8,6 +8,8 @@ import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import FiltrosBusca from "@modules/store/components/filtros-busca"
 import { getSiteUrl, robotsMeta } from "@lib/util/seo"
+import { sortProducts } from "@lib/util/sort-products"
+import { isProductOutOfStock } from "@lib/util/stock"
 
 type Props = {
   params: Promise<{ countryCode: string }>
@@ -55,14 +57,27 @@ export default async function SearchPage({ params, searchParams }: Props) {
           queryParams: {
             ...(idsBusca ? { id: idsBusca.ids } : { q: termo }),
             limit: 48,
+            // *categories: o boost da loja (grupoLoja) usa categoria pra
+            // detectar infantil — sem elas cai só no título.
             fields:
-              "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata",
+              "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata,*categories",
           } as any,
         })
     : { response: { products: [], count: 0 } }
 
+  // Pós-ordenação: a busca por ids vinha na ordem CRUA da API — "fralda"
+  // trazia infantil esgotada em 1º. Reusa o boost da loja (destaque/rank +
+  // Tena→demais→infantil) e, por último (sort estável = vence), manda os
+  // ESGOTADOS pro fim da lista.
+  const produtosOrdenados = sortProducts(products, "destaque", true)
+  produtosOrdenados.sort(
+    (a, b) => Number(isProductOutOfStock(a)) - Number(isProductOutOfStock(b))
+  )
+
   // estrelinhas dos cards — agregados em LOTE (1 chamada pro resultado todo)
-  const reviewsAggs = await getReviewsAggregates(products.map((p) => p.id))
+  const reviewsAggs = await getReviewsAggregates(
+    produtosOrdenados.map((p) => p.id)
+  )
 
   return (
     <div className="content-container py-8">
@@ -110,7 +125,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
           id="busca-grid"
           className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 small:grid-cols-3 small:gap-x-6 medium:grid-cols-4"
         >
-          {products.map((p) => (
+          {produtosOrdenados.map((p) => (
             <li
               key={p.id}
               data-titulo={p.title}

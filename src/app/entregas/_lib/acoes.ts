@@ -418,9 +418,25 @@ export async function registrarStatus(input: {
  * manda pra cada cliente pendente com celular — UMA VEZ por dia: a coluna
  * aviso_sai_hoje_em trava re-disparo (apertar 2x não duplica; go-live 11/06).
  */
+/** caso Sérgio 10/07: DDD+8 díg começando em 6-9 = celular sem o 9º dígito
+ * (pré-2016). O WhatsApp completa o 9 e a mensagem cai em OUTRA pessoa.
+ * Fixo (2-5) passa. Aceita com/sem 55 na frente. */
+function celularSuspeitoSem9(cel: string | null | undefined): boolean {
+  let d = (cel || "").replace(/\D/g, "")
+  if (d.startsWith("55") && d.length >= 12) d = d.slice(2)
+  return d.length === 10 && "6789".includes(d[2])
+}
+
 export async function avisarRotaSaiHoje(): Promise<{ enviados: number; total: number; ja_avisada?: boolean; falhas?: number }> {
   const rota = await getRota()
-  const alvos = rota.filter((p) => p.status === "pendente" && p.celular && !p.aviso_sai_hoje_em)
+  const alvos = rota.filter(
+    (p) =>
+      p.status === "pendente" &&
+      p.celular &&
+      !p.aviso_sai_hoje_em &&
+      // nº suspeito fica FORA (não é falha retentável — é nº provavelmente errado)
+      !celularSuspeitoSem9(p.celular)
+  )
   if (!alvos.length) {
     return { enviados: 0, total: 0, ja_avisada: rota.some((p) => p.aviso_sai_hoje_em) }
   }

@@ -12,7 +12,7 @@ const OPCOES = [
     label: "Falar com a MAPA",
     sub: "assistente virtual · responde na hora",
     href:
-      "https://wa.me/551149903013?text=" +
+      "https://wa.me/551141190201?text=" +
       encodeURIComponent("Olá! Quero ajuda para escolher minha fralda."),
   },
   {
@@ -57,11 +57,15 @@ export default function BotaoWhatsApp({ secundario = false }: { secundario?: boo
         aria-haspopup="menu"
         aria-expanded={open}
         className={
+          // Verde #15803d (green-700) no lugar do #25D366 da marca: o verde claro
+          // dava 1,98:1 de contraste (reprova WCAG AA); o escuro dá 5,0:1 e o
+          // botão continua "verde de WhatsApp". O ícone pequeno do popover mantém
+          // o verde da marca (decorativo, ao lado de texto escuro).
           secundario
             ? // SECUNDÁRIO (hero): outline/ghost verde, menor — de-enfatiza vs "Comprar agora"
-              "inline-flex w-auto items-center justify-center gap-2 rounded-large border-2 border-[#25D366] bg-transparent px-4 py-2 text-sm font-semibold text-[#25D366] transition-colors hover:bg-[#25D366]/10 small:px-5 small:py-2.5"
+              "inline-flex w-auto items-center justify-center gap-2 rounded-large border-2 border-[#15803d] bg-transparent px-4 py-2 text-sm font-semibold text-[#15803d] transition-colors hover:bg-[#15803d]/10 small:px-5 small:py-2.5"
             : // PADRÃO: verde sólido cheio
-              "inline-flex w-full items-center justify-center gap-2 rounded-large bg-[#25D366] px-6 py-3 font-semibold text-white transition-opacity hover:opacity-90 small:w-auto"
+              "inline-flex w-full items-center justify-center gap-2 rounded-large bg-[#15803d] px-6 py-3 font-semibold text-white transition-opacity hover:opacity-90 small:w-auto"
         }
       >
         <IconeWhats /> Falar no WhatsApp

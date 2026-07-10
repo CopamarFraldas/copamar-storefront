@@ -21,9 +21,11 @@ export default function PrecoAVista({
   const aVista = Math.round(amount * (1 - DESC_AVISTA) * 100) / 100
   const fmt = convertToLocale({ amount: aVista, currency_code })
 
+  // emerald-700: o 600 dava 3,76:1 de contraste (reprova WCAG AA) — a
+  // sublinha do modo `full` já usava 700, então padroniza no mais escuro
   return (
     <span
-      className={`block text-emerald-600 dark:text-emerald-400 leading-tight font-bold ${
+      className={`block text-emerald-700 dark:text-emerald-400 leading-tight font-bold ${
         full ? "text-lg sm:text-xl" : "text-sm small:text-base medium:text-lg"
       }`}
       data-testid="preco-a-vista"

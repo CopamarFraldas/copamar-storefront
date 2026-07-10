@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { rotuloSubcategorias, trackClickCategoria } from "@lib/util/categorias"
 import type { NavCat } from "@lib/data/nav-categories"
 
 type Props = { categories: NavCat[] }
@@ -153,7 +154,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                             <li key={s.handle}>
                               <LocalizedClientLink
                                 href={`/categories/${s.handle}`}
-                                onClick={() => setOpen(false)}
+                                onClick={() => { trackClickCategoria(s.handle, "menu"); setOpen(false) }}
                                 className="text-sm text-ui-fg-subtle transition-colors hover:text-[#1251b8] focus:outline-none focus-visible:text-[#1251b8] focus-visible:underline"
                                 role="menuitem"
                               >
@@ -165,7 +166,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                         </ul>
                         <LocalizedClientLink
                           href={`/categories/${cat.handle}`}
-                          onClick={() => setOpen(false)}
+                          onClick={() => { trackClickCategoria(cat.handle, "menu"); setOpen(false) }}
                           className="mt-3 inline-block text-sm font-medium text-[#1251b8] hover:underline"
                           role="menuitem"
                         >
@@ -175,7 +176,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                     ) : (
                       <LocalizedClientLink
                         href={`/categories/${cat.handle}`}
-                        onClick={() => setOpen(false)}
+                        onClick={() => { trackClickCategoria(cat.handle, "menu"); setOpen(false) }}
                         className="text-sm font-medium text-[#1251b8] hover:underline"
                         role="menuitem"
                       >
@@ -245,21 +246,27 @@ const MegaMenuClient = ({ categories }: Props) => {
                           type="button"
                           aria-expanded={isOpen}
                           onClick={() => toggleExpand(cat.handle)}
-                          className="flex w-full items-center justify-between px-3 py-3 text-left text-ui-fg-base"
+                          className="flex min-h-[44px] w-full items-center justify-between gap-2 px-3 py-3 text-left text-ui-fg-base"
                         >
                           <span>
                             {cat.name}{" "}
                             <span className="text-ui-fg-subtle">({cat.count})</span>
                           </span>
-                          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden className={`transition-transform ${isOpen ? "rotate-90" : ""}`}>
-                            <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                          {/* affordance explícita (feedback 10/07: "não estava
+                              óbvio que expandia") — rótulo curto + chevron ▾
+                              SEMPRE visíveis; ▾ vira ▴ quando aberto */}
+                          <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-[#1251b8]">
+                            {rotuloSubcategorias(cat.subs.map((s) => s.name)).rotuloCurto}
+                            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden className={`transition-transform ${isOpen ? "rotate-180" : ""}`}>
+                              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </span>
                         </button>
                       ) : (
                         <LocalizedClientLink
                           href={`/categories/${cat.handle}`}
-                          onClick={() => setMobileOpen(false)}
-                          className="flex items-center justify-between px-3 py-3 text-ui-fg-base"
+                          onClick={() => { trackClickCategoria(cat.handle, "menu"); setMobileOpen(false) }}
+                          className="flex min-h-[44px] items-center justify-between px-3 py-3 text-ui-fg-base"
                         >
                           <span>
                             {cat.name}{" "}
@@ -273,7 +280,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                             <li key={s.handle}>
                               <LocalizedClientLink
                                 href={`/categories/${s.handle}`}
-                                onClick={() => setMobileOpen(false)}
+                                onClick={() => { trackClickCategoria(s.handle, "menu"); setMobileOpen(false) }}
                                 className="block py-2 text-sm text-ui-fg-subtle hover:text-[#1251b8]"
                               >
                                 {s.name}{" "}
@@ -284,7 +291,7 @@ const MegaMenuClient = ({ categories }: Props) => {
                           <li>
                             <LocalizedClientLink
                               href={`/categories/${cat.handle}`}
-                              onClick={() => setMobileOpen(false)}
+                              onClick={() => { trackClickCategoria(cat.handle, "menu"); setMobileOpen(false) }}
                               className="block py-2 text-sm font-medium text-[#1251b8]"
                             >
                               Ver tudo →
