@@ -28,9 +28,12 @@ const MAX_TICKS = 225
 const PagBankPix = ({
   cartId,
   fiscalDoc,
+  sessionData,
 }: {
   cartId: string
   fiscalDoc?: string
+  /** data da payment session PagBank ativa — rehidrata o QR pós-refresh */
+  sessionData?: Record<string, any>
 }) => {
   // Documento do FATURAMENTO (CPF/CNPJ informado na identificação). O PIX é pago
   // por quem escaneia o QR, mas o pedido PagBank precisa de um documento — usamos
@@ -39,11 +42,28 @@ const PagBankPix = ({
   const fiscalDigits = (fiscalDoc || "").replace(/\D/g, "")
   const hasFiscal = isValidCpfOrCnpj(fiscalDigits)
 
-  const [stage, setStage] = useState<Stage>("form")
+  // REHIDRATAÇÃO pós-refresh (bug 10/07): se a sessão PagBank ativa é de PIX
+  // (sem data.method === "card") e o QR JÁ foi gerado (qr_text na sessão),
+  // reabre direto no estágio do QR — mesmo código, mesmo total, polling
+  // religado — em vez de voltar pro formulário "Gerar PIX". Recarregar a
+  // página nunca pode mudar o pagamento. NÃO cria sessão nova no mount: só lê
+  // a que já existe.
+  const qrSessao =
+    sessionData &&
+    sessionData.method !== "card" &&
+    sessionData.qr_text &&
+    sessionData.pagbank_order_id // sem order_id o polling não anda → form
+      ? sessionData
+      : null
+  const [stage, setStage] = useState<Stage>(qrSessao ? "qr" : "form")
   const [cpf, setCpf] = useState("")
-  const [qrText, setQrText] = useState<string | null>(null)
-  const [qrImage, setQrImage] = useState<string | null>(null)
-  const [orderId, setOrderId] = useState<string | null>(null)
+  const [qrText, setQrText] = useState<string | null>(qrSessao?.qr_text ?? null)
+  const [qrImage, setQrImage] = useState<string | null>(
+    qrSessao?.qr_image ?? null
+  )
+  const [orderId, setOrderId] = useState<string | null>(
+    qrSessao?.pagbank_order_id ?? null
+  )
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)

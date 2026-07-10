@@ -11,7 +11,7 @@ import PagHiperBoleto from "@modules/checkout/components/paghiper-boleto"
 import PagarNaLoja from "@modules/checkout/components/pagar-na-loja"
 import Divider from "@modules/common/components/divider"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 /**
  * Pagamento — 3 FORMAS ACHATADAS (Marco 18/06): PIX · Cartão · Boleto, cada uma
@@ -54,20 +54,32 @@ const Payment = ({
       o.service_zone?.fulfillment_set?.type === "pickup"
   )
 
-  // estado inicial: se a sessão ativa é boleto, marca boleto; com qualquer OUTRA
-  // sessão ativa começa vazio (PagBank não distingue PIX/Cartão — o cliente
-  // re-escolhe; nunca sobrescrever o que já existe). SEM sessão nenhuma, o PIX
-  // já vem pré-selecionado — SÓ o estado do radio: nenhuma payment session é
+  // estado inicial: a sessão ativa manda. PIX e Cartão são o MESMO provider
+  // PagBank — distingue pelo `data` da sessão: o fluxo de cartão grava
+  // data.method === "card" (createPagbankCard); o de PIX não grava method e
+  // carrega o QR (qr_text/qr_image). Recarregar a página com QR PIX ativo tem
+  // que NASCER "pix" — senão o useEffect abaixo removia o PIX5 e o total
+  // deixava de bater com o QR já gerado (bug 10/07). SEM sessão nenhuma, o PIX
+  // vem pré-selecionado — SÓ o estado do radio: nenhuma payment session é
   // criada no mount (o QR do PagBankPix só nasce no clique em "Gerar PIX") e o
   // desconto PIX5 entra pelo MESMO useEffect de sempre, idêntico ao clique
   // manual (incidente "PIX órfão": trocar método após o QR apaga a sessão).
   const [opcao, setOpcao] = useState<Opcao>(() => {
     if (activeSession) {
-      return isPagHiperBoleto(activeSession.provider_id) ? "boleto" : ""
+      if (isPagHiperBoleto(activeSession.provider_id)) return "boleto"
+      if (isManual(activeSession.provider_id)) return "loja"
+      if (isPagBank(activeSession.provider_id)) {
+        return activeSession.data?.method === "card" ? "card" : "pix"
+      }
+      return ""
     }
     // pré-seleciona só se o PIX (PagBank) está de fato disponível
     return pagbankId ? "pix" : ""
   })
+
+  // troca EXPLÍCITA de método (clique do cliente) ≠ re-inicialização por
+  // refresh/remount — só o clique pode tirar o PIX5 com QR já gerado.
+  const escolhaExplicitaRef = useRef(false)
 
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -101,9 +113,22 @@ const Payment = ({
   // não. Promoção do Medusa → vale no TOTAL. NÃO é cumulativo (é o mesmo 5%).
   useEffect(() => {
     if (!isOpen) return
-    setDescontoPix(
-      opcao === "pix" || opcao === "boleto" || opcao === "loja"
-    ).catch(() => {})
+    const ligar = opcao === "pix" || opcao === "boleto" || opcao === "loja"
+    // REDE DE SEGURANÇA (incidente PIX órfão): com sessão PIX PagBank e QR já
+    // gerado, NUNCA mexer no PIX5 por re-inicialização/refresh — mudar o total
+    // (em QUALQUER direção) faz o QR deixar de bater e APAGA a payment_session.
+    // No caminho normal o setDescontoPix(true) seria no-op (PIX5 já está lá);
+    // no edge (PIX5 falhou antes do QR), re-aplicar mudaria o total do QR vivo.
+    // Só a troca explícita de método (clique) passa daqui — aí o fluxo normal
+    // cuida (remove PIX5, sessão é recriada pelo novo método).
+    const pixQrAtivo =
+      !!activeSession &&
+      isPagBank(activeSession.provider_id) &&
+      activeSession.data?.method !== "card" &&
+      !!activeSession.data?.qr_text
+    if (pixQrAtivo && !escolhaExplicitaRef.current) return
+    setDescontoPix(ligar).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, opcao])
 
   // formas achatadas. RETIRADA → PIX + Pagar na loja; ENTREGA → PIX/Cartão/Boleto.
@@ -182,6 +207,7 @@ const Payment = ({
                     type="button"
                     onClick={() => {
                       setError(null)
+                      escolhaExplicitaRef.current = true
                       setOpcao(o.key)
                     }}
                     className={clx(
@@ -229,7 +255,15 @@ const Payment = ({
                   <p className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
                     ✅ 5% de desconto no PIX aplicado no total
                   </p>
-                  <PagBankPix cartId={cart.id} fiscalDoc={fiscalDoc} />
+                  <PagBankPix
+                    cartId={cart.id}
+                    fiscalDoc={fiscalDoc}
+                    sessionData={
+                      activeSession && isPagBank(activeSession.provider_id)
+                        ? activeSession.data
+                        : undefined
+                    }
+                  />
                 </div>
               )}
               {opcao === "card" && (
