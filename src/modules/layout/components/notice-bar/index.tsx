@@ -11,10 +11,9 @@ import { useEffect, useState } from "react"
  * CLS: começa VISÍVEL (estado comum = não-dispensada → sem salto). Só some pra
  * quem já fechou nesta sessão (pequeno reflow pra trás, aceitável).
  */
-// v4-horario: chave nova de propósito — quem dispensou o aviso anterior PRECISA
-// ver este (mudou: horário do feriado + expediente de sexta). Voltar pra v1
-// quando o aviso de horário sair.
-const STORAGE_KEY = "copamar-notice-dismissed-v4-horario"
+// v5: aviso de feriado removido (Marco 10/07) — volta o texto permanente
+// (entrega própria + 5% à vista). Chave nova pra re-exibir a quem dispensou.
+const STORAGE_KEY = "copamar-notice-dismissed-v5-padrao"
 
 const NoticeBar = () => {
   const [hidden, setHidden] = useState(false)
@@ -34,9 +33,8 @@ const NoticeBar = () => {
       <div className="content-container flex items-center justify-center gap-x-2 py-2 pr-8 text-center">
         <span aria-hidden>🧭</span>
         <span>
-          Hoje é <strong>feriado</strong> e atendemos <strong>até as 16h</strong>{" "}
-          · <strong>sexta (10/07) funcionamos normalmente</strong> 💙 Precisa de
-          algo?{" "}
+          <strong>Entrega própria</strong> em SP e Grande ABC ·{" "}
+          <strong>5% de desconto à vista</strong> 💙 Precisa de algo?{" "}
           <a
             href="https://wa.me/5511952050000?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Copamar%20e%20gostaria%20de%20falar%20com%20um%20especialista."
             target="_blank"
