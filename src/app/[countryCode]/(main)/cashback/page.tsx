@@ -44,6 +44,10 @@ const FAQS: { q: string; a: string }[] = [
     a: "Na hora de fechar a próxima compra, aparece um botão para usar o saldo. Um clique e pronto: o cashback cobre até 30% do valor dos produtos da nova compra (o frete não). Ele não soma com cupom de desconto, mas funciona junto com os 5% do PIX.",
   },
   {
+    q: "E se meu pedido for cancelado?",
+    a: "Se você usou cashback em um pedido que acabou cancelado, a gente devolve todo o saldo usado para a sua conta — com a validade renovada, para você não perder nada por causa do cancelamento.",
+  },
+  {
     q: "O cashback expira?",
     a: "Sim: cada crédito vale por 60 dias depois de liberado. É só usar dentro desse prazo — a gente lembra você pelo WhatsApp quando ele liberar.",
   },
