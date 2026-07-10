@@ -40,6 +40,16 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   }, [])
 
   const { promotions = [] } = cart
+
+  // O resgate de cashback (CASHBK-*) NÃO é cupom: ele tem box próprio no
+  // checkout com "desfazer" que estorna o débito no ledger. Aqui ele fica
+  // INVISÍVEL (sem lixeira!) — remover o code por fora do /cashback/remover
+  // deixaria o saldo reservado sem desconto correspondente (revisão 10/07).
+  const temCashback = promotions.some((p) => p.code?.startsWith("CASHBK-"))
+  const promotionsVisiveis = promotions.filter(
+    (p) => !p.code?.startsWith("CASHBK-")
+  )
+
   const removePromotionCode = async (code: string) => {
     if (pixLock) return
     const validPromotions = promotions.filter(
@@ -57,6 +67,14 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
 
     const code = formData.get("code")
     if (!code) {
+      return
+    }
+    // NÃO-CUMULATIVO também com o cashback (mesma regra do backend): cupom
+    // manual por cima do resgate acumularia os dois descontos.
+    if (temCashback) {
+      setErrorMessage(
+        "Cupom não acumula com o cashback. Remova o cashback aplicado para usar o cupom."
+      )
       return
     }
     const input = document.getElementById("promotion-input") as HTMLInputElement
@@ -131,14 +149,14 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
           )}
         </form>
 
-        {promotions.length > 0 && (
+        {promotionsVisiveis.length > 0 && (
           <div className="w-full flex items-center">
             <div className="flex flex-col w-full">
               <Heading className="txt-medium mb-2">
                 Cupom(ns) aplicado(s):
               </Heading>
 
-              {promotions.map((promotion) => {
+              {promotionsVisiveis.map((promotion) => {
                 return (
                   <div
                     key={promotion.id}

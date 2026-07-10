@@ -2,12 +2,16 @@ import { Container } from "@medusajs/ui"
 
 import ChevronDown from "@modules/common/icons/chevron-down"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import CashbackCard from "@modules/account/components/cashback-card"
 import { convertToLocale } from "@lib/util/money"
+import type { CashbackSaldo } from "@lib/data/cashback"
 import { HttpTypes } from "@medusajs/types"
 
 type OverviewProps = {
   customer: HttpTypes.StoreCustomer | null
   orders: HttpTypes.StoreOrder[] | null
+  /** saldo do programa de cashback — null (flag OFF/falha) esconde o card */
+  cashback?: CashbackSaldo | null
 }
 
 /** Cartãozinho de número (Cliente desde / Pedidos / Endereços) — mobile-first. */
@@ -26,7 +30,7 @@ const STATUS_PT: Record<string, { txt: string; cor: string }> = {
   requires_action: { txt: "Requer ação", cor: "text-amber-600" },
 }
 
-const Overview = ({ customer, orders }: OverviewProps) => {
+const Overview = ({ customer, orders, cashback }: OverviewProps) => {
   const anoDesde = customer?.created_at
     ? new Date(customer.created_at as any).getFullYear()
     : null
@@ -63,6 +67,13 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             rotulo="endereços salvos"
           />
         </div>
+
+        {/* 💰 Meu cashback — só aparece com o programa LIGADO (dado do backend) */}
+        {cashback && (
+          <div className="mt-3">
+            <CashbackCard cashback={cashback} />
+          </div>
+        )}
       </div>
 
       {/* pedidos recentes — também visível no mobile */}

@@ -3,6 +3,7 @@
 import { Button, Heading } from "@medusajs/ui"
 
 import CartTotals from "@modules/common/components/cart-totals"
+import CashbackSelo from "@modules/common/components/cashback-selo"
 import Divider from "@modules/common/components/divider"
 import DiscountCode from "@modules/checkout/components/discount-code"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -26,6 +27,8 @@ const Summary = ({ cart }: SummaryProps) => {
       <DiscountCode cart={cart} />
       <Divider />
       <CartTotals totals={cart} />
+      {/* 💰 selo do cashback — só renderiza quando CASHBACK_ATIVO (proxy) */}
+      <CashbackSelo totals={cart} />
       <LocalizedClientLink
         href={"/checkout?step=" + step}
         data-testid="checkout-button"

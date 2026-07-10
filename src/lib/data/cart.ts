@@ -314,8 +314,12 @@ export async function setDescontoPix(ativo: boolean) {
     .filter((c: any): c is string => typeof c === "string" && !!c)
   // NÃO-CUMULATIVO (Marco 03/07, cupom ANIVER10): com CUPOM MANUAL no carrinho
   // o PIX5 automático não entra (e sai se já estava) — senão o aniversário de
-  // 10% virava 15% no PIX. Cupom manual = qualquer código ≠ PIX5.
-  const temCupomManual = codes.some((c) => c !== "PIX5")
+  // 10% virava 15% no PIX. Cupom manual = qualquer código ≠ PIX5 — EXCETO o
+  // resgate de cashback (CASHBK-*), que por regra aprovada CONVIVE com o PIX5
+  // (sem esta exceção, usar o cashback derrubava os 5% do PIX — revisão 10/07).
+  const temCupomManual = codes.some(
+    (c) => c !== "PIX5" && !c.startsWith("CASHBK-")
+  )
   const querPix5 = ativo && !temCupomManual
   const tem = codes.includes("PIX5")
   if (querPix5 === tem) return

@@ -3,6 +3,7 @@ import { Heading } from "@medusajs/ui"
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import DiscountCode from "@modules/checkout/components/discount-code"
 import CartTotals from "@modules/common/components/cart-totals"
+import CashbackSelo from "@modules/common/components/cashback-selo"
 import Divider from "@modules/common/components/divider"
 
 const CheckoutSummary = ({ cart }: { cart: any }) => {
@@ -18,6 +19,8 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         </Heading>
         <Divider className="my-6" />
         <CartTotals totals={cart} />
+        {/* 💰 selo do cashback — só renderiza quando CASHBACK_ATIVO (proxy) */}
+        <CashbackSelo totals={cart} className="mt-2" />
         <ItemsPreviewTemplate cart={cart} />
         <div className="my-6">
           <DiscountCode cart={cart} />
