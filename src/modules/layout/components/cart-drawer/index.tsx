@@ -11,6 +11,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
+import CartCrossSell from "./cross-sell"
 
 /**
  * CARRINHO LATERAL (drawer) — Marco 07/06, inspirado no site da Tena:
@@ -19,7 +20,16 @@ import { useEffect, useRef, useState } from "react"
  * (Finalizar compra / Escolher mais produtos). Substitui o dropdown de hover.
  * Fecha com ESC/overlay; mobile = largura cheia (max 420px).
  */
-const CartDrawer = ({ cart: cartState }: { cart?: HttpTypes.StoreCart | null }) => {
+const CartDrawer = ({
+  cart: cartState,
+  complementos = [],
+  countryCode = "br",
+}: {
+  cart?: HttpTypes.StoreCart | null
+  /** curadoria toalha/luva pro "Vai levar junto?" — já buscada no server */
+  complementos?: HttpTypes.StoreProduct[]
+  countryCode?: string
+}) => {
   const [aberto, setAberto] = useState(false)
   const [toast, setToast] = useState(false)
   const pathname = usePathname()
@@ -213,6 +223,15 @@ const CartDrawer = ({ cart: cartState }: { cart?: HttpTypes.StoreCart | null }) 
                       </li>
                     ))}
                   </ul>
+
+                  {/* "Vai levar junto?" — toalha/luva (cross-sell 10/07) */}
+                  {complementos.length > 0 && (
+                    <CartCrossSell
+                      cart={cartState!}
+                      produtos={complementos}
+                      countryCode={countryCode}
+                    />
+                  )}
                 </div>
 
                 {/* rodapé: barra frete grátis + subtotal + CTAs */}

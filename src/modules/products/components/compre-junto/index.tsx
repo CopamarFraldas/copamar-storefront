@@ -2,6 +2,7 @@ import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { HttpTypes } from "@medusajs/types"
 import Product from "../product-preview"
+import { COMPLEMENTOS, REGEX_ALVO, REGEX_HIGIENE } from "./curadoria"
 
 /**
  * "Compre Junto" (Manus 10/07, aprovado pelo Marco): complementos de HIGIENE
@@ -9,16 +10,9 @@ import Product from "../product-preview"
  * Curadoria FIXA por tipo (handles publicados, conferidos): zero risco de
  * sugestão sem pé nem cabeça. Fralda/pants → toalha + luva + protetor de cama;
  * absorvente → idem; itens de higiene não mostram a seção (evita circular).
+ * A curadoria/regex moram em ./curadoria (compartilhada com a lateral do
+ * carrinho — cross-sell do drawer, 10/07).
  */
-
-const COMPLEMENTOS = [
-  "toalha-umedecida-tena-confort-40-unidades",
-  "luva-de-procedimento-vinil-s-po-p",
-  "protetor-de-colchao-gerialife-c-6-unidades",
-]
-
-const REGEX_ALVO = /fralda|pants|slip|absorvente|roupa [íi]ntima|protetor masculino|tena men/i
-const REGEX_HIGIENE = /luva|toalha|len[çc]ol|protetor de colch[ãa]o|umedecida/i
 
 export default async function CompreJunto({
   product,
