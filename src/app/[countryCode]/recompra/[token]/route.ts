@@ -49,7 +49,9 @@ export async function GET(
   const cc = /^[a-z]{2}$/i.test(countryCode || "")
     ? countryCode.toLowerCase()
     : "br"
-  const origin = req.nextUrl.origin
+  // atrás do Caddy o nextUrl.origin vira localhost:8000 — Location quebrada
+  // no navegador do cliente. Preferir o domínio público configurado.
+  const origin = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin
   const home = NextResponse.redirect(
     new URL(`/${cc}?recompra=invalido`, origin),
     307
