@@ -41,7 +41,10 @@ export default function BannerTopoAB({
   const hMobile = alturaMobile ?? altura
 
   useEffect(() => {
-    const v = getBannerVariant()
+    // Marco 12/07: o carrossel com setas/bolinhas virou o banner TITULAR pra
+    // todo mundo (fim do sorteio A/B — a esteira antiga fica preservada no
+    // código caso a gente queira voltar). Medição banner_view/click continua.
+    const v = "carrossel" as BannerVariant
     setVariante(v)
     if (!viewEnviado.current) {
       viewEnviado.current = true

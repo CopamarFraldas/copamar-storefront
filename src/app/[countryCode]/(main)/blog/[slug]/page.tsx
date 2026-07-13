@@ -135,6 +135,19 @@ export default async function BlogArticlePage({ params }: Props) {
           </LocalizedClientLink>
         </aside>
         <ArticleFaq faqs={frontmatter.faqs} />
+        {/* interlinking SEO (12/07): âncora exata "fralda geriátrica" pra
+            categoria (pos 18, canibalizada) — no template, os 67 posts
+            empurram a página de uma vez */}
+        <p className="mt-10 border-t border-ui-border-base pt-6 text-sm text-ui-fg-subtle">
+          Procurando{" "}
+          <LocalizedClientLink
+            href="/categories/fraldas-geriatricas"
+            className="font-medium text-ui-fg-base underline underline-offset-2 hover:no-underline"
+          >
+            fralda geriátrica
+          </LocalizedClientLink>
+          ? Veja a linha completa direto da fábrica, com preço de atacado.
+        </p>
       </article>
     </div>
   )

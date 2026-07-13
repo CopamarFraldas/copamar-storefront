@@ -48,7 +48,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
     >
       <ImageOrPlaceholder image={initialImage} size={size} title={title} />
       {/* só há efeito se existir 2ª imagem (graceful p/ produto de 1 foto) */}
-      {hoverImage && <HoverImage src={hoverImage} />}
+      {hoverImage && <HoverImage src={hoverImage} title={title} />}
     </Container>
   )
 }
@@ -61,7 +61,7 @@ const ImageOrPlaceholder = ({
   return image ? (
     <Image
       src={image}
-      alt={title ? `Foto do produto ${title}` : "Foto do produto"}
+      alt={title || "Foto do produto"}
       className="absolute inset-0 object-contain object-center p-2"
       draggable={false}
       quality={50}

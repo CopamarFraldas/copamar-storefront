@@ -27,12 +27,15 @@ export async function generateMetadata(props: {
   const { countryCode } = await props.params
   const { getSiteUrl } = await import("@lib/util/seo")
   const description =
-    "Fraldas geriátricas direto da fábrica, com preço de atacado. Atacadista e distribuidora especializada há 20 anos em Santo André/SP. Fralda para idoso e acamado, parcelamento 3x sem juros, 5% à vista e entrega para todo o Brasil."
+    "Fraldas geriátricas direto da fábrica, no atacado e varejo desde 2006. Entrega própria em SP e ABC, envio para todo o Brasil e 5% à vista no PIX."
   return {
     // absolute: o título já traz a marca; o template do layout anexaria de novo.
-    // #56: os termos que o povo realmente busca, no formato aprovado pelo Marco.
+    // SEO 12/07 (Search Console 28d): a home canibalizava a categoria no head
+    // term "fralda geriátrica" (categoria em pos 18) — o head term agora é da
+    // /categories/fraldas-geriatricas; a home foca marca + diferenciais que JÁ
+    // ganham ("direto da fábrica" pos 5,1 / "atacado" pos 3,4).
     title: {
-      absolute: "Fralda Geriátrica Direto das Fábricas · Atacado | Copamar",
+      absolute: "Copamar Fraldas — Fábrica de Fraldas Geriátricas | Atacado",
     },
     description,
     alternates: { canonical: `${getSiteUrl()}/${countryCode}` },

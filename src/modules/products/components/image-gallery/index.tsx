@@ -92,7 +92,7 @@ const ImageGallery = ({ images, title }: ImageGalleryProps) => {
             >
               <Image
                 src={image.url!}
-                alt=""
+                alt={title ? `${title} — miniatura ${index + 1}` : `Miniatura ${index + 1}`}
                 fill
                 sizes="60px"
                 style={{ objectFit: "contain" }}

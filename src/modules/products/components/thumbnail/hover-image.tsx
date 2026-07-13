@@ -12,7 +12,7 @@ import { useEffect, useState } from "react"
  *   (antes do hover), evitando o "piscar" na 1ª passada do mouse.
  * Requer que o card pai tenha a classe `group` (já tem no product-preview).
  */
-const HoverImage = ({ src }: { src: string }) => {
+const HoverImage = ({ src, title }: { src: string; title?: string }) => {
   const [canHover, setCanHover] = useState(false)
 
   useEffect(() => {
@@ -24,7 +24,9 @@ const HoverImage = ({ src }: { src: string }) => {
   return (
     <Image
       src={src}
-      alt=""
+      // alt com o nome do produto (SEO de imagem); aria-hidden mantém, pois pro
+      // leitor de tela é duplicata da imagem base do card
+      alt={title ? `${title} — foto 2` : ""}
       aria-hidden
       fill
       draggable={false}

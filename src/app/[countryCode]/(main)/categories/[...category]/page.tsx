@@ -6,8 +6,14 @@ import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
+import HubFraldasGeriatricas from "@modules/categories/components/hub-fraldas-geriatricas"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getSiteUrl } from "@lib/util/seo"
+
+// HUB do termo-cabeça "fralda geriátrica" (Search Console: pos 7-8, CTR 0,3%;
+// a categoria estava na pos 18, canibalizada) — só esta categoria ganha
+// metadata dedicada + guia/FAQ/bloco-fábrica; as demais seguem intactas.
+const HANDLE_HUB = "fraldas-geriatricas"
 
 type Props = {
   params: Promise<{ category: string[]; countryCode: string }>
@@ -48,6 +54,38 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
   try {
     const productCategory = await getCategoryByHandle(params.category)
+
+    const url = `${getSiteUrl()}/${params.countryCode}/categories/${params.category.join("/")}`
+
+    // metadata dedicada do HUB — definida COMPLETA (gotcha Next: metadata da
+    // página SUBSTITUI o do layout, não mescla). Fatos batem com /sobre.
+    if (productCategory.handle === HANDLE_HUB) {
+      const titleHub =
+        "Fralda Geriátrica direto da Fábrica | Copamar — atacado e varejo"
+      const descriptionHub =
+        "Fralda geriátrica com preço direto de fábrica, no atacado e no varejo. Especialistas desde 2006, 5% de desconto à vista, entrega própria na Grande SP e envio para todo o Brasil."
+      return {
+        title: { absolute: titleHub },
+        description: descriptionHub,
+        openGraph: {
+          title: titleHub,
+          description: descriptionHub,
+          type: "website",
+          url,
+          siteName: "Copamar Fraldas",
+          locale: "pt_BR",
+          images: [
+            {
+              url: `${getSiteUrl()}/og-image.png`,
+              width: 1200,
+              height: 630,
+              alt: "Fraldas Geriátricas — Copamar Fraldas",
+            },
+          ],
+        },
+        alternates: { canonical: url },
+      }
+    }
 
     const description =
       productCategory.description ??
@@ -116,6 +154,8 @@ export default async function CategoryPage(props: Props) {
       page={page}
       countryCode={params.countryCode}
     />
+    {/* HUB abaixo da grade: guia de escolha + fábrica/atacado + FAQ (JSON-LD) */}
+    {productCategory.handle === HANDLE_HUB && <HubFraldasGeriatricas />}
     </>
   )
 }
