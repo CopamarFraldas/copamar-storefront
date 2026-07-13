@@ -29,7 +29,7 @@
  */
 
 import Image from "next/image"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 
 import { BANNERS_FALLBACK, type BannerInput } from "@modules/home/components/banner-esteira"
 import { painelId, trackBanner } from "@lib/tracking/banner-ab"
@@ -71,6 +71,17 @@ export default function BannerCarrossel({
   const [cicloKey, setCicloKey] = useState(0)
   const toqueAteRef = useRef(0)
   const pausado = hover || foco
+  // FITA COLADA (Marco 12/07): cada painel tem a largura NATURAL da arte
+  // (altura fixa, largura proporcional — igual à esteira antiga), painéis
+  // grudados sem vão, e o trilho desloca em PIXELS pra centralizar o ativo —
+  // os vizinhos aparecem espiando colados nos dois lados. Como as artes têm
+  // proporções mistas (2.49 e 3.22 no seed; admin pode subir qualquer uma),
+  // a posição é MEDIDA no DOM (offsetLeft/offsetWidth) e re-medida quando
+  // uma imagem carrega ou o wrapper muda de tamanho.
+  const wrapRef = useRef<HTMLDivElement | null>(null)
+  const painelRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [tx, setTx] = useState(0)
+  const [medidaTick, setMedidaTick] = useState(0)
 
   // painel real ativo (bolinhas): nos clones aponta pro real equivalente,
   // então a bolinha já avança pra frente durante a volta último→primeiro
@@ -82,6 +93,24 @@ export default function BannerCarrossel({
     const onChange = (e: MediaQueryListEvent) => setReduzido(e.matches)
     mq.addEventListener?.("change", onChange)
     return () => mq.removeEventListener?.("change", onChange)
+  }, [])
+
+  // mede e centraliza o painel ativo (roda em layout pra não piscar)
+  useLayoutEffect(() => {
+    const wrap = wrapRef.current
+    const alvo = painelRefs.current[pos]
+    if (!wrap || !alvo) return
+    const centroPainel = alvo.offsetLeft + alvo.offsetWidth / 2
+    setTx(wrap.clientWidth / 2 - centroPainel)
+  }, [pos, medidaTick])
+
+  // re-mede quando o wrapper muda de tamanho (rotação de tela, resize)
+  useEffect(() => {
+    const wrap = wrapRef.current
+    if (!wrap || typeof ResizeObserver === "undefined") return
+    const ro = new ResizeObserver(() => setMedidaTick((t) => t + 1))
+    ro.observe(wrap)
+    return () => ro.disconnect()
   }, [])
 
   useEffect(() => {
@@ -155,6 +184,7 @@ export default function BannerCarrossel({
 
   return (
     <section
+      ref={wrapRef as any}
       className="bcar-wrap group relative w-full overflow-hidden bg-copamar-bg-light dark:bg-ui-bg-subtle"
       role="region"
       aria-roledescription="carrossel"
@@ -190,7 +220,7 @@ export default function BannerCarrossel({
         className={`flex ${
           reduzido || semTransicao ? "" : "transition-transform duration-500 ease-out"
         }`}
-        style={{ transform: `translateX(-${pos * 100}%)`, height: "var(--eh)" }}
+        style={{ transform: `translateX(${tx}px)`, height: "var(--eh)" }}
         onTransitionEnd={(e) => {
           if (e.target !== e.currentTarget || e.propertyName !== "transform") return
           snap(pos)
@@ -214,6 +244,7 @@ export default function BannerCarrossel({
               sizes="(max-width: 767px) 460px, 680px"
               quality={70}
               draggable={false}
+              onLoad={() => setMedidaTick((t) => t + 1)}
               className="block w-auto select-none"
               style={{ height: "var(--eh)", width: "auto", maxWidth: "100%", objectFit: "contain" }}
               {...(prioridade && !clone && r === 0
@@ -228,7 +259,8 @@ export default function BannerCarrossel({
               aria-roledescription="painel"
               aria-label={`Painel ${r + 1} de ${n}`}
               aria-hidden={!ativo || clone}
-              className="flex h-full w-full shrink-0 items-center justify-center"
+              ref={(el) => { painelRefs.current[j] = el }}
+              className="flex h-full shrink-0 items-center justify-center"
             >
               {b.link ? (
                 <a
@@ -250,15 +282,15 @@ export default function BannerCarrossel({
         })}
       </div>
 
-      {/* setas (alvo ≥44px): mobile sempre visível e discreta; desktop só no
-          hover/foco do carrossel (md:opacity-0 + group-hover/focus-within) */}
+      {/* setas (alvo ≥44px): SEMPRE visíveis (Marco 12/07 — no hover ninguém
+          achava; público 45-65 precisa ver o controle) */}
       {temLoop && (
         <>
           <button
             type="button"
             onClick={() => passo(-1)}
             aria-label="Painel anterior"
-            className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/75 pb-1 text-2xl font-bold leading-none text-copamar-primary shadow-md ring-1 ring-black/10 transition hover:bg-white md:h-12 md:w-12 md:bg-white/90 md:text-3xl md:opacity-0 md:focus-visible:opacity-100 md:group-focus-within:opacity-100 md:group-hover:opacity-100"
+            className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/75 pb-1 text-2xl font-bold leading-none text-copamar-primary shadow-md ring-1 ring-black/10 transition hover:bg-white md:h-12 md:w-12 md:bg-white/90 md:text-3xl"
           >
             ‹
           </button>
@@ -266,7 +298,7 @@ export default function BannerCarrossel({
             type="button"
             onClick={() => passo(1)}
             aria-label="Próximo painel"
-            className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/75 pb-1 text-2xl font-bold leading-none text-copamar-primary shadow-md ring-1 ring-black/10 transition hover:bg-white md:h-12 md:w-12 md:bg-white/90 md:text-3xl md:opacity-0 md:focus-visible:opacity-100 md:group-focus-within:opacity-100 md:group-hover:opacity-100"
+            className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/75 pb-1 text-2xl font-bold leading-none text-copamar-primary shadow-md ring-1 ring-black/10 transition hover:bg-white md:h-12 md:w-12 md:bg-white/90 md:text-3xl"
           >
             ›
           </button>
