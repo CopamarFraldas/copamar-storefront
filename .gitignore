@@ -67,3 +67,4 @@ package-lock.json
 
 # mídia oficial Tena (96MB — backup em gdrive:Medusa-Assets, não no git)
 public/produtos/tena/
+.next.bak/
