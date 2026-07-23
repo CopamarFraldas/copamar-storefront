@@ -206,6 +206,13 @@ export async function registrarEntrega(
   if (!SUPA || !KEY) return { ok: false, erro: "Banco não configurado." }
   const numero_pedido = String(formData.get("numero_pedido") || "")
   if (!numero_pedido) return { ok: false, erro: "Pedido não informado." }
+  // Fechamento RETROATIVO (pendências de dias anteriores, 23/07): data_rota da
+  // parada original (até 7 dias atrás). Fora disso, vale hoje — e o aviso de
+  // WhatsApp pro cliente é PULADO no retroativo (ele já recebeu lá atrás).
+  const _dr = String(formData.get("data_rota") || "")
+  const _limite = new Date(Date.now() - 3 * 3600 * 1000 - 7 * 86400_000).toISOString().slice(0, 10)
+  const dataRotaAlvo = /^\d{4}-\d{2}-\d{2}$/.test(_dr) && _dr < hojeBR() && _dr >= _limite ? _dr : hojeBR()
+  const retroativo = dataRotaAlvo !== hojeBR()
   const nome = String(formData.get("recebedor_nome") || "").trim()
   const cpf = String(formData.get("recebedor_cpf") || "").replace(/\D/g, "")
   const gps_lat = formData.get("gps_lat") ? Number(formData.get("gps_lat")) : null
@@ -252,7 +259,7 @@ export async function registrarEntrega(
     // devolvida traz celular/nome que o cruzamento Bling pode ter preenchido
     // DEPOIS da tela do Dedé carregar.
     const r = await fetch(
-      `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${hojeBR()}&numero_pedido=eq.${encodeURIComponent(numero_pedido)}`,
+      `${SUPA}/rest/v1/entregas_frota?data_rota=eq.${dataRotaAlvo}&numero_pedido=eq.${encodeURIComponent(numero_pedido)}`,
       {
         method: "PATCH",
         headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json", Prefer: "return=representation" },
@@ -264,7 +271,7 @@ export async function registrarEntrega(
     if (gravou) {
       const cel = celular || linhas[0]?.celular
       const nome = nome_cliente || linhas[0]?.nome_cliente
-      if (!(await avisoRepetido(numero_pedido, cel, "entregue"))) {
+      if (!retroativo && !(await avisoRepetido(numero_pedido, cel, "entregue"))) {
         await enviarWhatsApp(cel, mensagemCliente("entregue", nome), numero_pedido)
       }
     }

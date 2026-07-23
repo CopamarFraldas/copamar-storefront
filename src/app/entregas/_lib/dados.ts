@@ -25,6 +25,7 @@ export type Parada = {
   instrucao_cliente: string | null
   dest_lat: number | null
   dest_long: number | null
+  data_rota?: string
 }
 
 const SUPA = process.env.SUPABASE_URL
@@ -56,6 +57,7 @@ function normaliza(p: any): Parada {
     instrucao_cliente: p.instrucao_cliente ?? null,
     dest_lat: typeof p.dest_lat === "number" ? p.dest_lat : null,
     dest_long: typeof p.dest_long === "number" ? p.dest_long : null,
+    data_rota: p.data_rota ?? undefined,
   }
 }
 
@@ -66,6 +68,26 @@ function normaliza(p: any): Parada {
  * falsas em produção (auditoria 11/06). O JSON anonimizado fica só pra dev sem
  * banco configurado. Dado real de cliente vive no Supabase, não no git.
  */
+/** Pendências de dias ANTERIORES (adiado/ausente/pendente, últimos 3 dias) —
+ * caso 20814/20822 23/07: o Dedé entregava no dia seguinte mas a rota velha não
+ * abria mais no app e a parada ficava órfã como "adiado" fantasma. */
+export async function getPendencias(motoristaId?: string | null): Promise<Parada[]> {
+  if (!SUPA || !KEY) return []
+  try {
+    const hoje = hojeBR()
+    const desde = new Date(Date.now() - 3 * 3600 * 1000 - 3 * 86400_000).toISOString().slice(0, 10)
+    const filtroMot = motoristaId ? `&motorista=eq.${encodeURIComponent(motoristaId)}` : ""
+    const r = await fetch(
+      `${SUPA}/rest/v1/entregas_frota?data_rota=gte.${desde}&data_rota=lt.${hoje}&status=in.(adiado,ausente,pendente)${filtroMot}&order=data_rota,ordem`,
+      { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }, cache: "no-store" }
+    )
+    if (!r.ok) return []
+    return ((await r.json()) as any[]).map(normaliza)
+  } catch {
+    return []
+  }
+}
+
 export async function getRota(motoristaId?: string | null): Promise<Parada[]> {
   if (!SUPA || !KEY) {
     // dev sem banco: rota demo anonimizada
